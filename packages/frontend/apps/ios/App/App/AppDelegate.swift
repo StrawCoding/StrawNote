@@ -31,8 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
   }
 
-  private func findAffineViewController(from root: UIViewController) -> AFFiNEViewController? {
-    if let affine = root as? AFFiNEViewController {
+  private func findAffineViewController(from root: UIViewController) -> StrawNoteViewController? {
+    if let affine = root as? StrawNoteViewController {
       return affine
     }
     if let navigation = root as? UINavigationController {

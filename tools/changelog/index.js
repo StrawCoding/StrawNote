@@ -159,7 +159,7 @@ const messageHead =
 
 - [${DEPLOYED_URL}](${DEPLOYED_URL})
 `
-    : `# AFFiNE Client ${FLAVOR} released`;
+    : `# StrawNote Client ${FLAVOR} released`;
 
 let changelogMessage = `${messageHead}
 

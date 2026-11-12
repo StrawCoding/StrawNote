@@ -18,7 +18,7 @@ import {
 } from '@affine/core/modules/import';
 import { UrlService } from '@affine/core/modules/url';
 import {
-  getAFFiNEWorkspaceSchema,
+  getStrawNoteWorkspaceSchema,
   type WorkspaceMetadata,
   WorkspaceService,
 } from '@affine/core/modules/workspace';
@@ -298,7 +298,7 @@ const importConfigs: Record<ImportType, ImportConfig> = {
         const fileName = file.name.split('.').slice(0, -1).join('.');
         const docId = await MarkdownTransformer.importMarkdownToDoc({
           collection: docCollection,
-          schema: getAFFiNEWorkspaceSchema(),
+          schema: getStrawNoteWorkspaceSchema(),
           markdown: text,
           fileName,
           extensions: getStoreManager().config.init().value.get('store'),
@@ -332,7 +332,7 @@ const importConfigs: Record<ImportType, ImportConfig> = {
         const fileName = file.name.split('.').slice(0, -1).join('.');
         const docId = await HtmlTransformer.importHTMLToDoc({
           collection: docCollection,
-          schema: getAFFiNEWorkspaceSchema(),
+          schema: getStrawNoteWorkspaceSchema(),
           extensions: getStoreManager().config.init().value.get('store'),
           html: text,
           fileName,
@@ -394,7 +394,7 @@ const importConfigs: Record<ImportType, ImportConfig> = {
       for (const file of files) {
         const docId = await DocxTransformer.importDocx({
           collection: docCollection,
-          schema: getAFFiNEWorkspaceSchema(),
+          schema: getStrawNoteWorkspaceSchema(),
           imported: file,
           extensions: getStoreManager().config.init().value.get('store'),
         });
@@ -413,7 +413,7 @@ const importConfigs: Record<ImportType, ImportConfig> = {
       const docIds = (
         await ZipTransformer.importDocs(
           docCollection,
-          getAFFiNEWorkspaceSchema(),
+          getStrawNoteWorkspaceSchema(),
           file
         )
       )

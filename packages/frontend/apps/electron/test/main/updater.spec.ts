@@ -19,7 +19,7 @@ import {
 } from 'vitest';
 
 import {
-  AFFiNEUpdateProvider,
+  StrawNoteUpdateProvider,
   availableForMyPlatformAndInstaller,
 } from '../../src/main/updater/affine-update-provider';
 import { MockedAppAdapter, MockedUpdater } from './mocks';
@@ -96,7 +96,7 @@ describe('testing for client update', () => {
         const updater = new MockedUpdater(null, app);
 
         updater.setFeedURL(
-          AFFiNEUpdateProvider.configFeed({
+          StrawNoteUpdateProvider.configFeed({
             channel: buildType as any,
           })
         );
@@ -188,7 +188,7 @@ describe('testing for client update', () => {
 
         const updater = new MockedUpdater(null, new MockedAppAdapter('0.10.0'));
         updater.setFeedURL(
-          AFFiNEUpdateProvider.configFeed({ channel: 'canary' })
+          StrawNoteUpdateProvider.configFeed({ channel: 'canary' })
         );
 
         if (error) {

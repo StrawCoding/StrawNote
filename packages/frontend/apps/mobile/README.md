@@ -1,3 +1,3 @@
 # mobile
 
-AFFiNE Mobile Edition Web app.
+StrawNote Mobile Edition Web app.

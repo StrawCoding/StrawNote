@@ -1,7 +1,7 @@
 {
   "name": "@affine/android",
   "version": "0.27.5",
-  "description": "AFFiNE Desktop Web application",
+  "description": "StrawNote Desktop Web application",
   "private": true,
   "scripts": {
     "build": "affine bundle",

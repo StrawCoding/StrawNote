@@ -27,6 +27,15 @@ git merge affine/canary
 ---
 
 
+
+### 品牌命名
+
+- 產品顯示名稱：**StrawNote**（稻草筆記）
+- Deep link scheme：`strawnote://`（含 canary/beta/internal/dev）
+- Electron productName／App ID：`StrawNote`／`com.strawcoding.strawnote*`
+- npm 工作區套件仍為 `@affine/*`（內部模組路徑，避免一次大規模改 import）
+- Android Java package 仍為 `app.affine.pro`（顯示名已改 StrawNote；完整改 package 另開）
+
 ### StrawNote 映像／更新來源
 
 - GitHub：https://github.com/StrawCoding/StrawNote

@@ -1,6 +1,6 @@
 # Android
 
-AFFiNE Android app.
+StrawNote Android app.
 
 ## Setup
 

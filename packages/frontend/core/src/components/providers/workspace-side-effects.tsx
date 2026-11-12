@@ -28,7 +28,7 @@ import { QuickSearchContainer } from '@affine/core/modules/quicksearch';
 import { NbstoreService } from '@affine/core/modules/storage';
 import { WorkbenchService } from '@affine/core/modules/workbench';
 import {
-  getAFFiNEWorkspaceSchema,
+  getStrawNoteWorkspaceSchema,
   WorkspaceService,
 } from '@affine/core/modules/workspace';
 import { useI18n } from '@affine/i18n';
@@ -73,7 +73,7 @@ export const WorkspaceSideEffects = () => {
           throwIfAborted(abort);
           const [doc] = await ZipTransformer.importDocs(
             currentWorkspace.docCollection,
-            getAFFiNEWorkspaceSchema(),
+            getStrawNoteWorkspaceSchema(),
             templateBlob
           );
           if (doc) {

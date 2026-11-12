@@ -18,7 +18,7 @@ import { Doc as YDoc } from 'yjs';
 
 import type { DefaultServerService, WorkspaceServerService } from '../../cloud';
 import {
-  getAFFiNEWorkspaceSchema,
+  getStrawNoteWorkspaceSchema,
   type WorkspaceService,
 } from '../../workspace';
 import { WorkspaceImpl } from '../../workspace/impls/workspace';
@@ -69,7 +69,7 @@ export class SnapshotHelper extends Service {
   // todo: cache the transformer?
   getTransformer() {
     const collection = this.getTempWorkspace();
-    const schema = getAFFiNEWorkspaceSchema();
+    const schema = getStrawNoteWorkspaceSchema();
     const imageProxyUrl = new URL(
       BUILD_CONFIG.imageProxyUrl,
       this.serverService.baseUrl

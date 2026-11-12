@@ -14,10 +14,10 @@ test.describe('AIAction/ChangeTone', () => {
   }) => {
     const { changeTone } = await utils.editor.askAIWithText(
       page,
-      'AFFiNE is a great note-taking app'
+      'StrawNote is a great note-taking app'
     );
     const { answer, responses } = await changeTone('informal');
-    await expect(answer).toHaveText(/AFFiNE/, { timeout: 10000 });
+    await expect(answer).toHaveText(/StrawNote/, { timeout: 10000 });
     expect(responses).toEqual(new Set(['insert-below', 'replace-selection']));
   });
 
@@ -30,13 +30,13 @@ test.describe('AIAction/ChangeTone', () => {
       async () => {
         await utils.editor.createEdgelessText(
           page,
-          'AFFiNE is a great note-taking app'
+          'StrawNote is a great note-taking app'
         );
       }
     );
 
     const { answer, responses } = await changeTone('informal');
-    await expect(answer).toHaveText(/AFFiNE/, { timeout: 10000 });
+    await expect(answer).toHaveText(/StrawNote/, { timeout: 10000 });
     expect(responses).toEqual(new Set(['insert-below']));
   });
 
@@ -49,13 +49,13 @@ test.describe('AIAction/ChangeTone', () => {
       async () => {
         await utils.editor.createEdgelessNote(
           page,
-          'AFFiNE is a great note-taking app'
+          'StrawNote is a great note-taking app'
         );
       }
     );
 
     const { answer, responses } = await changeTone('informal');
-    await expect(answer).toHaveText(/AFFiNE/, { timeout: 10000 });
+    await expect(answer).toHaveText(/StrawNote/, { timeout: 10000 });
     expect(responses).toEqual(new Set(['insert-below']));
   });
 
@@ -65,7 +65,7 @@ test.describe('AIAction/ChangeTone', () => {
   }) => {
     const { changeTone } = await utils.editor.askAIWithText(
       page,
-      'AFFiNE is a great note-taking app'
+      'StrawNote is a great note-taking app'
     );
     const { answer } = await changeTone('informal');
     const replace = answer.getByTestId('answer-replace');
@@ -80,7 +80,7 @@ test.describe('AIAction/ChangeTone', () => {
       prompt,
       actionName,
     } = await utils.chatPanel.getLatestAIActionMessage(page);
-    await expect(panelAnswer).toHaveText(/AFFiNE/);
+    await expect(panelAnswer).toHaveText(/StrawNote/);
     await expect(prompt).toHaveText(/Change tone/);
     await expect(actionName).toHaveText(/Change tone/);
   });

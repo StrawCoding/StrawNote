@@ -16,7 +16,7 @@ platform :ios do
   lane :archive do
     provisioning_profiles = {}
     {
-      'AFFiNE' => ['app.affine.pro', 'BUILD_PROVISION_PROFILE_PATH'],
+      'StrawNote' => ['app.affine.pro', 'BUILD_PROVISION_PROFILE_PATH'],
       'ShareExtension' => ['app.affine.pro.ShareExtension', 'BUILD_PROVISION_PROFILE_SHARE_EXTENSION_PATH']
     }.each do |target, (bundle_identifier, profile_env)|
       profile_path = ENV.fetch(profile_env)
@@ -38,7 +38,7 @@ platform :ios do
     increment_build_number(xcodeproj: 'App.xcodeproj', build_number: current_build_number + 1)
     build_app(
       workspace: 'App.xcworkspace', scheme: 'App', configuration: 'Release',
-      output_directory: 'release', output_name: 'AFFiNE.ipa',
+      output_directory: 'release', output_name: 'StrawNote.ipa',
       export_method: 'app-store', skip_profile_detection: true,
       export_options: {signingStyle: 'manual', provisioningProfiles: provisioning_profiles}
     )

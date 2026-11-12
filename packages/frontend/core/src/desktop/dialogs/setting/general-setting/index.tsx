@@ -27,7 +27,7 @@ import { ExperimentalFeatures } from './experimental-features';
 import { PaymentIcon, UpgradeIcon } from './icons';
 import { MeetingsSettings } from './meetings';
 import { NotificationSettings } from './notifications';
-import { AFFiNEPricingPlans } from './plans';
+import { StrawNotePricingPlans } from './plans';
 import { Shortcuts } from './shortcuts';
 
 export type GeneralSettingList = SettingSidebarItem[];
@@ -143,7 +143,7 @@ export const useGeneralSettingList = (): GeneralSettingList => {
       },
       {
         key: 'about',
-        title: t['com.affine.aboutAFFiNE.title'](),
+        title: t['com.affine.aboutStrawNote.title'](),
         icon: <InformationIcon />,
         testId: 'about-panel-trigger',
       }
@@ -181,7 +181,7 @@ export const GeneralSetting = ({
     case 'about':
       return <AboutAffine />;
     case 'plans':
-      return <AFFiNEPricingPlans />;
+      return <StrawNotePricingPlans />;
     case 'billing':
       return <BillingSettings onChangeSettingState={onChangeSettingState} />;
     case 'experimental-features':

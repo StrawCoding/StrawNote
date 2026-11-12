@@ -14,10 +14,10 @@ test.describe('AIAction/ImproveWriting', () => {
   }) => {
     const { improveWriting } = await utils.editor.askAIWithText(
       page,
-      'AFFiNE is so smart'
+      'StrawNote is so smart'
     );
     const { answer, responses } = await improveWriting();
-    await expect(answer).toHaveText(/AFFiNE/, { timeout: 10000 });
+    await expect(answer).toHaveText(/StrawNote/, { timeout: 10000 });
     expect(responses).toEqual(new Set(['insert-below', 'replace-selection']));
   });
 
@@ -28,11 +28,11 @@ test.describe('AIAction/ImproveWriting', () => {
     const { improveWriting } = await utils.editor.askAIWithEdgeless(
       page,
       async () => {
-        await utils.editor.createEdgelessText(page, 'AFFiNE is so smart');
+        await utils.editor.createEdgelessText(page, 'StrawNote is so smart');
       }
     );
     const { answer, responses } = await improveWriting();
-    await expect(answer).toHaveText(/AFFiNE/, { timeout: 10000 });
+    await expect(answer).toHaveText(/StrawNote/, { timeout: 10000 });
     expect(responses).toEqual(new Set(['insert-below']));
   });
 
@@ -43,11 +43,11 @@ test.describe('AIAction/ImproveWriting', () => {
     const { improveWriting } = await utils.editor.askAIWithEdgeless(
       page,
       async () => {
-        await utils.editor.createEdgelessNote(page, 'AFFiNE is so smart');
+        await utils.editor.createEdgelessNote(page, 'StrawNote is so smart');
       }
     );
     const { answer, responses } = await improveWriting();
-    await expect(answer).toHaveText(/AFFiNE/, { timeout: 10000 });
+    await expect(answer).toHaveText(/StrawNote/, { timeout: 10000 });
     expect(responses).toEqual(new Set(['insert-below']));
   });
 
@@ -57,10 +57,10 @@ test.describe('AIAction/ImproveWriting', () => {
   }) => {
     const { improveWriting } = await utils.editor.askAIWithText(
       page,
-      'AFFiNE is so smart'
+      'StrawNote is so smart'
     );
     const { answer } = await improveWriting();
-    await expect(answer).toHaveText(/AFFiNE/, { timeout: 10000 });
+    await expect(answer).toHaveText(/StrawNote/, { timeout: 10000 });
     const replace = answer.getByTestId('answer-replace');
     await replace.click();
     await utils.chatPanel.waitForHistory(page, [
@@ -73,7 +73,7 @@ test.describe('AIAction/ImproveWriting', () => {
       prompt,
       actionName,
     } = await utils.chatPanel.getLatestAIActionMessage(page);
-    await expect(panelAnswer).toHaveText(/AFFiNE/);
+    await expect(panelAnswer).toHaveText(/StrawNote/);
     await expect(prompt).toHaveText(/Improve the follow text/);
     await expect(actionName).toHaveText(/Improve writing for it/);
   });

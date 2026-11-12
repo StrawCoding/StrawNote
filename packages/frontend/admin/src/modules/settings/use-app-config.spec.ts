@@ -80,7 +80,7 @@ describe('useAppConfig', () => {
     mocked.setQueryState({
       appConfig: {
         server: {
-          name: 'AFFiNE',
+          name: 'StrawNote',
           hosts: ['localhost'],
         },
         auth: {
@@ -108,12 +108,12 @@ describe('useAppConfig', () => {
     const { result } = renderHook(() => useAppConfig());
 
     act(() => {
-      result.current.update('server/name', 'AFFiNE Cloud');
+      result.current.update('server/name', 'StrawNote Cloud');
     });
     expect(result.current.isGroupDirty('server')).toBe(true);
 
     act(() => {
-      result.current.update('server/name', 'AFFiNE');
+      result.current.update('server/name', 'StrawNote');
     });
     expect(result.current.isGroupDirty('server')).toBe(false);
   });
@@ -122,7 +122,7 @@ describe('useAppConfig', () => {
     const { result } = renderHook(() => useAppConfig());
 
     act(() => {
-      result.current.update('server/name', 'AFFiNE Cloud');
+      result.current.update('server/name', 'StrawNote Cloud');
       result.current.update('auth/allowSignup', false);
     });
 
@@ -135,7 +135,7 @@ describe('useAppConfig', () => {
 
     expect(result.current.isGroupDirty('server')).toBe(false);
     expect(result.current.isGroupDirty('auth')).toBe(true);
-    expect(result.current.patchedAppConfig.server.name).toBe('AFFiNE');
+    expect(result.current.patchedAppConfig.server.name).toBe('StrawNote');
     expect(result.current.getGroupVersion('server')).toBe(1);
   });
 
@@ -143,21 +143,21 @@ describe('useAppConfig', () => {
     const { result } = renderHook(() => useAppConfig());
 
     act(() => {
-      result.current.update('server/name', 'AFFiNE Cloud');
+      result.current.update('server/name', 'StrawNote Cloud');
       result.current.update('auth/allowSignup', false);
     });
 
     mocked.saveUpdatesMock.mockResolvedValue({
       updateAppConfig: {
         server: {
-          name: 'AFFiNE Cloud',
+          name: 'StrawNote Cloud',
         },
       },
     });
     mocked.mutateMock.mockResolvedValue({
       appConfig: {
         ...mocked.getQueryState().appConfig,
-        server: { name: 'AFFiNE Cloud', hosts: ['localhost'] },
+        server: { name: 'StrawNote Cloud', hosts: ['localhost'] },
       },
     });
 
@@ -170,13 +170,13 @@ describe('useAppConfig', () => {
         {
           module: 'server',
           key: 'name',
-          value: 'AFFiNE Cloud',
+          value: 'StrawNote Cloud',
         },
       ],
     });
     expect(result.current.isGroupDirty('server')).toBe(false);
     expect(result.current.isGroupDirty('auth')).toBe(true);
-    expect(result.current.patchedAppConfig.server.name).toBe('AFFiNE Cloud');
+    expect(result.current.patchedAppConfig.server.name).toBe('StrawNote Cloud');
     expect(result.current.getGroupVersion('server')).toBe(1);
     expect(mocked.notifySuccessMock).toHaveBeenCalledTimes(1);
   });

@@ -49,13 +49,13 @@ interface UpdateProviderOptions {
   channel: typeof buildType;
 }
 
-export class AFFiNEUpdateProvider extends Provider<GithubUpdateInfo> {
+export class StrawNoteUpdateProvider extends Provider<GithubUpdateInfo> {
   static configFeed(options: UpdateProviderOptions): CustomPublishOptions {
     return {
       provider: 'custom',
       // StrawNote: read releases from our GitHub repo (not affine.pro).
       feedUrl: 'https://api.github.com/repos/StrawCoding/StrawNote/releases',
-      updateProvider: AFFiNEUpdateProvider,
+      updateProvider: StrawNoteUpdateProvider,
       ...options,
     };
   }
@@ -196,9 +196,9 @@ type VersionDistribution = 'canary' | 'beta' | 'stable';
 type VersionPlatform = 'windows' | 'macos' | 'linux';
 type VersionArch = 'x64' | 'arm64';
 type FileParts =
-  | ['affine', string, VersionDistribution, VersionPlatform, VersionArch]
+  | ['affine' | 'strawnote', string, VersionDistribution, VersionPlatform, VersionArch]
   | [
-      'affine',
+      'affine' | 'strawnote',
       string,
       `${'canary' | 'beta'}.${number}`,
       VersionDistribution,
@@ -220,7 +220,7 @@ export function availableForMyPlatformAndInstaller(
   const imLinux = platform === 'linux';
 
   //  in form of:
-  //   affine-${build}-${buildSuffix}-${distribution}-${platform}-${arch}.${installer}
+  //   strawnote-${build}-${buildSuffix}-${distribution}-${platform}-${arch}.${installer}
   //          ^ 1.0.0    ^canary.1    ^ canary        ^windows    ^ x64  ^.nsis.exe
   const filename = file.split('/').pop();
 

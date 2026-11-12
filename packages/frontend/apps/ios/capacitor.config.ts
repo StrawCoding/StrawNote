@@ -13,14 +13,14 @@ interface AppConfig {
 }
 
 const config: CapacitorConfig & AppConfig = {
-  appId: 'app.affine.pro',
-  appName: 'AFFiNE',
+  appId: 'com.strawcoding.strawnote',
+  appName: 'StrawNote',
   webDir: 'dist',
   affineVersion: packageJson.version,
   ios: {
-    scheme: 'AFFiNE',
+    scheme: 'StrawNote',
     path: '.',
-    appendUserAgent: `iOS AFFiNE/${packageJson.version}`,
+    appendUserAgent: `iOS StrawNote/${packageJson.version}`,
     webContentsDebuggingEnabled: true,
     // Silence Capacitor's bridge logging (⚡️ TO JS / ⚡️ To Native -> / ⚡️ [log]).
     loggingBehavior: 'none',

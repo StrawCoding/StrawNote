@@ -92,7 +92,7 @@ const SubscriptionBilling = () => {
           ? 'com.affine.payment.billing-setting.subscription-conflict'
           : 'com.affine.payment.billing-setting.subscription-manageable'
       ]({
-        planName: plan === SubscriptionPlan.AI ? 'AFFiNE AI' : 'AFFiNE Pro',
+        planName: plan === SubscriptionPlan.AI ? 'StrawNote AI' : 'StrawNote Pro',
       })}
     >
       <SettingRow

@@ -3,7 +3,7 @@ import Intelligents
 import UIKit
 import WebKit
 
-class AFFiNEViewController: CAPBridgeViewController, UIScrollViewDelegate, AffineThemeConfigurable {
+class StrawNoteViewController: CAPBridgeViewController, UIScrollViewDelegate, AffineThemeConfigurable {
   var intelligentsButton: IntelligentsButton?
   var appThemeUserInterfaceStyle: UIUserInterfaceStyle = .unspecified {
     didSet {

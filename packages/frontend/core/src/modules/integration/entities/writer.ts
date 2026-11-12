@@ -4,7 +4,7 @@ import { Entity } from '@toeverything/infra';
 
 import type { TagService } from '../../tag';
 import {
-  getAFFiNEWorkspaceSchema,
+  getStrawNoteWorkspaceSchema,
   type WorkspaceService,
 } from '../../workspace';
 
@@ -58,7 +58,7 @@ export class IntegrationWriter extends Entity {
     if (!docId) {
       const newDocId = await MarkdownTransformer.importMarkdownToDoc({
         collection: workspace.docCollection,
-        schema: getAFFiNEWorkspaceSchema(),
+        schema: getStrawNoteWorkspaceSchema(),
         markdown,
         fileName: title,
         extensions: getStoreManager().config.init().value.get('store'),

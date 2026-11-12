@@ -9,7 +9,7 @@ import {
 test('buildAuthenticationDeepLink', () => {
   const payload = { code: '1', next: '/workspace/123' };
   const url = buildAuthenticationDeepLink({
-    scheme: 'affine',
+    scheme: 'strawnote',
     method: 'open-app-signin',
     payload,
     server: 'https://app.affine.local',
@@ -17,7 +17,7 @@ test('buildAuthenticationDeepLink', () => {
 
   const parsed = new URL(url);
 
-  expect(parsed.protocol).toBe('affine:');
+  expect(parsed.protocol).toBe('strawnote:');
   expect(parsed.hostname).toBe('authentication');
   expect(parsed.searchParams.get('method')).toBe('open-app-signin');
   expect(parsed.searchParams.get('payload')).toBe(JSON.stringify(payload));
@@ -25,7 +25,7 @@ test('buildAuthenticationDeepLink', () => {
 });
 
 test('buildOpenAppUrlRoute', () => {
-  const urlToOpen = 'affine://authentication?method=oauth&payload=%7B%7D';
+  const urlToOpen = 'strawnote://authentication?method=oauth&payload=%7B%7D';
   const route = buildOpenAppUrlRoute(urlToOpen);
 
   const parsed = new URL(route, 'https://app.affine.local');

@@ -1,29 +1,29 @@
 import { z } from 'zod';
 
 export const appSchemes = z.enum([
-  'affine',
-  'affine-canary',
-  'affine-beta',
-  'affine-internal',
-  'affine-dev',
+  'strawnote',
+  'strawnote-canary',
+  'strawnote-beta',
+  'strawnote-internal',
+  'strawnote-dev',
 ]);
 
 export type Scheme = z.infer<typeof appSchemes>;
 export type Channel = 'stable' | 'canary' | 'beta' | 'internal';
 
 export const schemeToChannel = {
-  affine: 'stable',
-  'affine-canary': 'canary',
-  'affine-beta': 'beta',
-  'affine-internal': 'internal',
-  'affine-dev': 'canary', // dev does not have a dedicated app. use canary as the placeholder.
+  strawnote: 'stable',
+  'strawnote-canary': 'canary',
+  'strawnote-beta': 'beta',
+  'strawnote-internal': 'internal',
+  'strawnote-dev': 'canary', // dev does not have a dedicated app. use canary as the placeholder.
 } as Record<Scheme, Channel>;
 
 export const channelToScheme = {
-  stable: 'affine',
-  canary: BUILD_CONFIG.debug ? 'affine-dev' : 'affine-canary',
-  beta: 'affine-beta',
-  internal: 'affine-internal',
+  stable: 'strawnote',
+  canary: BUILD_CONFIG.debug ? 'strawnote-dev' : 'strawnote-canary',
+  beta: 'strawnote-beta',
+  internal: 'strawnote-internal',
 } as Record<Channel, Scheme>;
 
 export const appIconMap = {
@@ -34,10 +34,10 @@ export const appIconMap = {
 } satisfies Record<Channel, string>;
 
 export const appNames = {
-  stable: 'AFFiNE',
-  canary: 'AFFiNE Canary',
-  beta: 'AFFiNE Beta',
-  internal: 'AFFiNE Internal',
+  stable: 'StrawNote',
+  canary: 'StrawNote Canary',
+  beta: 'StrawNote Beta',
+  internal: 'StrawNote Internal',
 } satisfies Record<Channel, string>;
 
 export const appSchemaUrl = z.custom<string>(

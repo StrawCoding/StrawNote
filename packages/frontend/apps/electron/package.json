@@ -89,10 +89,16 @@
   "build": {
     "protocols": [
       {
-        "name": "affine",
+        "name": "strawnote",
         "schemes": [
-          "affine"
+          "strawnote",
+          "strawnote-canary",
+          "strawnote-beta",
+          "strawnote-internal",
+          "strawnote-dev"
         ]
+      }
+    ]
       }
     ]
   }

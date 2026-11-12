@@ -79,7 +79,7 @@ export function normalizeOpenAppSignInNextParam(
   return normalized;
 }
 
-// return an AFFiNE app's url to be opened in desktop app
+// return a StrawNote app's url to be opened in desktop app
 export const getOpenUrlInDesktopAppLink = (
   url: string,
   newTab = true,

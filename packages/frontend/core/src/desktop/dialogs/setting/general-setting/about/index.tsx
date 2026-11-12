@@ -54,11 +54,11 @@ export const AboutAffine = () => {
   return (
     <>
       <SettingHeader
-        title={t['com.affine.aboutAFFiNE.title']()}
-        subtitle={t['com.affine.aboutAFFiNE.subtitle']()}
+        title={t['com.affine.aboutStrawNote.title']()}
+        subtitle={t['com.affine.aboutStrawNote.subtitle']()}
         data-testid="about-title"
       />
-      <SettingWrapper title={t['com.affine.aboutAFFiNE.version.title']()}>
+      <SettingWrapper title={t['com.affine.aboutStrawNote.version.title']()}>
         <SettingRow
           name={appName}
           desc={BUILD_CONFIG.appVersion}
@@ -67,15 +67,15 @@ export const AboutAffine = () => {
           <img src={appIcon} alt={appName} width={56} height={56} />
         </SettingRow>
         <SettingRow
-          name={t['com.affine.aboutAFFiNE.version.editor.title']()}
+          name={t['com.affine.aboutStrawNote.version.editor.title']()}
           desc={BUILD_CONFIG.editorVersion}
         />
         {BUILD_CONFIG.isElectron ? (
           <>
             <UpdateCheckSection />
             <SettingRow
-              name={t['com.affine.aboutAFFiNE.autoCheckUpdate.title']()}
-              desc={t['com.affine.aboutAFFiNE.autoCheckUpdate.description']()}
+              name={t['com.affine.aboutStrawNote.autoCheckUpdate.title']()}
+              desc={t['com.affine.aboutStrawNote.autoCheckUpdate.description']()}
             >
               <Switch
                 checked={appSettings.autoCheckUpdate}
@@ -83,9 +83,9 @@ export const AboutAffine = () => {
               />
             </SettingRow>
             <SettingRow
-              name={t['com.affine.aboutAFFiNE.autoDownloadUpdate.title']()}
+              name={t['com.affine.aboutStrawNote.autoDownloadUpdate.title']()}
               desc={t[
-                'com.affine.aboutAFFiNE.autoDownloadUpdate.description'
+                'com.affine.aboutStrawNote.autoDownloadUpdate.description'
               ]()}
             >
               <Switch
@@ -94,8 +94,8 @@ export const AboutAffine = () => {
               />
             </SettingRow>
             <SettingRow
-              name={t['com.affine.aboutAFFiNE.changelog.title']()}
-              desc={t['com.affine.aboutAFFiNE.changelog.description']()}
+              name={t['com.affine.aboutStrawNote.changelog.title']()}
+              desc={t['com.affine.aboutStrawNote.changelog.description']()}
               style={{ cursor: 'pointer' }}
               onClick={() => {
                 urlService.openPopupWindow(BUILD_CONFIG.changelogUrl);
@@ -115,14 +115,14 @@ export const AboutAffine = () => {
           />
         </SettingRow>
       </SettingWrapper>
-      <SettingWrapper title={t['com.affine.aboutAFFiNE.contact.title']()}>
+      <SettingWrapper title={t['com.affine.aboutStrawNote.contact.title']()}>
         <a
           className={styles.link}
           rel="noreferrer"
           href="https://affine.pro"
           target="_blank"
         >
-          {t['com.affine.aboutAFFiNE.contact.website']()}
+          {t['com.affine.aboutStrawNote.contact.website']()}
           <OpenInNewIcon className="icon" />
         </a>
         <a
@@ -131,11 +131,11 @@ export const AboutAffine = () => {
           href="https://affine.pro/redirect/discord"
           target="_blank"
         >
-          {t['com.affine.aboutAFFiNE.contact.community']()}
+          {t['com.affine.aboutStrawNote.contact.community']()}
           <OpenInNewIcon className="icon" />
         </a>
       </SettingWrapper>
-      <SettingWrapper title={t['com.affine.aboutAFFiNE.community.title']()}>
+      <SettingWrapper title={t['com.affine.aboutStrawNote.community.title']()}>
         <div className={styles.communityWrapper}>
           {relatedLinks.map(({ icon, title, link }) => {
             return (
@@ -153,14 +153,14 @@ export const AboutAffine = () => {
           })}
         </div>
       </SettingWrapper>
-      <SettingWrapper title={t['com.affine.aboutAFFiNE.legal.title']()}>
+      <SettingWrapper title={t['com.affine.aboutStrawNote.legal.title']()}>
         <a
           className={styles.link}
           rel="noreferrer"
           href="https://affine.pro/privacy"
           target="_blank"
         >
-          {t['com.affine.aboutAFFiNE.legal.privacy']()}
+          {t['com.affine.aboutStrawNote.legal.privacy']()}
           <OpenInNewIcon className="icon" />
         </a>
         <a
@@ -169,7 +169,7 @@ export const AboutAffine = () => {
           href="https://affine.pro/terms"
           target="_blank"
         >
-          {t['com.affine.aboutAFFiNE.legal.tos']()}
+          {t['com.affine.aboutStrawNote.legal.tos']()}
           <OpenInNewIcon className="icon" />
         </a>
       </SettingWrapper>

@@ -225,7 +225,7 @@ const LocalWorkspaces = ({
   );
 };
 
-export const AFFiNEWorkspaceList = ({
+export const StrawNoteWorkspaceList = ({
   onEventEnd,
   onClickWorkspace,
   showEnableCloudButton,

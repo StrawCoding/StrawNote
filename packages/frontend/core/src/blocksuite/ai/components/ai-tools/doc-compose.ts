@@ -1,5 +1,5 @@
 import { getStoreManager } from '@affine/core/blocksuite/manager/store';
-import { getAFFiNEWorkspaceSchema } from '@affine/core/modules/workspace';
+import { getStrawNoteWorkspaceSchema } from '@affine/core/modules/workspace';
 import { getEmbedLinkedDocIcons } from '@blocksuite/affine/blocks/embed-doc';
 import { RefNodeSlotsProvider } from '@blocksuite/affine/inlines/reference';
 import type { ColorScheme } from '@blocksuite/affine/model';
@@ -163,7 +163,7 @@ export class DocComposeTool extends ArtifactTool<
         const refNodeSlots = std.getOptional(RefNodeSlotsProvider);
         const docId = await MarkdownTransformer.importMarkdownToDoc({
           collection: workspace,
-          schema: getAFFiNEWorkspaceSchema(),
+          schema: getStrawNoteWorkspaceSchema(),
           markdown: successResult.markdown,
           fileName: title,
           extensions: getStoreManager().config.init().value.get('store'),

@@ -14,7 +14,7 @@ test.describe('AIAction/WriteAnPoemAboutThis', () => {
   }) => {
     const { writePoem } = await utils.editor.askAIWithText(
       page,
-      'AFFiNE is a workspace with fully merged docs'
+      'StrawNote is a workspace with fully merged docs'
     );
     const { answer, responses } = await writePoem();
     await expect(answer.locator('text-renderer')).toContainText(/\S/);
@@ -30,7 +30,7 @@ test.describe('AIAction/WriteAnPoemAboutThis', () => {
       async () => {
         await utils.editor.createEdgelessText(
           page,
-          'AFFiNE is a workspace with fully merged docs'
+          'StrawNote is a workspace with fully merged docs'
         );
       }
     );
@@ -48,7 +48,7 @@ test.describe('AIAction/WriteAnPoemAboutThis', () => {
       async () => {
         await utils.editor.createEdgelessNote(
           page,
-          'AFFiNE is a workspace with fully merged docs'
+          'StrawNote is a workspace with fully merged docs'
         );
       }
     );
@@ -63,10 +63,10 @@ test.describe('AIAction/WriteAnPoemAboutThis', () => {
   }) => {
     const { writePoem } = await utils.editor.askAIWithText(
       page,
-      'AFFiNE is a workspace with fully merged docs'
+      'StrawNote is a workspace with fully merged docs'
     );
     const { answer } = await writePoem();
-    await expect(answer).toHaveText(/AFFiNE/);
+    await expect(answer).toHaveText(/StrawNote/);
     const replace = answer.getByTestId('answer-replace');
     await replace.click();
     await utils.chatPanel.waitForHistory(page, [
@@ -79,7 +79,7 @@ test.describe('AIAction/WriteAnPoemAboutThis', () => {
       prompt,
       actionName,
     } = await utils.chatPanel.getLatestAIActionMessage(page);
-    await expect(panelAnswer).toHaveText(/AFFiNE/);
+    await expect(panelAnswer).toHaveText(/StrawNote/);
     await expect(prompt).toHaveText(/Write a poem about this/);
     await expect(actionName).toHaveText(/Write a poem about this/);
   });

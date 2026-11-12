@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const outputRoot = fileURLToPath(
   new URL(
-    '../out/canary/AFFiNE-canary-darwin-arm64/AFFiNE-canary.app/Contents/Resources',
+    '../out/canary/StrawNote-canary-darwin-arm64/StrawNote-canary.app/Contents/Resources',
     import.meta.url
   )
 );

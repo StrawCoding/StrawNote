@@ -9,7 +9,7 @@ import Intelligents
 import UIKit
 import WebKit
 
-extension AFFiNEViewController: IntelligentsButtonDelegate {
+extension StrawNoteViewController: IntelligentsButtonDelegate {
   private static let aiConsentKey = "com.affine.intelligents.userConsented"
 
   private var hasUserConsented: Bool {
@@ -126,7 +126,7 @@ extension AFFiNEViewController: IntelligentsButtonDelegate {
   @MainActor
   private func showAIErrorAlert(_ error: Error) {
     let alert = UIAlertController(
-      title: "Unable to open AFFiNE AI",
+      title: "Unable to open StrawNote AI",
       message: error.localizedDescription,
       preferredStyle: .alert
     )

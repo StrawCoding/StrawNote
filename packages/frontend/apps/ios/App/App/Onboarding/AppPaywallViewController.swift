@@ -191,7 +191,7 @@ enum AppPaywallPlan: String, CaseIterable {
     case .lite:
       [
         "Sync docs and boards across all devices",
-        "Access AFFiNE on Mac, Windows, Linux, Web, iPhone, and Android",
+        "Access StrawNote on Mac, Windows, Linux, Web, iPhone, and Android",
         "Upload files larger than 10 MB",
         "Secure cloud backup for your content",
         "Pick up where you left off, anytime",

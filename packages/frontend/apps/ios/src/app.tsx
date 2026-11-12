@@ -40,7 +40,7 @@ import {
   WorkbenchService,
 } from '@affine/core/modules/workbench';
 import {
-  getAFFiNEWorkspaceSchema,
+  getStrawNoteWorkspaceSchema,
   WorkspacesService,
 } from '@affine/core/modules/workspace';
 import { configureBrowserWorkspaceFlavours } from '@affine/core/modules/workspace-engine';
@@ -629,7 +629,7 @@ const showNativeSignIn = async () => {
     await workspace.engine.doc.waitForDocReady(workspace.id);
     const docId = await MarkdownTransformer.importMarkdownToDoc({
       collection: workspace.docCollection,
-      schema: getAFFiNEWorkspaceSchema(),
+      schema: getStrawNoteWorkspaceSchema(),
       markdown,
       extensions: getStoreManager().config.init().value.get('store'),
     });

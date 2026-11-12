@@ -36,7 +36,7 @@ export class RunCommand extends PackageCommand {
   static override paths = [[], ['run'], ['r']];
 
   static override usage = PackageCommand.Usage({
-    description: 'AFFiNE Monorepo scripts',
+    description: 'StrawNote Monorepo scripts',
     details: `
       \`affine web <script>\`    Run any script defined in package's package.json
 
@@ -148,8 +148,8 @@ export class RunCommand extends PackageCommand {
       }
     }
 
-    const isAFFiNECommand = args[0] === 'affine';
-    if (isAFFiNECommand) {
+    const isStrawNoteCommand = args[0] === 'affine';
+    if (isStrawNoteCommand) {
       // remove 'affine' from 'affine xxx' command
       args.shift();
       args.push('-p', pkg.name);

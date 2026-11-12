@@ -15,8 +15,8 @@ interface AppConfig {
 }
 
 const config: CapacitorConfig & AppConfig = {
-  appId: 'app.affine.pro',
-  appName: 'AFFiNE',
+  appId: 'com.strawcoding.strawnote',
+  appName: 'StrawNote',
   webDir: 'dist',
   affineVersion: packageJson.version,
   android: {

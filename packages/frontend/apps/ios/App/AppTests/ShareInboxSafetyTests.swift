@@ -59,7 +59,7 @@ final class ShareInboxSafetyTests: XCTestCase {
     )
     var data = renderer.pdfData { context in
       context.beginPage()
-      "AFFiNE PDF share preview".draw(at: CGPoint(x: 24, y: 24), withAttributes: nil)
+      "StrawNote PDF share preview".draw(at: CGPoint(x: 24, y: 24), withAttributes: nil)
     }
     data.append(Data(repeating: 0x20, count: max(0, size - data.count)))
     return data

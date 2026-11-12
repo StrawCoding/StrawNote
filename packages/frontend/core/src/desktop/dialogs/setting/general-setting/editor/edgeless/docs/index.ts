@@ -1,4 +1,4 @@
-import { getAFFiNEWorkspaceSchema } from '@affine/core/modules/workspace';
+import { getStrawNoteWorkspaceSchema } from '@affine/core/modules/workspace';
 import { WorkspaceImpl } from '@affine/core/modules/workspace/impls/workspace';
 import type { DocSnapshot, Store } from '@blocksuite/affine/store';
 import { Transformer } from '@blocksuite/affine/store';
@@ -87,7 +87,7 @@ async function initDoc(name: DocName) {
   const snapshot = (await loaders[name]()) as DocSnapshot;
   const collection = getCollection();
   const transformer = new Transformer({
-    schema: getAFFiNEWorkspaceSchema(),
+    schema: getStrawNoteWorkspaceSchema(),
     blobCRUD: collection.blobSync,
     docCRUD: {
       create: (id: string) => collection.createDoc(id).getStore({ id }),

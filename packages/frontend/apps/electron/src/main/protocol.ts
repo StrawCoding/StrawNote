@@ -51,9 +51,9 @@ async function resolveWhitelistedLocalPath(filepath: string) {
 }
 
 const apiBaseByBuildType: Record<typeof buildType, string> = {
-  stable: 'https://app.affine.pro',
-  beta: 'https://insider.affine.pro',
-  internal: 'https://insider.affine.pro',
+  stable: 'https://notes.wastebase.xyz',
+  beta: 'https://notes.wastebase.xyz',
+  internal: 'https://notes.wastebase.xyz',
   canary: 'https://affine.fail',
 };
 

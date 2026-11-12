@@ -14,10 +14,10 @@ test.describe('AIAction/MakeItLonger', () => {
   }) => {
     const { makeItLonger } = await utils.editor.askAIWithText(
       page,
-      'AFFiNE is a workspace with fully merged docs'
+      'StrawNote is a workspace with fully merged docs'
     );
     const { answer, responses } = await makeItLonger();
-    await expect(answer).toHaveText(/AFFiNE/, { timeout: 10000 });
+    await expect(answer).toHaveText(/StrawNote/, { timeout: 10000 });
     expect(responses).toEqual(new Set(['insert-below', 'replace-selection']));
   });
 
@@ -30,12 +30,12 @@ test.describe('AIAction/MakeItLonger', () => {
       async () => {
         await utils.editor.createEdgelessText(
           page,
-          'AFFiNE is a workspace with fully merged docs'
+          'StrawNote is a workspace with fully merged docs'
         );
       }
     );
     const { answer, responses } = await makeItLonger();
-    await expect(answer).toHaveText(/AFFiNE/, { timeout: 10000 });
+    await expect(answer).toHaveText(/StrawNote/, { timeout: 10000 });
     expect(responses).toEqual(new Set(['insert-below']));
   });
 
@@ -48,12 +48,12 @@ test.describe('AIAction/MakeItLonger', () => {
       async () => {
         await utils.editor.createEdgelessNote(
           page,
-          'AFFiNE is a workspace with fully merged docs'
+          'StrawNote is a workspace with fully merged docs'
         );
       }
     );
     const { answer, responses } = await makeItLonger();
-    await expect(answer).toHaveText(/AFFiNE/, { timeout: 10000 });
+    await expect(answer).toHaveText(/StrawNote/, { timeout: 10000 });
     expect(responses).toEqual(new Set(['insert-below']));
   });
 
@@ -63,10 +63,10 @@ test.describe('AIAction/MakeItLonger', () => {
   }) => {
     const { makeItLonger } = await utils.editor.askAIWithText(
       page,
-      'AFFiNE is a workspace with fully merged docs'
+      'StrawNote is a workspace with fully merged docs'
     );
     const { answer } = await makeItLonger();
-    await expect(answer).toHaveText(/AFFiNE/, { timeout: 10000 });
+    await expect(answer).toHaveText(/StrawNote/, { timeout: 10000 });
     const replace = answer.getByTestId('answer-replace');
     await replace.click();
     await utils.chatPanel.waitForHistory(page, [
@@ -79,7 +79,7 @@ test.describe('AIAction/MakeItLonger', () => {
       prompt,
       actionName,
     } = await utils.chatPanel.getLatestAIActionMessage(page);
-    await expect(panelAnswer).toHaveText(/AFFiNE/);
+    await expect(panelAnswer).toHaveText(/StrawNote/);
     await expect(prompt).toHaveText(/Expand the following text/);
     await expect(actionName).toHaveText(/Make it longer/);
   });

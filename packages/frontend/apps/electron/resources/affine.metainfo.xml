@@ -29,7 +29,7 @@
     <internet>always</internet>
   </recommends>
   <provides>
-    <mediatype>x-scheme-handler/affine</mediatype>
+    <mediatype>x-scheme-handler/strawnote</mediatype>
   </provides>
   <supports>
     <control>pointing</control>
@@ -39,7 +39,7 @@
   </supports>
   <description>
     <p>Write, Draw, Plan, All at Once. With AI.</p>
-    <p>AFFiNE is a workspace with fully merged docs, whiteboards and databases. Get more things done, your creativity isn’t monotone.</p>
+    <p>StrawNote is a workspace with fully merged docs, whiteboards and databases. Get more things done, your creativity isn’t monotone.</p>
     <p>Features</p>
     <ul>
       <li>Write your way to better productivity. Build up your content like blocks and let your ideas run wild.</li>

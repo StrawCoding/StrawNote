@@ -3,7 +3,7 @@ import {
   affineIconGradientStop,
 } from './believer-card.css';
 
-export const bgAFFiNERaw = `<svg 
+export const bgStrawNoteRaw = `<svg 
   width="352" 
   height="320" 
   viewBox="0 0 352 320" 

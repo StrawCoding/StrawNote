@@ -17,7 +17,7 @@ const ROOT = path.resolve(__dirname, '..');
 const envBuildType = (process.env.BUILD_TYPE || 'canary').trim().toLowerCase();
 const buildType = ReleaseTypeSchema.parse(envBuildType);
 const stableBuild = buildType === 'stable';
-const productName = !stableBuild ? `AFFiNE-${buildType}` : 'AFFiNE';
+const productName = !stableBuild ? `StrawNote-${buildType}` : 'StrawNote';
 const icoPath = path.join(
   ROOT,
   !stableBuild
@@ -70,10 +70,10 @@ const {
 log(`parsed args: arch=${arch}, platform=${platform}`);
 
 const appIdMap = {
-  internal: 'pro.affine.internal',
-  canary: 'pro.affine.canary',
-  beta: 'pro.affine.beta',
-  stable: 'pro.affine.app',
+  internal: 'com.strawcoding.strawnote.internal',
+  canary: 'com.strawcoding.strawnote.canary',
+  beta: 'com.strawcoding.strawnote.beta',
+  stable: 'com.strawcoding.strawnote',
 };
 
 export {

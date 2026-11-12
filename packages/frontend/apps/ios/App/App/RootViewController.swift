@@ -10,7 +10,7 @@ import UIKit
 import WebKit
 
 class RootViewController: UINavigationController {
-  private var affineViewController: AFFiNEViewController?
+  private var affineViewController: StrawNoteViewController?
   private var didScheduleOnboardingPresentation = false
 
   override init(rootViewController _: UIViewController) {
@@ -32,7 +32,7 @@ class RootViewController: UINavigationController {
 
   func commitInit() {
     assert(viewControllers.isEmpty)
-    let affineViewController = AFFiNEViewController()
+    let affineViewController = StrawNoteViewController()
     self.affineViewController = affineViewController
     viewControllers = [affineViewController]
   }
@@ -68,7 +68,7 @@ class RootViewController: UINavigationController {
       guard let self else { return }
 
       guard let webView = affineViewController?.webView else {
-        showOnboardingAlert(message: String(localized: "AFFiNE is still loading. Please try again in a moment."))
+        showOnboardingAlert(message: String(localized: "StrawNote is still loading. Please try again in a moment."))
         return
       }
 

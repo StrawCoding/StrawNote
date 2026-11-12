@@ -1,6 +1,6 @@
 //
 //  ShareInboxStore.swift
-//  Shared between AFFiNE and ShareExtension
+//  Shared between StrawNote and ShareExtension
 //
 
 import Foundation

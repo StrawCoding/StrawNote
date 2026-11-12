@@ -12,7 +12,7 @@ import type { WorkspacePropertyType } from '../../workspace-property';
 
 const integrationType = f.enum('readwise');
 
-export const AFFiNE_WORKSPACE_DB_SCHEMA = {
+export const StrawNote_WORKSPACE_DB_SCHEMA = {
   folders: {
     id: f.string().primaryKey().optional().default(nanoid),
     parentId: f.string().optional(),
@@ -55,14 +55,14 @@ export const AFFiNE_WORKSPACE_DB_SCHEMA = {
     icon: f.json<IconData>(),
   },
 } as const satisfies DBSchemaBuilder;
-export type AFFiNEWorkspaceDbSchema = typeof AFFiNE_WORKSPACE_DB_SCHEMA;
+export type StrawNoteWorkspaceDbSchema = typeof StrawNote_WORKSPACE_DB_SCHEMA;
 
-export type DocProperties = ORMEntity<AFFiNEWorkspaceDbSchema['docProperties']>;
+export type DocProperties = ORMEntity<StrawNoteWorkspaceDbSchema['docProperties']>;
 export type DocCustomPropertyInfo = ORMEntity<
-  AFFiNEWorkspaceDbSchema['docCustomPropertyInfo']
+  StrawNoteWorkspaceDbSchema['docCustomPropertyInfo']
 >;
 
-export const AFFiNE_WORKSPACE_USERDATA_DB_SCHEMA = {
+export const StrawNote_WORKSPACE_USERDATA_DB_SCHEMA = {
   favorite: {
     key: f.string().primaryKey(),
     index: f.string(),
@@ -83,8 +83,8 @@ export const AFFiNE_WORKSPACE_USERDATA_DB_SCHEMA = {
     refMeta: f.json(),
   },
 } as const satisfies DBSchemaBuilder;
-export type AFFiNEWorkspaceUserdataDbSchema =
-  typeof AFFiNE_WORKSPACE_USERDATA_DB_SCHEMA;
+export type StrawNoteWorkspaceUserdataDbSchema =
+  typeof StrawNote_WORKSPACE_USERDATA_DB_SCHEMA;
 export type DocIntegrationRef = ORMEntity<
-  AFFiNEWorkspaceUserdataDbSchema['docIntegrationRef']
+  StrawNoteWorkspaceUserdataDbSchema['docIntegrationRef']
 >;

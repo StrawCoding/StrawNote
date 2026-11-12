@@ -1,6 +1,6 @@
 # iOS
 
-AFFiNE iOS app.
+StrawNote iOS app.
 
 ## Build
 

@@ -395,7 +395,7 @@ function getAllApps(): TappableAppInfo[] {
     (value): value is TappableAppInfo =>
       value !== null &&
       !value.bundleIdentifier.startsWith('com.apple') &&
-      !value.bundleIdentifier.startsWith('pro.affine') &&
+      !value.bundleIdentifier.startsWith('com.strawcoding.strawnote') &&
       value.processId !== process.pid
   );
 }

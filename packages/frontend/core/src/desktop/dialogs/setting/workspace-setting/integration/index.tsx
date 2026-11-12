@@ -74,7 +74,7 @@ export const IntegrationSetting = ({
           <>
             {t['com.affine.integration.setting.description']()}
             {/* <br /> */}
-            {/* <a>{t['Learn how to develop a integration for AFFiNE']()}</a> */}
+            {/* <a>{t['Learn how to develop a integration for StrawNote']()}</a> */}
           </>
         }
       />

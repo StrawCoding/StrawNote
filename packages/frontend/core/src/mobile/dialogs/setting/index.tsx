@@ -37,7 +37,7 @@ const SupportGroup = () => {
 
   const shareApp = useCallback(async () => {
     const shareData = {
-      title: 'AFFiNE',
+      title: 'StrawNote',
       text: t['com.affine.mobile.setting.support.invite-message'](),
       url: AFFINE_DOWNLOAD_URL,
     };

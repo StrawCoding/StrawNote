@@ -7,7 +7,7 @@ import {
   resolveNewDocTitle,
 } from '@affine/core/modules/editor-setting';
 import { WorkbenchService } from '@affine/core/modules/workbench';
-import { getAFFiNEWorkspaceSchema } from '@affine/core/modules/workspace';
+import { getStrawNoteWorkspaceSchema } from '@affine/core/modules/workspace';
 import { type DocMode } from '@blocksuite/affine/model';
 import type { Workspace } from '@blocksuite/affine/store';
 import { LiveData, useLiveData, useServices } from '@toeverything/infra';
@@ -122,7 +122,7 @@ export const usePageHelper = (docCollection: Workspace) => {
       };
       showImportModal({
         collection: docCollection,
-        schema: getAFFiNEWorkspaceSchema(),
+        schema: getStrawNoteWorkspaceSchema(),
         extensions: getStoreManager().config.init().value.get('store'),
         onSuccess,
         onFail: message => {

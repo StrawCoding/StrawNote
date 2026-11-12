@@ -79,7 +79,7 @@ final class ShareViewController: UIViewController {
     let opened = openedByContext || openMainAppViaResponderChain(url)
     #if DEBUG
       NSLog(
-        "[AFFiNE Share] open url=%@ extensionContext=%@ final=%@",
+        "[StrawNote Share] open url=%@ extensionContext=%@ final=%@",
         url.absoluteString,
         openedByContext ? "YES" : "NO",
         opened ? "YES" : "NO"

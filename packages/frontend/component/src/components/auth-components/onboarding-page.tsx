@@ -250,7 +250,7 @@ export const OnboardingPage = ({
           you once again for your supports.
         </p>
         <Button
-          className={clsx(styles.button, styles.openAFFiNEButton)}
+          className={clsx(styles.button, styles.openStrawNoteButton)}
           variant="primary"
           size="extraLarge"
           onClick={() => {

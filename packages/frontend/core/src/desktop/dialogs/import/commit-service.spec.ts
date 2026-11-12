@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 
 import { getStoreManager } from '@affine/core/blocksuite/manager/store';
-import { getAFFiNEWorkspaceSchema } from '@affine/core/modules/workspace';
+import { getStrawNoteWorkspaceSchema } from '@affine/core/modules/workspace';
 import type { DocSnapshot } from '@blocksuite/affine/store';
 import { TestWorkspace } from '@blocksuite/affine/store/test';
 import type { ImportBatch } from '@blocksuite/affine/widgets/linked-doc';
@@ -125,7 +125,7 @@ function createCommitService(
 ) {
   return new ImportCommitService({
     collection,
-    schema: getAFFiNEWorkspaceSchema(),
+    schema: getStrawNoteWorkspaceSchema(),
     extensions: getStoreManager().config.init().value.get('store'),
     organizeService: options.organizeService as never,
     explorerIconService: options.explorerIconService as never,

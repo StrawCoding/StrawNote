@@ -38,7 +38,7 @@ export const LocalSharePage = (props: ShareMenuProps) => {
               variant="primary"
               data-testid="share-menu-enable-affine-cloud-button"
             >
-              {t['Enable AFFiNE Cloud']()}
+              {t['Enable StrawNote Cloud']()}
             </Button>
           </div>
         </div>
@@ -51,7 +51,7 @@ export const LocalSharePage = (props: ShareMenuProps) => {
   );
 };
 
-export const AFFiNESharePage = (
+export const StrawNoteSharePage = (
   props: ShareMenuProps & {
     onClickInvite: () => void;
     onClickMembers: () => void;
@@ -126,7 +126,7 @@ export const SharePage = (
       // TODO(@eyhn): refactor this part
       <ErrorBoundary fallback={null}>
         <Suspense>
-          <AFFiNESharePage {...props} />
+          <StrawNoteSharePage {...props} />
         </Suspense>
       </ErrorBoundary>
     );

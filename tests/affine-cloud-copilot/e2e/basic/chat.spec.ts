@@ -45,7 +45,7 @@ test.describe('AIBasic/Chat', () => {
     // Type and send a message
     await utils.chatPanel.makeChat(
       page,
-      'Introduce AFFiNE to me. Answer in 500 words.'
+      'Introduce StrawNote to me. Answer in 500 words.'
     );
 
     if (!(await page.getByTestId('ai-loading').isVisible())) {
@@ -53,7 +53,7 @@ test.describe('AIBasic/Chat', () => {
       await utils.chatPanel.waitForHistory(page, [
         {
           role: 'user',
-          content: 'Introduce AFFiNE to me. Answer in 500 words.',
+          content: 'Introduce StrawNote to me. Answer in 500 words.',
         },
         {
           role: 'assistant',
@@ -68,7 +68,7 @@ test.describe('AIBasic/Chat', () => {
     await utils.chatPanel.waitForHistory(page, [
       {
         role: 'user',
-        content: 'Introduce AFFiNE to me. Answer in 500 words.',
+        content: 'Introduce StrawNote to me. Answer in 500 words.',
       },
       {
         role: 'assistant',
@@ -81,7 +81,7 @@ test.describe('AIBasic/Chat', () => {
     await utils.chatPanel.waitForHistory(page, [
       {
         role: 'user',
-        content: 'Introduce AFFiNE to me. Answer in 500 words.',
+        content: 'Introduce StrawNote to me. Answer in 500 words.',
       },
       {
         role: 'assistant',
@@ -96,14 +96,14 @@ test.describe('AIBasic/Chat', () => {
   }) => {
     await utils.chatPanel.makeChat(
       page,
-      'Introduce AFFiNE to me. Answer in 5000 words.'
+      'Introduce StrawNote to me. Answer in 5000 words.'
     );
 
     // AI Generating
     await utils.chatPanel.waitForHistory(page, [
       {
         role: 'user',
-        content: 'Introduce AFFiNE to me. Answer in 5000 words.',
+        content: 'Introduce StrawNote to me. Answer in 5000 words.',
       },
       {
         role: 'assistant',
@@ -115,7 +115,7 @@ test.describe('AIBasic/Chat', () => {
     await utils.chatPanel.waitForHistory(page, [
       {
         role: 'user',
-        content: 'Introduce AFFiNE to me. Answer in 5000 words.',
+        content: 'Introduce StrawNote to me. Answer in 5000 words.',
       },
       {
         role: 'assistant',
@@ -372,7 +372,7 @@ test.describe('AIBasic/Chat', () => {
     await utils.chatPanel.closeChatPanel(page);
     await utils.editor.askAIWithText(
       page,
-      'AFFiNE is an open source all in one workspace.'
+      'StrawNote is an open source all in one workspace.'
     );
     await page.keyboard.type('Translate to chinese.');
 
@@ -457,7 +457,7 @@ test.describe('AIBasic/Chat', () => {
     await utils.chatPanel.closeChatPanel(page);
     await utils.editor.askAIWithText(
       page,
-      'AFFiNE is an open source all in one workspace.'
+      'StrawNote is an open source all in one workspace.'
     );
     await page.keyboard.type('Translate to chinese.');
 

@@ -1,3 +1,3 @@
 # web
 
-AFFiNE Desktop Edition Web app.
+StrawNote Desktop Edition Web app.

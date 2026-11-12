@@ -35,7 +35,7 @@ const Settings = () => {
   return <PlanLayout cloud={<CloudPlans />} ai={<AIPlan />} />;
 };
 
-export const AFFiNEPricingPlans = () => {
+export const StrawNotePricingPlans = () => {
   return (
     <SWRErrorBoundary FallbackComponent={PlansErrorBoundary}>
       <Settings />

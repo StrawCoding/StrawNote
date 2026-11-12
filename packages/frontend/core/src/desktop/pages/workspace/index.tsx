@@ -10,7 +10,7 @@ import { DndService } from '@affine/core/modules/dnd/services';
 import { GlobalContextService } from '@affine/core/modules/global-context';
 import { OpenInAppGuard } from '@affine/core/modules/open-in-app';
 import {
-  getAFFiNEWorkspaceSchema,
+  getStrawNoteWorkspaceSchema,
   type Workspace,
   type WorkspaceMetadata,
   WorkspacesService,
@@ -281,7 +281,7 @@ const WorkspacePage = ({ meta }: { meta: WorkspaceMetadata }) => {
       window.exportWorkspaceSnapshot = async (docs?: string[]) => {
         await ZipTransformer.exportDocs(
           workspace.docCollection,
-          getAFFiNEWorkspaceSchema(),
+          getStrawNoteWorkspaceSchema(),
           Array.from(workspace.docCollection.docs.values())
             .filter(doc => (docs ? docs.includes(doc.id) : true))
             .map(doc => doc.getStore())
@@ -297,7 +297,7 @@ const WorkspacePage = ({ meta }: { meta: WorkspaceMetadata }) => {
             const blob = new Blob([file], { type: 'application/zip' });
             const newDocs = await ZipTransformer.importDocs(
               workspace.docCollection,
-              getAFFiNEWorkspaceSchema(),
+              getStrawNoteWorkspaceSchema(),
               blob
             );
             console.log(

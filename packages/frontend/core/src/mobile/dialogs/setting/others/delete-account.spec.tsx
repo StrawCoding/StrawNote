@@ -181,7 +181,7 @@ vi.mock('@toeverything/infra', async () => {
       baseUrl: 'https://affine.pro',
       ['config$']: {
         value: {
-          serverName: 'AFFiNE Cloud',
+          serverName: 'StrawNote Cloud',
         },
       },
     },

@@ -57,7 +57,7 @@ describe('oauth flow mode', () => {
         'https://app.affine.pro'
       )
     ).toBe(
-      'https://app.affine.pro/redirect-proxy?redirect_uri=https%3A%2F%2Fgithub.com%2Ftoeverything%2FAFFiNE'
+      'https://app.affine.pro/redirect-proxy?redirect_uri=https%3A%2F%2Fgithub.com%2Ftoeverything%2FStrawNote'
     );
   });
 });

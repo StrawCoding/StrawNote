@@ -247,7 +247,7 @@ describe('link preview transport and route ownership', () => {
     expect(owner.generation).toBe(generation);
   });
 
-  test('adds the app version only in the AFFiNE transport', async () => {
+  test('adds the app version only in the StrawNote transport', async () => {
     const fetch = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({

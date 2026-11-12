@@ -5,7 +5,7 @@ import {
 } from '@affine/component/global-loading';
 import type { AffineEditorContainer } from '@affine/core/blocksuite/block-suite-editor/blocksuite-editor';
 import { EditorService } from '@affine/core/modules/editor';
-import { getAFFiNEWorkspaceSchema } from '@affine/core/modules/workspace/global-schema';
+import { getStrawNoteWorkspaceSchema } from '@affine/core/modules/workspace/global-schema';
 import { useI18n } from '@affine/i18n';
 import { track } from '@affine/track';
 import { ExportManager } from '@blocksuite/affine/blocks/surface';
@@ -66,7 +66,7 @@ interface AdapterConfig {
 
 function createTransformer(doc: Store) {
   return new Transformer({
-    schema: getAFFiNEWorkspaceSchema(),
+    schema: getStrawNoteWorkspaceSchema(),
     blobCRUD: doc.workspace.blobSync,
     docCRUD: {
       create: (id: string) => doc.workspace.createDoc(id).getStore({ id }),
@@ -192,7 +192,7 @@ async function exportHandler({
     case 'snapshot':
       await ZipTransformer.exportDocs(
         page.workspace,
-        getAFFiNEWorkspaceSchema(),
+        getStrawNoteWorkspaceSchema(),
         [page]
       );
       return true;

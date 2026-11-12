@@ -18,17 +18,17 @@ const errorMessage = (error?: string) => {
     case 'destination-not-found':
       return 'One or more selected tags or the collection no longer exist.';
     case 'offline-confirmation-required':
-      return 'AFFiNE could not confirm the latest workspace state.';
+      return 'StrawNote could not confirm the latest workspace state.';
     case 'attachment-missing':
       return 'The shared attachment is no longer available.';
     case 'attachment-too-large':
       return 'The shared attachment is too large for this workspace.';
     case 'attachment-write-failed':
-      return 'AFFiNE could not store this attachment in the selected workspace. Try again or choose another workspace.';
+      return 'StrawNote could not store this attachment in the selected workspace. Try again or choose another workspace.';
     case 'import-conflict':
       return 'This share conflicts with an existing document and was not changed.';
     case 'completion-failed':
-      return 'This share was saved, but AFFiNE could not clear it from the inbox. Try again.';
+      return 'This share was saved, but StrawNote could not clear it from the inbox. Try again.';
     default:
       return undefined;
   }
@@ -127,7 +127,7 @@ export const ShareImportController = ({
           </PageHeader>
           <main className={styles.main}>
             <div className={styles.warning}>
-              Update AFFiNE to import this shared item. It will stay in your
+              Update StrawNote to import this shared item. It will stay in your
               inbox until then.
             </div>
           </main>
@@ -257,7 +257,7 @@ export const ShareImportController = ({
               {selectedWorkspaceName}
             </h2>
             <p className={styles.confirmationText}>
-              AFFiNE could not confirm that this workspace, your permissions,
+              StrawNote could not confirm that this workspace, your permissions,
               and its destinations are current online. Saving will use the most
               recent data available on this device.
             </p>

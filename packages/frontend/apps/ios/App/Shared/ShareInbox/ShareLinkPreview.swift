@@ -211,7 +211,7 @@ struct ShareLinkPreviewClient {
   }
 
   private func addClientHeaders(to request: inout URLRequest) {
-    request.setValue("AFFiNE/\(appVersion)", forHTTPHeaderField: "User-Agent")
+    request.setValue("StrawNote/\(appVersion)", forHTTPHeaderField: "User-Agent")
     request.setValue(appVersion, forHTTPHeaderField: "x-affine-version")
   }
 

@@ -107,7 +107,7 @@ public final class NativePaywallBridge: ObservableObject {
         contentWorld: .page
       )
       guard result as? Bool == true else {
-        throw bridgeError("The Stripe purchase is still being processed. Check AFFiNE billing settings.")
+        throw bridgeError("The Stripe purchase is still being processed. Check StrawNote billing settings.")
       }
     } catch {
       errorMessage = error.localizedDescription
@@ -315,11 +315,11 @@ private extension NativePaywallBridge {
       return false
     case "existing":
       if response.provider == "stripe" {
-        throw bridgeError("You already subscribe to this plan. Manage it in AFFiNE billing settings.")
+        throw bridgeError("You already subscribe to this plan. Manage it in StrawNote billing settings.")
       }
       throw bridgeError("You already subscribe to this plan. Manage it in the App Store.")
     case "conflict":
-      throw bridgeError("This plan has a purchase that needs verification. Review your subscriptions in AFFiNE billing settings.")
+      throw bridgeError("This plan has a purchase that needs verification. Review your subscriptions in StrawNote billing settings.")
     case "processing":
       throw bridgeError("Your purchase is still being processed. Use Restore purchases to check it.")
     default:
