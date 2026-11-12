@@ -67,7 +67,7 @@ jobs:
         id: plan
         with:
           targets: ${{ inputs.targets || 'server,desktop-macos,desktop-windows,desktop-linux?' }}
-          tool-image: ${{ vars.AFFINE_RELEASE_TOOL_IMAGE || 'ghcr.io/toeverything/affine-release:latest' }}
+          tool-image: ${{ vars.STRAWNOTE_RELEASE_TOOL_IMAGE || vars.AFFINE_RELEASE_TOOL_IMAGE || 'ghcr.io/strawcoding/strawnote-release:latest' }}
           created-at: ${{ steps.run.outputs.created-at }}
       - uses: actions/upload-artifact@v4
         with:

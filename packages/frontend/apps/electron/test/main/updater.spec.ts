@@ -40,7 +40,7 @@ describe('testing for client update', () => {
   ];
 
   const basicRequestHandlers = [
-    http.get('https://affine.pro/api/worker/releases', async ({ request }) => {
+    http.get('https://api.github.com/repos/StrawCoding/StrawNote/releases', async ({ request }) => {
       const url = new URL(request.url);
       const buffer = await fs.readFile(
         path.join(
@@ -57,7 +57,7 @@ describe('testing for client update', () => {
       expectReleaseList.map(({ version }) => {
         return [
           http.get(
-            `https://github.com/toeverything/AFFiNE/releases/download/v${version}/latest.yml`,
+            `https://github.com/StrawCoding/StrawNote/releases/download/v${version}/latest.yml`,
             async req => {
               const buffer = await fs.readFile(
                 path.join(
@@ -106,7 +106,7 @@ describe('testing for client update', () => {
         expect(info.updateInfo.releaseName).toBe(version);
         expect(info.updateInfo.version).toBe(version);
         expect(info.updateInfo.files.map(file => file.url)).toEqual([
-          `https://github.com/toeverything/AFFiNE/releases/download/v${version}/affine-${version}-${buildType}-windows-x64.nsis.exe`,
+          `https://github.com/StrawCoding/StrawNote/releases/download/v${version}/affine-${version}-${buildType}-windows-x64.nsis.exe`,
         ]);
       });
     }
@@ -164,7 +164,7 @@ describe('testing for client update', () => {
           path.join(__dirname, 'fixtures', 'candidates', 'canary.json')
         );
         const tag = `v${newerVersion}`;
-        const baseUrl = `https://github.com/toeverything/AFFiNE/releases/download/${tag}`;
+        const baseUrl = `https://github.com/StrawCoding/StrawNote/releases/download/${tag}`;
         const assets = [{ name: installer, url: `${baseUrl}/${installer}` }];
         const manifestUrl = `${baseUrl}/latest.yml`;
         if (hasManifest) {
@@ -172,7 +172,7 @@ describe('testing for client update', () => {
         }
 
         server.use(
-          http.get('https://affine.pro/api/worker/releases', () =>
+          http.get('https://api.github.com/repos/StrawCoding/StrawNote/releases', () =>
             HttpResponse.json([
               { ...older, tag_name: tag, name: newerVersion, assets },
               older,

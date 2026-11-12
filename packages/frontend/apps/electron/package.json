@@ -3,13 +3,13 @@
   "private": true,
   "version": "0.27.5",
   "main": "./dist/main.js",
-  "author": "toeverything",
+  "author": "StrawCoding",
   "repository": {
-    "url": "https://github.com/toeverything/AFFiNE",
+    "url": "https://github.com/StrawCoding/StrawNote",
     "type": "git"
   },
-  "description": "AFFiNE Desktop App",
-  "homepage": "https://github.com/toeverything/AFFiNE",
+  "description": "StrawNote Desktop App",
+  "homepage": "https://github.com/StrawCoding/StrawNote",
   "exports": {
     "./helper/exposed": "./src/helper/exposed.ts",
     "./main/exposed": "./src/main/exposed.ts",

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <component type="desktop-application">
-  <id>affine</id>
-  <name>AFFiNE</name>
+  <id>strawnote</id>
+  <name>StrawNote</name>
   <summary>Productivity and note-taking app</summary>
   <metadata_license>CC0-1.0</metadata_license>
-  <project_license>MIT AND LicenseRef-proprietary=https://github.com/toeverything/AFFiNE/blob/canary/LICENSE</project_license>
-  <url type="homepage">https://affine.pro</url>
-  <url type="bugtracker">https://github.com/toeverything/AFFiNE/issues</url>
-  <url type="help">https://docs.affine.pro/</url>
-  <url type="vcs-browser">https://github.com/toeverything/AFFiNE</url>
-  <url type="contribute">https://docs.affine.pro/contributing</url>
-  <developer id="pro.affine.app">
-    <name>affine</name>
+  <project_license>MIT AND LicenseRef-proprietary=https://github.com/StrawCoding/StrawNote/blob/strawnote/LICENSE</project_license>
+  <url type="homepage">https://github.com/StrawCoding/StrawNote</url>
+  <url type="bugtracker">https://github.com/StrawCoding/StrawNote/issues</url>
+  <url type="help">https://github.com/StrawCoding/StrawNote#readme</url>
+  <url type="vcs-browser">https://github.com/StrawCoding/StrawNote</url>
+  <url type="contribute">https://github.com/StrawCoding/StrawNote</url>
+  <developer id="com.strawcoding.strawnote">
+    <name>StrawCoding</name>
   </developer>
   <content_rating type="oars-1.1"/>
   <categories>
@@ -65,7 +65,7 @@
   </screenshots>
   <releases>
     <release version="0.27.5" date="2026-09-09">
-      <url>https://github.com/toeverything/AFFiNE/releases/tag/v0.27.5</url>
+      <url>https://github.com/StrawCoding/StrawNote/releases/tag/v0.27.5</url>
     </release>
   </releases>
 </component>

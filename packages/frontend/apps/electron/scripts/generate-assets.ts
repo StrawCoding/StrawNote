@@ -67,8 +67,8 @@ if (process.env.BUILD_TYPE === 'internal') {
   const appUpdaterYml = path.join(publicDistDir, 'app-update.yml');
   const appUpdaterYmlContent = await fs.readFile(appUpdaterYml, 'utf-8');
   const newAppUpdaterYmlContent = appUpdaterYmlContent.replace(
-    'AFFiNE',
-    'AFFiNE-Releases'
+    'StrawNote',
+    'StrawNote-Releases'
   );
   await fs.writeFile(appUpdaterYml, newAppUpdaterYmlContent);
 }

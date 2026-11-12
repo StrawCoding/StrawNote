@@ -14,7 +14,7 @@ export const SeeAllLink = () => {
   return (
     <a
       className={styles.allPlansLink}
-      href="https://affine.pro/pricing"
+      href="https://github.com/StrawCoding/StrawNote"
       target="_blank"
       rel="noopener noreferrer"
     >

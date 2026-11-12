@@ -11,7 +11,7 @@ const { ok } = await new WebClient(SLACK_BOT_TOKEN).chat.postMessage({
   blocks: render(
     `# AFFiNE Copilot Test ${COPILOT_RESULT}
 
-- [${BRANCH_NAME?.replace('refs/heads/', '') || BRANCH_SHA}](https://github.com/toeverything/AFFiNE/commit/${BRANCH_SHA})
+- [${BRANCH_NAME?.replace('refs/heads/', '') || BRANCH_SHA}](https://github.com/StrawCoding/StrawNote/commit/${BRANCH_SHA})
 `
   ),
 });

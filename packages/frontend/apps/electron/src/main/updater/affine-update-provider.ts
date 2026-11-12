@@ -34,8 +34,14 @@ interface GithubRelease {
   assets: Array<{
     name: string;
     url: string;
+    browser_download_url?: string;
     size: number;
   }>;
+}
+
+function assetDownloadUrl(asset: GithubRelease['assets'][number]) {
+  // Prefer public browser download URLs from GitHub Releases API.
+  return asset.browser_download_url || asset.url;
 }
 
 interface UpdateProviderOptions {
@@ -47,7 +53,8 @@ export class AFFiNEUpdateProvider extends Provider<GithubUpdateInfo> {
   static configFeed(options: UpdateProviderOptions): CustomPublishOptions {
     return {
       provider: 'custom',
-      feedUrl: 'https://affine.pro/api/worker/releases',
+      // StrawNote: read releases from our GitHub repo (not affine.pro).
+      feedUrl: 'https://api.github.com/repos/StrawCoding/StrawNote/releases',
       updateProvider: AFFiNEUpdateProvider,
       ...options,
     };
@@ -87,7 +94,17 @@ export class AFFiNEUpdateProvider extends Provider<GithubUpdateInfo> {
       );
     }
 
-    const releases: GithubRelease[] = JSON.parse(releasesJsonStr);
+    const releasesRaw: GithubRelease[] = JSON.parse(releasesJsonStr);
+    const channel = String(this.options.channel);
+    const releases = releasesRaw.filter(release => {
+      if (release.draft) return false;
+      const tag = release.tag_name.toLowerCase();
+      if (channel === 'canary') return tag.includes('canary');
+      if (channel === 'beta') return tag.includes('beta');
+      if (channel === 'internal') return tag.includes('internal');
+      // stable: exclude prerelease channels
+      return !tag.includes('canary') && !tag.includes('beta') && !tag.includes('internal');
+    });
 
     if (releases.length === 0) {
       throw new Error(
@@ -117,7 +134,7 @@ export class AFFiNEUpdateProvider extends Provider<GithubUpdateInfo> {
         continue;
       }
 
-      const channelFileUrl = new URL(channelFileAsset.url);
+      const channelFileUrl = new URL(assetDownloadUrl(channelFileAsset));
       let channelFileContent: string | null;
       try {
         channelFileContent = await this.httpRequest(channelFileUrl);
@@ -135,7 +152,7 @@ export class AFFiNEUpdateProvider extends Provider<GithubUpdateInfo> {
       );
       const files = result.files.flatMap(file => {
         const asset = installers.find(({ name }) => name === file.url);
-        return asset ? [{ ...file, url: asset.url }] : [];
+        return asset ? [{ ...file, url: assetDownloadUrl(asset) }] : [];
       });
       if (files.length === 0) {
         continue;

@@ -2,7 +2,7 @@
   "name": "@strawnote/monorepo",
   "version": "0.27.5",
   "private": true,
-  "author": "toeverything",
+  "author": "StrawCoding",
   "license": "MIT",
   "workspaces": [
     ".",

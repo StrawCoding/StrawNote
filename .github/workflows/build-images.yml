@@ -247,7 +247,7 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           provenance: true
           file: .github/deployment/node/Dockerfile
-          tags: ghcr.io/toeverything/affine:candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          tags: ghcr.io/strawcoding/strawnote:candidate-${{ github.run_id }}-${{ github.run_attempt }}
         id: image
     outputs:
-      image: ghcr.io/toeverything/affine@${{ steps.image.outputs.digest }}
+      image: ghcr.io/strawcoding/strawnote@${{ steps.image.outputs.digest }}

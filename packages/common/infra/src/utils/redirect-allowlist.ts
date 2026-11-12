@@ -8,6 +8,8 @@ export const TRUSTED_REDIRECT_DOMAINS = [
   't.me',
   'reddit.com',
   'affine.pro',
+  'wastebase.xyz',
+  'notes.wastebase.xyz',
 ].map(d => d.toLowerCase());
 
 export const ALLOWED_REDIRECT_PROTOCOLS = new Set(['http:', 'https:']);

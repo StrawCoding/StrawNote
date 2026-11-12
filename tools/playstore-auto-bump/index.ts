@@ -7,7 +7,7 @@ import {
   auth as google_auth,
 } from '@googleapis/androidpublisher';
 
-const packageName = 'app.affine.pro';
+const packageName = 'com.strawcoding.strawnote';
 const auth = new google_auth.GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/androidpublisher'],
 });

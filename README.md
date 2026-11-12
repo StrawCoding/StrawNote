@@ -26,6 +26,14 @@ git merge affine/canary
 
 ---
 
+
+### StrawNote 映像／更新來源
+
+- GitHub：https://github.com/StrawCoding/StrawNote
+- Desktop 自動更新：GitHub Releases API（`api.github.com/repos/StrawCoding/StrawNote/releases`）
+- Self-host Docker 映像：`ghcr.io/strawcoding/strawnote:stable`（見 `.docker/selfhost/compose.yml`）
+- 上游 AFFiNE 仍以 remote `affine` 追蹤，僅作合併來源，不作為發版／更新端點
+
 ## 以下為上游 AFFiNE 原始 README（保留供對照）
 
 <div align="center">
@@ -60,7 +68,7 @@ git merge affine/canary
 </div>
 <br/>
 
-[![Releases](https://img.shields.io/github/downloads/toeverything/AFFiNE/total)](https://github.com/toeverything/AFFiNE/releases/latest)
+[![Releases](https://img.shields.io/github/downloads/StrawCoding/StrawNote/total)](https://github.com/StrawCoding/StrawNote/releases/latest)
 [![All Contributors][all-contributors-badge]](#contributors)
 [![TypeScript-version-icon]](https://www.typescriptlang.org/)
 
@@ -122,14 +130,14 @@ Thanks for checking us out, we appreciate your interest and sincerely hope that 
 
 | Bug Reports                                                                                                                                         | Feature Requests                                                                                                                                               | Questions/Discussions                                                         | AFFiNE Community                                                  |
 | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| [Create a bug report](https://github.com/toeverything/AFFiNE/issues/new?assignees=&labels=bug%2Cproduct-review&template=BUG-REPORT.yml&title=TITLE) | [Submit a feature request](https://github.com/toeverything/AFFiNE/issues/new?assignees=&labels=feat%2Cproduct-review&template=FEATURE-REQUEST.yml&title=TITLE) | [Check GitHub Discussion](https://github.com/toeverything/AFFiNE/discussions) | [Visit the AFFiNE's Discord](https://affine.pro/redirect/discord) |
+| [Create a bug report](https://github.com/StrawCoding/StrawNote/issues/new?assignees=&labels=bug%2Cproduct-review&template=BUG-REPORT.yml&title=TITLE) | [Submit a feature request](https://github.com/StrawCoding/StrawNote/issues/new?assignees=&labels=feat%2Cproduct-review&template=FEATURE-REQUEST.yml&title=TITLE) | [Check GitHub Discussion](https://github.com/StrawCoding/StrawNote/discussions) | [Visit the AFFiNE's Discord](https://affine.pro/redirect/discord) |
 | Something isn't working as expected                                                                                                                 | An idea for a new feature, or improvements                                                                                                                     | Discuss and ask questions                                                     | A place to ask, learn and engage with others                      |
 
 Calling all developers, testers, tech writers and more! Contributions of all types are more than welcome, you can read more in [docs/types-of-contributions.md](docs/types-of-contributions.md). If you are interested in contributing code, read our [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) and feel free to check out our GitHub issues to get stuck in to show us what you’re made of.
 
 **Before you start contributing, please sign our [Contributor License Agreement] — it takes less than a minute with your GitHub account. Pull requests cannot be merged until every committer has signed (the `license/cla` check on your PR). Full text: [CLA.md](.github/CLA.md).**
 
-For **bug reports**, **feature requests** and other **suggestions** you can also [create a new issue](https://github.com/toeverything/AFFiNE/issues/new/choose) and choose the most appropriate template for your feedback.
+For **bug reports**, **feature requests** and other **suggestions** you can also [create a new issue](https://github.com/StrawCoding/StrawNote/issues/new/choose) and choose the most appropriate template for your feedback.
 
 For **translation** and **language support** you can visit our [Discord](https://affine.pro/redirect/discord).
 
@@ -206,13 +214,13 @@ We would like to express our gratitude to all the individuals who have already c
 
 Begin with Docker to deploy your own feature-rich, unrestricted version of AFFiNE. Our team is diligently updating to the latest version. For more information on how to self-host AFFiNE, please refer to our [documentation](https://docs.affine.pro/self-host-affine).
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/toeverything/AFFiNE)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/StrawCoding/StrawNote)
 
 [![Run on Sealos](https://sealos.io/Deploy-on-Sealos.svg)](https://sealos.io/products/app-store/affine)
 
 ## Feature Request
 
-For feature requests, please see [discussions](https://github.com/toeverything/AFFiNE/discussions/categories/ideas).
+For feature requests, please see [discussions](https://github.com/StrawCoding/StrawNote/discussions/categories/ideas).
 
 ## Building
 
@@ -245,7 +253,7 @@ See [LICENSE] for details.
 [building.md]: ./docs/BUILDING.md
 [update page]: https://affine.pro/blog?tag=Release%20Note
 [jobs available]: ./docs/jobs.md
-[latest packages]: https://github.com/toeverything/AFFiNE/pkgs/container/affine-self-hosted
+[latest packages]: https://github.com/StrawCoding/StrawNote/pkgs/container/strawnote
 [contributor license agreement]: https://cla-assistant.io/toeverything/AFFiNE
 [stars-icon]: https://img.shields.io/github/stars/toeverything/AFFiNE.svg?style=flat&logo=github&colorB=red&label=stars
 [codecov]: https://codecov.io/gh/toeverything/affine/branch/canary/graphs/badge.svg?branch=canary

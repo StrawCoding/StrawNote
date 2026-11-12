@@ -19,7 +19,7 @@ interface OpenAppProps {
 }
 const channel = BUILD_CONFIG.appBuildType;
 const url =
-  'https://affine.pro/download' + (channel !== 'stable' ? '/beta-canary' : '');
+  'https://github.com/StrawCoding/StrawNote/releases' + (channel !== 'stable' ? '?channel=' + channel : '/latest');
 
 export const OpenInAppPage = ({
   urlToOpen,
