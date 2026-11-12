@@ -176,7 +176,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine-tools/cli @affine/android
+          extra-flags: workspaces focus @strawnote/monorepo @affine-tools/cli @affine/android
           electron-install: false
 
       - uses: actions/setup-java@v5
@@ -254,7 +254,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine-tools/cli @affine/android
+          extra-flags: workspaces focus @strawnote/monorepo @affine-tools/cli @affine/android
           electron-install: false
 
       - uses: actions/setup-java@v5
@@ -340,7 +340,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine-tools/cli @affine/ios
+          extra-flags: workspaces focus @strawnote/monorepo @affine-tools/cli @affine/ios
           electron-install: false
           hard-link-nm: false
 
@@ -498,7 +498,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine-test/blocksuite @blocksuite/playground @blocksuite/integration-test
+          extra-flags: workspaces focus @strawnote/monorepo @affine-test/blocksuite @blocksuite/playground @blocksuite/integration-test
           playwright-install: true
           playwright-platform: 'chromium'
           electron-install: false
@@ -526,7 +526,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine-test/blocksuite @blocksuite/playground @blocksuite/integration-test
+          extra-flags: workspaces focus @strawnote/monorepo @affine-test/blocksuite @blocksuite/playground @blocksuite/integration-test
           playwright-install: true
           playwright-platform: 'chromium,firefox,webkit'
           electron-install: false
@@ -567,7 +567,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine-test/affine-local @affine/web @affine/server
+          extra-flags: workspaces focus @strawnote/monorepo @affine-test/affine-local @affine/web @affine/server
           playwright-install: true
           playwright-platform: 'chromium'
           electron-install: false
@@ -599,7 +599,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine-test/affine-mobile @affine/mobile
+          extra-flags: workspaces focus @strawnote/monorepo @affine-test/affine-mobile @affine/mobile
           playwright-install: true
           electron-install: false
           full-cache: true
@@ -820,7 +820,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine/electron-renderer @affine/nbstore @toeverything/infra
+          extra-flags: workspaces focus @strawnote/monorepo @affine/electron-renderer @affine/nbstore @toeverything/infra
           electron-install: false
           full-cache: true
       - name: Build Electron renderer
@@ -847,7 +847,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine-tools/cli @affine/monorepo @affine/native
+          extra-flags: workspaces focus @affine-tools/cli @strawnote/monorepo @affine/native
           electron-install: false
       - name: Download affine.linux-x64-gnu.node
         uses: actions/download-artifact@v4
@@ -898,7 +898,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine/server
+          extra-flags: workspaces focus @strawnote/monorepo @affine/server
           electron-install: false
           full-cache: true
 
@@ -977,7 +977,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine/server
+          extra-flags: workspaces focus @strawnote/monorepo @affine/server
           electron-install: false
           full-cache: true
 
@@ -1037,7 +1037,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine/server
+          extra-flags: workspaces focus @strawnote/monorepo @affine/server
           electron-install: false
           full-cache: true
 
@@ -1120,7 +1120,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine/server
+          extra-flags: workspaces focus @strawnote/monorepo @affine/server
           electron-install: false
           full-cache: true
 
@@ -1181,7 +1181,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine/server
+          extra-flags: workspaces focus @strawnote/monorepo @affine/server
           electron-install: false
           full-cache: true
 
@@ -1239,7 +1239,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine/server
+          extra-flags: workspaces focus @strawnote/monorepo @affine/server
           electron-install: false
       - name: Setup Rust
         uses: ./.github/actions/build-rust
@@ -1349,7 +1349,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine/server
+          extra-flags: workspaces focus @strawnote/monorepo @affine/server
           electron-install: false
           full-cache: true
 
@@ -1418,7 +1418,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine-test/affine-cloud-copilot @affine/web @affine/server
+          extra-flags: workspaces focus @strawnote/monorepo @affine-test/affine-cloud-copilot @affine/web @affine/server
           playwright-install: true
           playwright-platform: 'chromium'
           electron-install: false
@@ -1497,7 +1497,7 @@ jobs:
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
         with:
-          extra-flags: workspaces focus @affine/monorepo @affine-test/affine-cloud @affine-test/affine-desktop-cloud @affine/web @affine/server @affine/electron @affine/electron-renderer @affine/nbstore @toeverything/infra
+          extra-flags: workspaces focus @strawnote/monorepo @affine-test/affine-cloud @affine-test/affine-desktop-cloud @affine/web @affine/server @affine/electron @affine/electron-renderer @affine/nbstore @toeverything/infra
           playwright-install: true
           playwright-platform: 'chromium'
           electron-install: ${{ matrix.tests.shard == 'desktop' && 'true' || 'false' }}
@@ -1578,7 +1578,7 @@ jobs:
         uses: ./.github/actions/setup-node
         timeout-minutes: 10
         with:
-          extra-flags: workspaces focus @affine/electron @affine/monorepo @affine-test/affine-desktop @affine/nbstore @toeverything/infra
+          extra-flags: workspaces focus @affine/electron @strawnote/monorepo @affine-test/affine-desktop @affine/nbstore @toeverything/infra
           playwright-install: ${{ matrix.spec.test && 'true' || 'false' }}
           playwright-platform: 'chromium'
           hard-link-nm: false
