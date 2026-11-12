@@ -9,7 +9,7 @@ import { SUPPORTED_LANGUAGES } from './resources';
 
 const logger = new DebugLogger('i18n');
 
-const defaultLng: Language = 'en';
+const defaultLng: Language = 'zh-Hant';
 
 let _instance: i18n | null = null;
 export const getOrCreateI18n = (): i18n => {

@@ -1,4 +1,5 @@
 import en from './en.json' with { type: 'json' };
+import zhHant from './zh-Hant.json' with { type: 'json' };
 
 export type Language =
   | 'en'
@@ -67,8 +68,9 @@ export const SUPPORTED_LANGUAGES: Record<
   'zh-Hant': {
     name: 'Traditional Chinese',
     originalName: '繁體中文',
-    flagEmoji: '🇭🇰',
-    resource: () => import('./zh-Hant.json'),
+    flagEmoji: '🇹🇼',
+    // StrawNote default locale: bundle sync like English so i18next can boot on zh-Hant.
+    resource: zhHant,
   },
   fr: {
     name: 'French',

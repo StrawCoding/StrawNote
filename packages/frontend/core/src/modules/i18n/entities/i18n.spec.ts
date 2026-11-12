@@ -15,9 +15,9 @@ describe('mapLanguageInfo', () => {
     expect(mapLanguageInfo('fr').rtl).toBe(false);
   });
 
-  test('defaults to English when language is undefined', () => {
+  test('defaults to Traditional Chinese when language is undefined', () => {
     const info = mapLanguageInfo();
-    expect(info.key).toBe('en');
+    expect(info.key).toBe('zh-Hant');
     expect(info.rtl).toBe(false);
   });
 });
