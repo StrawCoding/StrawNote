@@ -176,8 +176,9 @@ export const AFFINE_FLAGS = {
       'com.affine.settings.workspace.experimental-features.enable-mobile-edgeless-editing.name',
     description:
       'com.affine.settings.workspace.experimental-features.enable-mobile-edgeless-editing.description',
+    // StrawNote Android：預設開啟畫布編輯，讓 S Pen／筆工具可用
     configurable: isMobile,
-    defaultState: false,
+    defaultState: isAndroid,
   },
   enable_pdf_embed_preview: {
     category: 'affine',

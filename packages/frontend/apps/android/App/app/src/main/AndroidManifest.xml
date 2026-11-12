@@ -64,4 +64,12 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- S Pen / stylus: optional hardware, keep installable on phones without pens -->
+    <uses-feature
+        android:name="android.hardware.faketouch.multitouch.distinct"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
 </manifest>

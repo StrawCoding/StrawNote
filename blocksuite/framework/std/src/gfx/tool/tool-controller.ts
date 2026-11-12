@@ -330,8 +330,13 @@ export class ToolController extends GfxExtension {
       this.std.event.add('dragStart', ctx => {
         const evt = ctx.get('pointerState');
 
+        // Stylus barrel button is often reported as secondary (button=2).
+        // Allow pen/eraser pointers to drag so S Pen side-button erase works.
+        const isStylusPointer =
+          evt.raw.pointerType === 'pen' || evt.raw.pointerType === 'eraser';
         if (
           evt.button === MouseButton.SECONDARY &&
+          !isStylusPointer &&
           !this.currentTool$.peek()?.allowDragWithRightButton
         ) {
           return;

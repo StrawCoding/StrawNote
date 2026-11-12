@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.content.ComponentCallbacks2
 import android.os.Bundle
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.View
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -25,6 +26,7 @@ import com.strawcoding.strawnote.plugin.HashCashPlugin
 import com.strawcoding.strawnote.plugin.NbStorePlugin
 import com.strawcoding.strawnote.plugin.MobileBackPlugin
 import com.strawcoding.strawnote.plugin.PreviewPlugin
+import com.strawcoding.strawnote.plugin.SPenPlugin
 import com.strawcoding.strawnote.service.GraphQLService
 import com.strawcoding.strawnote.service.SSEService
 import com.strawcoding.strawnote.service.WebService
@@ -61,8 +63,13 @@ class MainActivity : BridgeActivity(), AIButtonPlugin.Callback, AFFiNEThemePlugi
                 NbStorePlugin::class.java,
                 MobileBackPlugin::class.java,
                 PreviewPlugin::class.java,
+                SPenPlugin::class.java,
             )
         )
+    }
+
+    private fun spenPlugin(): SPenPlugin? {
+        return bridge?.getPlugin("SPen")?.instance as? SPenPlugin
     }
 
     private val fab: FloatingActionButton by lazy {
@@ -148,7 +155,15 @@ class MainActivity : BridgeActivity(), AIButtonPlugin.Callback, AFFiNEThemePlugi
                 builtInZoomControls = false
                 displayZoomControls = false
             }
+            (this as? AffineEditorWebView)?.configureStylusInput()
         }
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (spenPlugin()?.handleKeyEvent(event) == true) {
+            return true
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     override fun present() {

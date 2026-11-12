@@ -73,6 +73,7 @@ StrawNote pre-release 採：
 | Web／自架知識庫（文件、畫布、協作基礎） | 可用（繼承 AFFiNE self-host） |
 | Desktop（Electron）品牌／deep-link／updater | StrawNote |
 | Android / iOS 套件 ID | `com.strawcoding.strawnote` |
+| Android S Pen | 畫布（edgeless）預設可編輯；筆尖＝筆刷、側鍵／橡皮擦尖＝擦除；掌托抑制 |
 | 「下載 App」按鈕 | 暫連官方 AFFiNE 安裝包，並以 UI 彈窗提示「StrawNote 正在努力開發」 |
 | Markdown + 手寫混排 / `.straw` | 產品路線，持續開發中 |
 

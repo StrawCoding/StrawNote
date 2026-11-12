@@ -1,5 +1,6 @@
 import { KeyboardToolbarExtension } from '@affine/core/blocksuite/view-extensions/mobile/keyboard-toolbar-extension';
 import { MobileFeatureFlagControl } from '@affine/core/blocksuite/view-extensions/mobile/mobile-feature-flag-control';
+import { StylusPenController } from '@affine/core/blocksuite/view-extensions/mobile/stylus-pen-controller';
 import {
   type ViewExtensionContext,
   ViewExtensionProvider,
@@ -29,5 +30,10 @@ export class MobileViewExtension extends ViewExtensionProvider<MobileViewOptions
     }
 
     context.register(MobileFeatureFlagControl);
+
+    // S Pen / stylus: brush + side-button eraser on edgeless (Android first)
+    if (this.isEdgeless(context.scope)) {
+      context.register(StylusPenController);
+    }
   }
 }

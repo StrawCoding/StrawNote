@@ -67,6 +67,7 @@ import { HashCash } from './plugins/hashcash';
 import { MobileBack } from './plugins/mobile-back';
 import { NbStoreNativeDBApis } from './plugins/nbstore';
 import { Preview } from './plugins/preview';
+import { SPen } from './plugins/spen';
 import {
   authRequestProvider,
   clearEndpointSession,
@@ -467,6 +468,33 @@ const AndroidBackAdapter = () => {
   return null;
 };
 
+const AndroidSPenAdapter = () => {
+  useEffect(() => {
+    let remove = () => {};
+    let disposed = false;
+    SPen.addListener('spenButton', event => {
+      window.dispatchEvent(
+        new CustomEvent('strawnote:spen-button', { detail: event })
+      );
+    })
+      .then(handle => {
+        if (disposed) handle.remove().catch(console.error);
+        else
+          remove = () => {
+            handle.remove().catch(console.error);
+          };
+      })
+      .catch(() => {
+        // Plugin may be unavailable on non-device web previews.
+      });
+    return () => {
+      disposed = true;
+      remove();
+    };
+  }, []);
+  return null;
+};
+
 export function App() {
   return (
     <Suspense fallback={<AppFallback />}>
@@ -476,6 +504,7 @@ export function App() {
             <AffineContext store={getCurrentStore()}>
               <ThemeProvider />
               <AndroidBackAdapter />
+              <AndroidSPenAdapter />
               <RouterProvider router={router} />
             </AffineContext>
           </MobileModalConfigProvider>
