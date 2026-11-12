@@ -74,6 +74,24 @@ export const hideInSmallScreen = style({
     },
   },
 });
+export const downloadCluster = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+  gap: 4,
+  '@media': {
+    'screen and (max-width: 1024px)': {
+      display: 'none',
+    },
+  },
+});
+export const downloadHint = style({
+  color: cssVar('textSecondaryColor'),
+  fontSize: cssVar('fontXs'),
+  lineHeight: '1.3',
+  maxWidth: 220,
+  textAlign: 'right',
+});
 export const menu = style({
   width: '100vw',
   height: '100vh',

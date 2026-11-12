@@ -1,4 +1,6 @@
+import { openAppDownloadPage } from '@affine/component/utils/download-app';
 import { useCatchEventCallback } from '@affine/core/components/hooks/use-catch-event-hook';
+import { useI18n } from '@affine/i18n';
 import { track } from '@affine/track';
 import { CloseIcon, DownloadIcon } from '@blocksuite/icons/rc';
 import clsx from 'clsx';
@@ -13,6 +15,7 @@ export function AppDownloadButton({
   className?: string;
   style?: React.CSSProperties;
 }) {
+  const t = useI18n();
   const [show, setShow] = useState(true);
 
   const handleClose = useCatchEventCallback(() => {
@@ -22,8 +25,7 @@ export function AppDownloadButton({
   // TODO(@JimmFly): unify this type of literal value.
   const handleClick = useCallback(() => {
     track.$.navigationPanel.bottomButtons.downloadApp();
-    const url = `https://github.com/StrawCoding/StrawNote/releases/latest`;
-    open(url, '_blank');
+    openAppDownloadPage();
   }, []);
 
   if (!show) {
@@ -34,6 +36,7 @@ export function AppDownloadButton({
       style={style}
       className={clsx([styles.root, styles.rootPadding, className])}
       onClick={handleClick}
+      title={t['com.affine.download.strawnote-developing-hint']()}
     >
       <div className={clsx([styles.label])}>
         <DownloadIcon className={styles.icon} />

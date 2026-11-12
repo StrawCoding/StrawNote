@@ -1,5 +1,9 @@
 import { Button, Checkbox, IconButton } from '@affine/component';
 import {
+  OFFICIAL_APP_DOWNLOAD_URL,
+  openAppDownloadPage,
+} from '@affine/component/utils/download-app';
+import {
   OpenInAppService,
   OpenLinkMode,
 } from '@affine/core/modules/open-in-app';
@@ -60,15 +64,23 @@ export const OpenInAppCard = () => {
           <Trans i18nKey="com.affine.open-in-app.card.subtitle">
             Don&apos;t have the app?
             <a
-              href="https://github.com/StrawCoding/StrawNote/releases/latest"
+              href={OFFICIAL_APP_DOWNLOAD_URL}
               target="_blank"
               rel="noreferrer"
               className={styles.link}
+              title={t.t('com.affine.download.strawnote-developing-hint')}
+              onClick={e => {
+                e.preventDefault();
+                openAppDownloadPage();
+              }}
             >
               Click to download
             </a>
             .
           </Trans>
+          <div className={styles.downloadHint}>
+            {t.t('com.affine.download.strawnote-developing-hint')}
+          </div>
         </div>
         <div className={styles.controlsRow}>
           <label className={styles.rememberLabel}>

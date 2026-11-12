@@ -4,6 +4,7 @@ import { Logo1Icon } from '@blocksuite/icons/rc';
 import { useTheme } from 'next-themes';
 import { type ReactNode, useCallback } from 'react';
 
+import { openAppDownloadPage } from '../../utils/download-app';
 import dotBgDark from './assets/dot-bg.dark.png';
 import dotBgLight from './assets/dot-bg.light.png';
 import { DesktopNavbar } from './desktop-navbar';
@@ -18,7 +19,7 @@ export const AffineOtherPageLayout = ({
   const t = useI18n();
 
   const openDownloadLink = useCallback(() => {
-    open(BUILD_CONFIG.downloadUrl, '_blank');
+    openAppDownloadPage();
   }, []);
 
   const { resolvedTheme } = useTheme();
@@ -39,12 +40,21 @@ export const AffineOtherPageLayout = ({
           </a>
 
           <DesktopNavbar />
-          <Button
-            onClick={openDownloadLink}
-            className={styles.hideInSmallScreen}
-          >
-            {t['com.affine.auth.open.affine.download-app']()}
-          </Button>
+          <div className={styles.downloadCluster}>
+            <Button
+              onClick={openDownloadLink}
+              className={styles.hideInSmallScreen}
+              title={t['com.affine.download.strawnote-developing-hint']()}
+            >
+              {t['com.affine.auth.open.affine.download-app']()}
+            </Button>
+            <span
+              className={styles.downloadHint}
+              title={t['com.affine.download.strawnote-developing-tip']()}
+            >
+              {t['com.affine.download.strawnote-developing-hint']()}
+            </span>
+          </div>
           <MobileNavbar />
         </div>
       )}

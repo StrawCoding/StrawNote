@@ -19,8 +19,8 @@ import {
 } from 'vitest';
 
 import {
-  StrawNoteUpdateProvider,
   availableForMyPlatformAndInstaller,
+  StrawNoteUpdateProvider,
 } from '../../src/main/updater/affine-update-provider';
 import { MockedAppAdapter, MockedUpdater } from './mocks';
 
@@ -40,19 +40,22 @@ describe('testing for client update', () => {
   ];
 
   const basicRequestHandlers = [
-    http.get('https://api.github.com/repos/StrawCoding/StrawNote/releases', async ({ request }) => {
-      const url = new URL(request.url);
-      const buffer = await fs.readFile(
-        path.join(
-          __dirname,
-          'fixtures',
-          'candidates',
-          `${url.searchParams.get('channel')}.json`
-        )
-      );
-      const content = buffer.toString();
-      return HttpResponse.text(content);
-    }),
+    http.get(
+      'https://api.github.com/repos/StrawCoding/StrawNote/releases',
+      async ({ request }) => {
+        const url = new URL(request.url);
+        const buffer = await fs.readFile(
+          path.join(
+            __dirname,
+            'fixtures',
+            'candidates',
+            `${url.searchParams.get('channel')}.json`
+          )
+        );
+        const content = buffer.toString();
+        return HttpResponse.text(content);
+      }
+    ),
     ...flatten(
       expectReleaseList.map(({ version }) => {
         return [
@@ -172,11 +175,13 @@ describe('testing for client update', () => {
         }
 
         server.use(
-          http.get('https://api.github.com/repos/StrawCoding/StrawNote/releases', () =>
-            HttpResponse.json([
-              { ...older, tag_name: tag, name: newerVersion, assets },
-              older,
-            ])
+          http.get(
+            'https://api.github.com/repos/StrawCoding/StrawNote/releases',
+            () =>
+              HttpResponse.json([
+                { ...older, tag_name: tag, name: newerVersion, assets },
+                older,
+              ])
           )
         );
         if (response) {

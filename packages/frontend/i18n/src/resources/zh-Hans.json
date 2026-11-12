@@ -2725,5 +2725,7 @@
     "SEARCH_PERMISSION_SYNCING": "搜索权限仍在同步，请稍后再试。",
     "SEARCH_PROVIDER_UNAVAILABLE": "搜索服务暂时不可用。",
     "SEARCH_INDEX_FAILED": "搜索索引暂时不可用。"
-  }
+  },
+  "com.affine.download.strawnote-developing-tip": "StrawNote 正在努力开发中，目前先导向官方 AFFiNE 下载页。",
+  "com.affine.download.strawnote-developing-hint": "StrawNote 桌面版开发中，下载暂用官方 AFFiNE。"
 }

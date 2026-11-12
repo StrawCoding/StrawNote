@@ -1,4 +1,5 @@
 import { Button } from '@affine/component/ui/button';
+import { openAppDownloadPage } from '@affine/component/utils/download-app';
 import { WorkspaceDialogService } from '@affine/core/modules/dialogs';
 import { appIconMap, appNames } from '@affine/core/utils/channel';
 import { Trans, useI18n } from '@affine/i18n';
@@ -18,8 +19,6 @@ interface OpenAppProps {
   mode?: 'auth' | 'open-doc'; // default to 'auth'
 }
 const channel = BUILD_CONFIG.appBuildType;
-const url =
-  'https://github.com/StrawCoding/StrawNote/releases' + (channel !== 'stable' ? '?channel=' + channel : '/latest');
 
 export const OpenInAppPage = ({
   urlToOpen,
@@ -32,7 +31,7 @@ export const OpenInAppPage = ({
   const t = useI18n();
 
   const openDownloadLink = useCallback(() => {
-    open(url, '_blank');
+    openAppDownloadPage();
   }, []);
 
   const appIcon = appIconMap[channel];

@@ -29,7 +29,7 @@ const AFFINE_MOBILE_STORE_URL = BUILD_CONFIG.isIOS
   : BUILD_CONFIG.isAndroid
     ? 'https://play.google.com/store/apps/details?id=app.affine.pro'
     : undefined;
-const AFFINE_DOWNLOAD_URL = 'https://github.com/StrawCoding/StrawNote/releases/latest';
+const AFFINE_DOWNLOAD_URL = 'https://affine.pro/download';
 
 const SupportGroup = () => {
   const t = useI18n();

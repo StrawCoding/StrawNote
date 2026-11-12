@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { HTMLAttributes } from 'react';
 
-import { bgStrawNoteRaw, bgIconsRaw } from './assets';
+import { bgIconsRaw, bgStrawNoteRaw } from './assets';
 import { bg, card, content } from './believer-card.css';
 
 export const BelieverCard = ({

@@ -121,3 +121,10 @@ export const link = style({
   color: cssVarV2('text/link'),
   textDecoration: 'underline',
 });
+
+export const downloadHint = style({
+  marginTop: 4,
+  fontSize: cssVar('fontXs'),
+  color: cssVarV2('text/secondary'),
+  lineHeight: '1.4',
+});

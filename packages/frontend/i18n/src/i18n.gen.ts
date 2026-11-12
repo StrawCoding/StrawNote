@@ -1298,6 +1298,14 @@ export function useStrawNoteI18N(): {
       */
     ["com.affine.auth.open.affine.download-app"](): string;
     /**
+      * `StrawNote is under active development. You will be redirected to the official AFFiNE download page for now.`
+      */
+    ["com.affine.download.strawnote-developing-tip"](): string;
+    /**
+      * `StrawNote desktop app is under development; downloads currently use official AFFiNE.`
+      */
+    ["com.affine.download.strawnote-developing-hint"](): string;
+    /**
       * `Try again`
       */
     ["com.affine.auth.open.affine.try-again"](): string;

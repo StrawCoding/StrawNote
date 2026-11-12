@@ -45,7 +45,7 @@ export function getBuildConfig(
         editorVersion: pkg.version,
         githubUrl: 'https://github.com/StrawCoding/StrawNote',
         changelogUrl: 'https://github.com/StrawCoding/StrawNote/releases',
-        downloadUrl: 'https://github.com/StrawCoding/StrawNote/releases/latest',
+        downloadUrl: 'https://affine.pro/download',
         pricingUrl: 'https://github.com/StrawCoding/StrawNote',
         discordUrl: 'https://github.com/StrawCoding/StrawNote/discussions',
         requestLicenseUrl: 'https://github.com/StrawCoding/StrawNote',

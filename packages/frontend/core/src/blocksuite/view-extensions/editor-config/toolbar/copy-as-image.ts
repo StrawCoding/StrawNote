@@ -1,4 +1,5 @@
 import { notify } from '@affine/component';
+import { openAppDownloadPage } from '@affine/component/utils/download-app';
 import { isMindmapChild, isMindMapRoot } from '@affine/core/blocksuite/ai';
 import { EditorService } from '@affine/core/modules/editor';
 import { apis } from '@affine/electron-api';
@@ -114,7 +115,7 @@ export function copyAsImage(std: BlockStdScope) {
           key: 'download',
           label: I18n.t('com.affine.copy.asImage.notAvailable.action'),
           onClick: () => {
-            window.open('https://github.com/StrawCoding/StrawNote/releases/latest');
+            openAppDownloadPage();
           },
         },
       ],
