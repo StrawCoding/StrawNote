@@ -8,6 +8,11 @@ import { STRAWNOTE_CLOUD_URL } from '../../constants/strawnote-links';
 import { DEFAULT_SELF_HOSTED_SERVER_NAME } from './server-name';
 import type { ServerConfig, ServerMetadata } from './types';
 
+/**
+ * Default cloud = AFFiNE official.
+ * Native apps cannot use location.origin, so they point at app.affine.pro
+ * (or channel-specific AFFiNE hosts). Self-hosted builds still use location.origin.
+ */
 export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
   environment.isSelfHosted
     ? [
@@ -39,7 +44,7 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
               ? 'http://localhost:8080'
               : location.origin,
             config: {
-              serverName: 'StrawNote Cloud',
+              serverName: 'AFFiNE Cloud',
               features: [
                 ServerFeature.Indexer,
                 ServerFeature.Copilot,
@@ -67,10 +72,12 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
             {
               id: 'affine-cloud',
               baseUrl: BUILD_CONFIG.isNative
-                ? STRAWNOTE_CLOUD_URL
+                ? BUILD_CONFIG.isIOS
+                  ? 'https://apple.getaffineapp.com'
+                  : STRAWNOTE_CLOUD_URL
                 : location.origin,
               config: {
-                serverName: 'StrawNote Cloud',
+                serverName: 'AFFiNE Cloud',
                 features: [
                   ServerFeature.Indexer,
                   ServerFeature.Copilot,
@@ -98,10 +105,12 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
               {
                 id: 'affine-cloud',
                 baseUrl: BUILD_CONFIG.isNative
-                  ? STRAWNOTE_CLOUD_URL
+                  ? BUILD_CONFIG.isIOS
+                    ? 'https://apple.getaffineapp.com'
+                    : 'https://insider.affine.pro'
                   : location.origin,
                 config: {
-                  serverName: 'StrawNote Cloud',
+                  serverName: 'AFFiNE Cloud',
                   features: [
                     ServerFeature.Indexer,
                     ServerFeature.Copilot,
@@ -128,9 +137,9 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
             ? [
                 {
                   id: 'affine-cloud',
-                  baseUrl: STRAWNOTE_CLOUD_URL,
+                  baseUrl: 'https://insider.affine.pro',
                   config: {
-                    serverName: 'StrawNote Cloud',
+                    serverName: 'AFFiNE Cloud',
                     features: [
                       ServerFeature.Indexer,
                       ServerFeature.Copilot,
@@ -158,10 +167,10 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
                   {
                     id: 'affine-cloud',
                     baseUrl: BUILD_CONFIG.isNative
-                      ? STRAWNOTE_CLOUD_URL
+                      ? 'https://affine.fail'
                       : location.origin,
                     config: {
-                      serverName: 'StrawNote Cloud',
+                      serverName: 'AFFiNE Cloud',
                       features: [
                         ServerFeature.Indexer,
                         ServerFeature.Copilot,
@@ -195,9 +204,9 @@ export type TelemetryChannel =
 
 const OFFICIAL_TELEMETRY_ENDPOINTS: Record<TelemetryChannel, string> = {
   stable: STRAWNOTE_CLOUD_URL,
-  beta: STRAWNOTE_CLOUD_URL,
-  internal: STRAWNOTE_CLOUD_URL,
-  canary: STRAWNOTE_CLOUD_URL,
+  beta: 'https://insider.affine.pro',
+  internal: 'https://insider.affine.pro',
+  canary: 'https://affine.fail',
   local: 'http://localhost:8080',
 };
 
