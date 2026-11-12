@@ -2617,6 +2617,8 @@
   "error.REPLY_NOT_FOUND": "Reply not found.",
   "error.COMMENT_ATTACHMENT_NOT_FOUND": "Comment attachment not found.",
   "error.COMMENT_ATTACHMENT_QUOTA_EXCEEDED": "You have exceeded the comment attachment size quota.",
-  "com.affine.download.strawnote-developing-tip": "StrawNote is under active development. You will be redirected to the official AFFiNE download page for now.",
-  "com.affine.download.strawnote-developing-hint": "StrawNote desktop app is under development; downloads currently use official AFFiNE."
+  "com.affine.download.strawnote-developing-tip": "The StrawNote desktop app is still being built. You will be taken to the official AFFiNE download page for now.",
+  "com.affine.download.strawnote-developing-hint": "StrawNote desktop app is under development; downloads currently use official AFFiNE.",
+  "com.affine.download.strawnote-developing-title": "StrawNote is under active development",
+  "com.affine.download.strawnote-developing-confirm": "Go to download"
 }

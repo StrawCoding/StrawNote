@@ -2620,6 +2620,8 @@
   "error.COPILOT_CONTEXT_FILE_NOT_SUPPORTED": "文件 {{fileName}} 不支援用作上下文：{{message}}",
   "error.COPILOT_FAILED_TO_MATCH_GLOBAL_CONTEXT": "未能在工作區 {{workspaceId}} 中使用 \"%7B%7Bcontent%7D%7D\" 匹配上下文：{{message}}",
   "error.COPILOT_FAILED_TO_ADD_WORKSPACE_FILE_EMBEDDING": "無法新增工作區檔案嵌入： {{message}}",
-  "com.affine.download.strawnote-developing-tip": "StrawNote 正在努力開發中，目前先導向官方 AFFiNE 下載頁。",
-  "com.affine.download.strawnote-developing-hint": "StrawNote 桌面版開發中，下載暫用官方 AFFiNE。"
+  "com.affine.download.strawnote-developing-tip": "StrawNote 桌面版尚在開發中，目前將先導向官方 AFFiNE 下載頁。",
+  "com.affine.download.strawnote-developing-hint": "StrawNote 桌面版開發中，下載暫用官方 AFFiNE。",
+  "com.affine.download.strawnote-developing-title": "StrawNote 正在努力開發",
+  "com.affine.download.strawnote-developing-confirm": "前往下載"
 }

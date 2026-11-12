@@ -2726,6 +2726,8 @@
     "SEARCH_PROVIDER_UNAVAILABLE": "搜索服务暂时不可用。",
     "SEARCH_INDEX_FAILED": "搜索索引暂时不可用。"
   },
-  "com.affine.download.strawnote-developing-tip": "StrawNote 正在努力开发中，目前先导向官方 AFFiNE 下载页。",
-  "com.affine.download.strawnote-developing-hint": "StrawNote 桌面版开发中，下载暂用官方 AFFiNE。"
+  "com.affine.download.strawnote-developing-tip": "StrawNote 桌面版仍在开发中，目前将先导向官方 AFFiNE 下载页。",
+  "com.affine.download.strawnote-developing-hint": "StrawNote 桌面版开发中，下载暂用官方 AFFiNE。",
+  "com.affine.download.strawnote-developing-title": "StrawNote 正在努力开发",
+  "com.affine.download.strawnote-developing-confirm": "前往下载"
 }

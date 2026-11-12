@@ -1,5 +1,6 @@
 import { ConfirmModalProvider, PromptModalProvider } from '@affine/component';
 import { ProviderComposer } from '@affine/component/provider-composer';
+import { AppDownloadConfirmBridge } from '@affine/component/utils/download-app';
 import { DirectionProvider } from '@affine/core/components/direction-provider';
 import { ThemeProvider } from '@affine/core/components/theme-provider';
 import type { createStore } from 'jotai';
@@ -29,6 +30,7 @@ export function AffineContext(props: AffineContextProps) {
         [props.store]
       )}
     >
+      <AppDownloadConfirmBridge />
       {props.children}
     </ProviderComposer>
   );
