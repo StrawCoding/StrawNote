@@ -48,21 +48,7 @@
       <li>AI partner helps you better write, draw and plan. Let you think bigger, create faster, work smarter in anytime, anywhere</li>
     </ul>
   </description>
-  <launchable type="desktop-id">affine.desktop</launchable>
-  <screenshots>
-    <screenshot type="default">
-      <image>https://affine.pro/overview/Write.jpg</image>
-      <caption>Document writing interface with block-based editing</caption>
-    </screenshot>
-    <screenshot>
-      <image>https://affine.pro/overview/Draw.jpg</image>
-      <caption>Whiteboard drawing and visualization capabilities</caption>
-    </screenshot>
-    <screenshot>
-      <image>https://affine.pro/overview/Plan.jpg</image>
-      <caption>Project planning and task management view</caption>
-    </screenshot>
-  </screenshots>
+  <launchable type="desktop-id">strawnote.desktop</launchable>
   <releases>
     <release version="0.27.5" date="2026-09-09">
       <url>https://github.com/StrawCoding/StrawNote/releases/tag/v0.27.5</url>

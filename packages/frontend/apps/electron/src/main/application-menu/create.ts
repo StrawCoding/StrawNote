@@ -254,7 +254,7 @@ export function createApplicationMenu() {
           click: async () => {
             // oxlint-disable-next-line no-var-requires
             const { shell } = require('electron');
-            await shell.openExternal('https://affine.pro/');
+            await shell.openExternal('https://github.com/StrawCoding/StrawNote');
           },
         },
         {
@@ -276,7 +276,7 @@ export function createApplicationMenu() {
             // oxlint-disable-next-line no-var-requires
             const { shell } = require('electron');
             await shell.openExternal(
-              'https://docs.affine.pro/docs/hello-bonjour-aloha-你好'
+              'https://github.com/StrawCoding/StrawNote#readme'
             );
           },
         },

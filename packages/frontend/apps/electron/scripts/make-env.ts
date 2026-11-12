@@ -44,7 +44,7 @@ const icnsPath = path.join(
 
 const iconPngPath = path.join(ROOT, './resources/icons/icon.png');
 
-const iconUrl = `https://cdn.affine.pro/app-icons/icon_${buildType}.ico`;
+const iconUrl = `https://raw.githubusercontent.com/StrawCoding/StrawNote/strawnote/packages/frontend/core/public/StrawNote.png`;
 
 log(`buildType=${buildType}, productName=${productName}, icoPath=${icoPath}`);
 

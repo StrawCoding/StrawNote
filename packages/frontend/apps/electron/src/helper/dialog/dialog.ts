@@ -39,7 +39,7 @@ export interface SelectMarkdownSyncFolderResult {
   canceled?: boolean;
 }
 
-const extension = 'affine';
+const extension = 'strawnote';
 
 function getDefaultDBFileName(name: string, id: string) {
   const fileName = `${name}_${id}.${extension}`;
@@ -214,7 +214,7 @@ export async function loadDBFile(): Promise<LoadDBFileResult> {
         {
           name: 'SQLite Database',
           // do we want to support other file format?
-          extensions: ['db', 'affine'],
+          extensions: ['db', 'strawnote', 'affine'],
         },
       ],
       message: 'Load Workspace from a StrawNote file',

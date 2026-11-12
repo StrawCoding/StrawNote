@@ -2,4 +2,4 @@
 set -e
 
 BUILD_TYPE=$(ls /usr/lib | grep '^affine')
-install -Dm0644 /usr/lib/${BUILD_TYPE}/resources/affine.metainfo.xml /usr/share/metainfo/affine.metainfo.xml
+install -Dm0644 /usr/lib/${BUILD_TYPE}/resources/strawnote.metainfo.xml /usr/share/metainfo/strawnote.metainfo.xml

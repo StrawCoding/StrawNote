@@ -170,7 +170,7 @@ const makers = [
       config: {
         format: 'ULMO',
         icon: icnsPath,
-        name: 'AFFiNE',
+        name: 'StrawNote',
         'icon-size': 128,
         background: path.join(
           __dirname,
@@ -204,7 +204,7 @@ const makers = [
   {
     name: '@electron-forge/maker-zip',
     config: {
-      name: 'affine',
+      name: 'strawnote',
       iconUrl: icoPath,
       setupIcon: icoPath,
       platforms: ['darwin', 'linux', 'win32'],
@@ -280,8 +280,8 @@ const makers = [
         baseVersion: '25.08',
         files: [
           [
-            './resources/affine.metainfo.xml',
-            '/usr/share/metainfo/affine.metainfo.xml',
+            './resources/strawnote.metainfo.xml',
+            '/usr/share/metainfo/strawnote.metainfo.xml',
           ],
         ],
         modules: [
@@ -351,7 +351,7 @@ export default {
     // We need the following line for updater
     extraResource: [
       './resources/app-update.yml',
-      ...(platform === 'linux' ? ['./resources/affine.metainfo.xml'] : []),
+      ...(platform === 'linux' ? ['./resources/strawnote.metainfo.xml'] : []),
     ],
     protocols: [
       {
@@ -384,7 +384,7 @@ export default {
     asar: true,
     extendInfo: {
       NSAudioCaptureUsageDescription:
-        'Please allow access in order to capture audio from other apps by AFFiNE.',
+        'Please allow access in order to capture audio from other apps by StrawNote.',
     },
   },
   makers,
