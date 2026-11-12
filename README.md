@@ -1,3 +1,33 @@
+# StrawNote（稻草筆記）
+
+> **本倉庫由 [AFFiNE](https://github.com/toeverything/AFFiNE) 分支而來（Based on / branched from AFFiNE）。**  
+> Upstream remote：`affine` → `https://github.com/toeverything/AFFiNE.git`  
+> 基準分支：`canary`（凍結點見下方 Upstream 資訊）  
+> 本地開發分支：`strawnote`
+
+StrawNote 是在 AFFiNE 開源知識庫／BlockSuite 架構上，朝「Markdown + 手寫（S Pen）自由混排、離線優先、`.straw` 可攜」方向演進的分支產品。上游 AFFiNE 的授權、貢獻者與原始功能說明仍適用於共用程式碼；產品品牌與後續變更以 StrawNote 為準。
+
+### Upstream 資訊
+
+| 項目 | 值 |
+|---|---|
+| 上游專案 | [toeverything/AFFiNE](https://github.com/toeverything/AFFiNE) |
+| 上游預設分支 | `canary` |
+| 分支起始 commit | `9c6155027`（`feat(server): cleanup embedding after workspace deleted (#15851)`） |
+| 本倉庫分支 | `strawnote`（自 AFFiNE `canary` 分出） |
+
+同步上游範例：
+
+```bash
+git fetch affine
+git merge affine/canary
+# 或：git rebase affine/canary
+```
+
+---
+
+## 以下為上游 AFFiNE 原始 README（保留供對照）
+
 <div align="center">
 
 <h1 style="border-bottom: none">
