@@ -4,6 +4,7 @@ import {
   ServerFeature,
 } from '@affine/graphql';
 
+import { STRAWNOTE_CLOUD_URL } from '../../constants/strawnote-links';
 import { DEFAULT_SELF_HOSTED_SERVER_NAME } from './server-name';
 import type { ServerConfig, ServerMetadata } from './types';
 
@@ -66,9 +67,7 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
             {
               id: 'affine-cloud',
               baseUrl: BUILD_CONFIG.isNative
-                ? BUILD_CONFIG.isIOS
-                  ? 'https://apple.getaffineapp.com'
-                  : 'https://app.affine.pro'
+                ? STRAWNOTE_CLOUD_URL
                 : location.origin,
               config: {
                 serverName: 'StrawNote Cloud',
@@ -99,9 +98,7 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
               {
                 id: 'affine-cloud',
                 baseUrl: BUILD_CONFIG.isNative
-                  ? BUILD_CONFIG.isIOS
-                    ? 'https://apple.getaffineapp.com'
-                    : 'https://insider.affine.pro'
+                  ? STRAWNOTE_CLOUD_URL
                   : location.origin,
                 config: {
                   serverName: 'StrawNote Cloud',
@@ -131,7 +128,7 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
             ? [
                 {
                   id: 'affine-cloud',
-                  baseUrl: 'https://insider.affine.pro',
+                  baseUrl: STRAWNOTE_CLOUD_URL,
                   config: {
                     serverName: 'StrawNote Cloud',
                     features: [
@@ -161,7 +158,7 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
                   {
                     id: 'affine-cloud',
                     baseUrl: BUILD_CONFIG.isNative
-                      ? 'https://affine.fail'
+                      ? STRAWNOTE_CLOUD_URL
                       : location.origin,
                     config: {
                       serverName: 'StrawNote Cloud',
@@ -197,10 +194,10 @@ export type TelemetryChannel =
   | 'local';
 
 const OFFICIAL_TELEMETRY_ENDPOINTS: Record<TelemetryChannel, string> = {
-  stable: 'https://app.affine.pro',
-  beta: 'https://insider.affine.pro',
-  internal: 'https://insider.affine.pro',
-  canary: 'https://affine.fail',
+  stable: STRAWNOTE_CLOUD_URL,
+  beta: STRAWNOTE_CLOUD_URL,
+  internal: STRAWNOTE_CLOUD_URL,
+  canary: STRAWNOTE_CLOUD_URL,
   local: 'http://localhost:8080',
 };
 

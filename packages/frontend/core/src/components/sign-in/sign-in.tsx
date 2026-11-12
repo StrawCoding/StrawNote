@@ -207,7 +207,7 @@ export const SignInStep = ({
               {/*prettier-ignore*/}
               <Trans i18nKey="com.affine.auth.sign.message">
                 By clicking &quot;Continue with Google/Email&quot; above, you acknowledge that
-                you agree to StrawNote&apos;s <a href="https://affine.pro/terms" target="_blank" rel="noreferrer">Terms of Conditions</a> and <a href="https://affine.pro/privacy" target="_blank" rel="noreferrer">Privacy Policy</a>.
+                you agree to StrawNote&apos;s <a href="https://github.com/StrawCoding/StrawNote/blob/strawnote/LICENSE" target="_blank" rel="noreferrer">Terms of Conditions</a> and <a href="https://github.com/StrawCoding/StrawNote/blob/strawnote/LICENSE" target="_blank" rel="noreferrer">Privacy Policy</a>.
             </Trans>
             </div>
             <div className={style.skipDivider}>

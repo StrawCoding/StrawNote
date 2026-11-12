@@ -13,6 +13,12 @@ import { useServices } from '@toeverything/infra';
 import { useCallback } from 'react';
 
 import { useAppSettingHelper } from '../../../../../components/hooks/affine/use-app-setting-helper';
+import {
+  STRAWNOTE_COMMUNITY_URL,
+  STRAWNOTE_HOME_URL,
+  STRAWNOTE_PRIVACY_URL,
+  STRAWNOTE_TERMS_URL,
+} from '../../../../../constants/strawnote-links';
 import { relatedLinks } from './config';
 import * as styles from './style.css';
 import { UpdateCheckSection } from './update-check-section';
@@ -75,7 +81,9 @@ export const AboutAffine = () => {
             <UpdateCheckSection />
             <SettingRow
               name={t['com.affine.aboutStrawNote.autoCheckUpdate.title']()}
-              desc={t['com.affine.aboutStrawNote.autoCheckUpdate.description']()}
+              desc={t[
+                'com.affine.aboutStrawNote.autoCheckUpdate.description'
+              ]()}
             >
               <Switch
                 checked={appSettings.autoCheckUpdate}
@@ -119,7 +127,7 @@ export const AboutAffine = () => {
         <a
           className={styles.link}
           rel="noreferrer"
-          href="https://affine.pro"
+          href={STRAWNOTE_HOME_URL}
           target="_blank"
         >
           {t['com.affine.aboutStrawNote.contact.website']()}
@@ -128,7 +136,7 @@ export const AboutAffine = () => {
         <a
           className={styles.link}
           rel="noreferrer"
-          href="https://affine.pro/redirect/discord"
+          href={STRAWNOTE_COMMUNITY_URL}
           target="_blank"
         >
           {t['com.affine.aboutStrawNote.contact.community']()}
@@ -157,7 +165,7 @@ export const AboutAffine = () => {
         <a
           className={styles.link}
           rel="noreferrer"
-          href="https://affine.pro/privacy"
+          href={STRAWNOTE_PRIVACY_URL}
           target="_blank"
         >
           {t['com.affine.aboutStrawNote.legal.privacy']()}
@@ -166,7 +174,7 @@ export const AboutAffine = () => {
         <a
           className={styles.link}
           rel="noreferrer"
-          href="https://affine.pro/terms"
+          href={STRAWNOTE_TERMS_URL}
           target="_blank"
         >
           {t['com.affine.aboutStrawNote.legal.tos']()}

@@ -156,7 +156,7 @@ export const AddSelfhostedStep = ({
             components={{
               1: (
                 <a
-                  href="https://docs.affine.pro/docs/self-host-affine"
+                  href="https://github.com/StrawCoding/StrawNote/blob/strawnote/docs/BUILDING.md"
                   target="_blank"
                   rel="noreferrer"
                 />

@@ -31,12 +31,12 @@ const links = [
     label: 'Report an Issue',
   },
   {
-    href: 'https://docs.affine.pro/docs/self-host-affine',
+    href: 'https://github.com/StrawCoding/StrawNote/blob/strawnote/docs/BUILDING.md',
     icon: <AlbumIcon size={20} />,
     label: 'Self-host Document',
   },
   {
-    href: 'https://affine.pro/pricing/?type=selfhost#table',
+    href: 'https://github.com/StrawCoding/StrawNote',
     icon: <UploadCloudIcon size={20} />,
     label: 'Upgrade to Team',
   },

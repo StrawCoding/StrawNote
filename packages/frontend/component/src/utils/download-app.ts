@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import type { ConfirmModalProps } from '../ui/modal/confirm-modal';
 import { useConfirmModal } from '../ui/modal/confirm-modal';
 
-/** Temporary: StrawNote desktop builds are not ready; use official AFFiNE downloads. */
+/** Temporary: StrawNote desktop builds are not ready; use interim download page. */
 export const OFFICIAL_APP_DOWNLOAD_URL = 'https://affine.pro/download';
 
 type OpenConfirmModal = (
@@ -43,7 +43,7 @@ export function openAppDownloadPage(
     'StrawNote is under active development';
   const description =
     I18n.t('com.affine.download.strawnote-developing-tip') ||
-    'StrawNote is under active development. You will be redirected to the official AFFiNE download page for now.';
+    'StrawNote is under active development. You will be redirected to a temporary download page for now.';
   const confirmText =
     I18n.t('com.affine.download.strawnote-developing-confirm') ||
     'Go to download';

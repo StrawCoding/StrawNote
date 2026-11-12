@@ -1,5 +1,11 @@
 import { useI18n } from '@affine/i18n';
 
+import {
+  STRAWNOTE_COMMUNITY_URL,
+  STRAWNOTE_HOME_URL,
+  STRAWNOTE_PRIVACY_URL,
+  STRAWNOTE_TERMS_URL,
+} from '../../../../constants/strawnote-links';
 import { SettingGroup } from '../group';
 import { RowLayout } from '../row.layout';
 
@@ -10,26 +16,26 @@ export const OthersGroup = () => {
     <SettingGroup title={t['com.affine.mobile.setting.others.title']()}>
       <RowLayout
         label={t['com.affine.mobile.setting.others.discord']()}
-        href="https://discord.com/invite/whd5mjYqVw"
+        href={STRAWNOTE_COMMUNITY_URL}
       />
       <RowLayout
         label={t['com.affine.mobile.setting.others.github']()}
-        href="https://github.com/StrawCoding/StrawNote"
+        href={STRAWNOTE_HOME_URL}
       />
 
       <RowLayout
         label={t['com.affine.mobile.setting.others.website']()}
-        href="https://affine.pro/"
+        href={STRAWNOTE_HOME_URL}
       />
 
       <RowLayout
         label={t['com.affine.mobile.setting.others.privacy']()}
-        href="https://affine.pro/privacy"
+        href={STRAWNOTE_PRIVACY_URL}
       />
 
       <RowLayout
         label={t['com.affine.mobile.setting.others.terms']()}
-        href="https://affine.pro/terms"
+        href={STRAWNOTE_TERMS_URL}
       />
     </SettingGroup>
   );

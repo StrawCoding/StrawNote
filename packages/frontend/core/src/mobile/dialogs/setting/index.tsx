@@ -24,12 +24,13 @@ import { SwipeDialog } from './swipe-dialog';
 import { UserProfile } from './user-profile';
 import { UserUsage } from './user-usage';
 
-const AFFINE_MOBILE_STORE_URL = BUILD_CONFIG.isIOS
-  ? 'https://apps.apple.com/app/notes-whiteboard-ai-affine/id6736937980'
+const STRAWNOTE_MOBILE_STORE_URL = BUILD_CONFIG.isIOS
+  ? undefined // StrawNote iOS not published yet
   : BUILD_CONFIG.isAndroid
-    ? 'https://play.google.com/store/apps/details?id=app.affine.pro'
+    ? 'https://play.google.com/store/apps/details?id=com.strawcoding.strawnote'
     : undefined;
-const AFFINE_DOWNLOAD_URL = 'https://affine.pro/download';
+const STRAWNOTE_DOWNLOAD_URL =
+  BUILD_CONFIG.downloadUrl || 'https://affine.pro/download';
 
 const SupportGroup = () => {
   const t = useI18n();
@@ -39,7 +40,7 @@ const SupportGroup = () => {
     const shareData = {
       title: 'StrawNote',
       text: t['com.affine.mobile.setting.support.invite-message'](),
-      url: AFFINE_DOWNLOAD_URL,
+      url: STRAWNOTE_DOWNLOAD_URL,
     };
 
     if ('share' in navigator && typeof navigator.share === 'function') {
@@ -53,21 +54,21 @@ const SupportGroup = () => {
       }
     }
 
-    const copied = await copyTextToClipboard(AFFINE_DOWNLOAD_URL);
+    const copied = await copyTextToClipboard(STRAWNOTE_DOWNLOAD_URL);
     if (copied) {
       notify.success({ title: t['Copied link to clipboard']() });
       return;
     }
 
-    urlService.openExternal(AFFINE_DOWNLOAD_URL);
+    urlService.openExternal(STRAWNOTE_DOWNLOAD_URL);
   }, [t, urlService]);
 
   return (
     <SettingGroup title={t['com.affine.mobile.setting.support.title']()}>
-      {AFFINE_MOBILE_STORE_URL ? (
+      {STRAWNOTE_MOBILE_STORE_URL ? (
         <RowLayout
           label={t['com.affine.mobile.setting.support.rate']()}
-          onClick={() => urlService.openExternal(AFFINE_MOBILE_STORE_URL)}
+          onClick={() => urlService.openExternal(STRAWNOTE_MOBILE_STORE_URL)}
         />
       ) : null}
       <RowLayout

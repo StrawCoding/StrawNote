@@ -46,9 +46,10 @@ export const ImportPage = ({
     <div className={importPageBodyStyle}>
       <div className="title">Import</div>
       <span>
-        StrawNote will gradually support more and more file types for import.&nbsp;
+        StrawNote will gradually support more and more file types for
+        import.&nbsp;
         <a
-          href="https://affine.pro/redirect/discord"
+          href="https://github.com/StrawCoding/StrawNote/discussions"
           target="_blank"
           rel="noreferrer"
         >

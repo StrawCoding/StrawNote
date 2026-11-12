@@ -65,7 +65,7 @@ export const OpenInAppPage = ({
 
         <div className={styles.topNavLinks}>
           <a
-            href="https://affine.pro"
+            href="https://github.com/StrawCoding/StrawNote"
             target="_blank"
             rel="noreferrer"
             className={styles.topNavLink}
@@ -73,7 +73,7 @@ export const OpenInAppPage = ({
             Official Website
           </a>
           <a
-            href="https://affine.pro/blog"
+            href="https://github.com/StrawCoding/StrawNote/releases"
             target="_blank"
             rel="noreferrer"
             className={styles.topNavLink}
@@ -81,7 +81,7 @@ export const OpenInAppPage = ({
             Blog
           </a>
           <a
-            href="https://affine.pro/about-us"
+            href="https://github.com/StrawCoding/StrawNote"
             target="_blank"
             rel="noreferrer"
             className={styles.topNavLink}

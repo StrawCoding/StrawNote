@@ -430,7 +430,7 @@ const SharePageFooter = () => {
   }
   return (
     <a
-      href="https://affine.pro"
+      href="https://github.com/StrawCoding/StrawNote"
       target="_blank"
       className={styles.link}
       rel="noreferrer"

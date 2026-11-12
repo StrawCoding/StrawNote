@@ -50,7 +50,7 @@ export function useStrawNoteI18N(): {
     /**
       * `StrawNote Cloud`
       */
-    ["StrawNote Cloud"](): string;
+    ["AFFiNE Cloud"](): string;
     /**
       * `All docs`
       */
@@ -186,11 +186,11 @@ export function useStrawNoteI18N(): {
     /**
       * `Enable StrawNote Sync`
       */
-    ["Enable StrawNote Cloud"](): string;
+    ["Enable AFFiNE Cloud"](): string;
     /**
       * `Your workspace will be synced and backed up with StrawNote Sync.`
       */
-    ["Enable StrawNote Cloud Description"](): string;
+    ["Enable AFFiNE Cloud Description"](): string;
     /**
       * `Some features need StrawNote Sync. Web workspaces are saved in this browser and may be removed automatically when disk space is low. Enable StrawNote Sync to keep this workspace safer and available across devices.`
       */
@@ -1297,22 +1297,6 @@ export function useStrawNoteI18N(): {
       * `Download app`
       */
     ["com.affine.auth.open.affine.download-app"](): string;
-    /**
-      * `StrawNote is under active development`
-      */
-    ["com.affine.download.strawnote-developing-title"](): string;
-    /**
-      * `The StrawNote desktop app is still being built. You will be taken to the official AFFiNE download page for now.`
-      */
-    ["com.affine.download.strawnote-developing-tip"](): string;
-    /**
-      * `Go to download`
-      */
-    ["com.affine.download.strawnote-developing-confirm"](): string;
-    /**
-      * `StrawNote desktop app is under development; downloads currently use official AFFiNE.`
-      */
-    ["com.affine.download.strawnote-developing-hint"](): string;
     /**
       * `Try again`
       */
@@ -9885,6 +9869,22 @@ export function useStrawNoteI18N(): {
       */
     ["com.affine.realtime.connection-error.timeout"](): string;
     /**
+      * `The StrawNote desktop app is still being built. You will be redirected to a temporary download page for now.`
+      */
+    ["com.affine.download.strawnote-developing-tip"](): string;
+    /**
+      * `StrawNote desktop app is under development; a temporary download page will open.`
+      */
+    ["com.affine.download.strawnote-developing-hint"](): string;
+    /**
+      * `StrawNote is under active development`
+      */
+    ["com.affine.download.strawnote-developing-title"](): string;
+    /**
+      * `Go to download`
+      */
+    ["com.affine.download.strawnote-developing-confirm"](): string;
+    /**
       * `An internal error occurred.`
       */
     ["error.INTERNAL_SERVER_ERROR"](): string;
@@ -10579,7 +10579,7 @@ export function useStrawNoteI18N(): {
         requiredVersion: string;
     }>): string;
     /**
-      * `This StrawNote server is too old for this client. Please upgrade the server to {{requiredVersion}}.`
+      * `This AFFiNE server is too old for this client. Please upgrade the server to {{requiredVersion}}.`
       */
     ["error.UNSUPPORTED_SERVER_VERSION"](options: {
         readonly requiredVersion: string;
@@ -11017,8 +11017,8 @@ export const TypedTrans: {
         strong: JSX.Element;
     }>>;
     /**
-      * `<strong>Where AI meets your meetings - affine your collaboration.</strong>
-    <ul><li>Extract Action Items & Key Insights Instantly</li><li>Smart Auto-Capture Starts With Your Meeting</li><li>Seamless Integration Across All Meeting Platforms</li><li>One Unified Space for All Your Meeting's Context</li><li>Your AI Assistant with Every Meeting Context Preserved</li></ul>`
+      * `<strong>Where AI meets your meetings — elevate your collaboration.</strong>
+    <ul><li>Extract Action Items & Key Insights Instantly</li><li>Smart Auto-Capture Starts With Your Meeting</li><li>Seamless Integration Across All Platforms</li></ul>`
       */
     ["com.affine.settings.meetings.setting.welcome.hints"]: ComponentType<TypedTransProps<Readonly<{}>, {
         strong: JSX.Element;

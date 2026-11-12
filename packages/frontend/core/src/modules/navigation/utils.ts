@@ -7,9 +7,10 @@ import queryString from 'query-string';
 function maybeAffineOrigin(origin: string, baseUrl: string) {
   return (
     origin.startsWith('assets://') ||
-    origin.endsWith('affine.pro') || // stable/beta
-    origin.endsWith('apple.getaffineapp.com') || // stable/beta
-    origin.endsWith('affine.fail') || // canary
+    origin.endsWith('affine.pro') || // upstream legacy
+    origin.endsWith('apple.getaffineapp.com') || // upstream legacy
+    origin.endsWith('affine.fail') || // upstream canary
+    origin.endsWith('wastebase.xyz') || // StrawNote self-host / demos
     origin === baseUrl // localhost or self-hosted
   );
 }
