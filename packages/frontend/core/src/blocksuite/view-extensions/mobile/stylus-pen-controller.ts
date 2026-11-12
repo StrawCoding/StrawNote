@@ -5,11 +5,8 @@ import {
   HighlighterTool,
 } from '@blocksuite/affine/gfx/brush';
 import { DisposableGroup } from '@blocksuite/affine/global/disposable';
-import {
-  type BlockStdScope,
-  GfxControllerIdentifier,
-  LifeCycleWatcher,
-} from '@blocksuite/affine/std';
+import { type BlockStdScope, LifeCycleWatcher } from '@blocksuite/affine/std';
+import { GfxControllerIdentifier } from '@blocksuite/affine/std/gfx';
 
 import {
   isStylusPointer,

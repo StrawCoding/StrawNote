@@ -19,16 +19,29 @@ def nativeAbi = nativeTarget == 'x86_64' ? 'x86_64' : 'arm64-v8a'
 
 apply from: 'capacitor.build.gradle'
 
+def strawnoteKeystoreProperties = new Properties()
+def strawnoteKeystorePropertiesFile = rootProject.file('key.properties')
+if (strawnoteKeystorePropertiesFile.exists()) {
+    strawnoteKeystorePropertiesFile.withInputStream { strawnoteKeystoreProperties.load(it) }
+}
+
+def strawnoteVersionName = (System.getenv('VERSION_NAME') ?: System.getenv('CI_VERSION_NAME') ?: '0.27.5').replaceFirst(/^v/, '')
+def strawnoteVersionCode = (System.getenv('VERSION_CODE') ?: '1') as int
+
 android {
     namespace = "com.strawcoding.strawnote"
     compileSdk = rootProject.ext.compileSdkVersion
-    ndkVersion = new File(sdkDirectory, "ndk").listFiles().sort().last().name
+    def ndkDir = new File(sdkDirectory, "ndk")
+    def ndkVersions = ndkDir.exists() ? ndkDir.listFiles()?.findAll { it.isDirectory() }?.sort() : null
+    if (ndkVersions) {
+        ndkVersion = ndkVersions.last().name
+    }
     defaultConfig {
         applicationId = "com.strawcoding.strawnote"
         minSdkVersion = rootProject.ext.minSdkVersion
         targetSdkVersion = rootProject.ext.targetSdkVersion
-        versionCode = 1
-        versionName = System.getenv('VERSION_NAME') ?: 'v1.0.0-local'
+        versionCode = strawnoteVersionCode
+        versionName = strawnoteVersionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [usesCleartextTraffic: "false"]
         aaptOptions {
@@ -38,6 +51,21 @@ android {
         }
         ndk {
             abiFilters nativeAbi
+        }
+    }
+    signingConfigs {
+        release {
+            if (strawnoteKeystoreProperties['storeFile']) {
+                storeFile file(strawnoteKeystoreProperties['storeFile'])
+                storePassword strawnoteKeystoreProperties['storePassword']
+                keyAlias strawnoteKeystoreProperties['keyAlias']
+                keyPassword strawnoteKeystoreProperties['keyPassword']
+            } else if (System.getenv('ANDROID_KEYSTORE_FILE')) {
+                storeFile file(System.getenv('ANDROID_KEYSTORE_FILE'))
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            }
         }
     }
     buildFeatures {
@@ -50,6 +78,9 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (signingConfigs.release.storeFile != null) {
+                signingConfig signingConfigs.release
+            }
         }
         profile {
             initWith release

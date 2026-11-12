@@ -1,0 +1,4 @@
+# StrawNote Android — package is always com.strawcoding.strawnote.
+# json_key_file comes from PLAY_JSON_KEY_PATH (CI / local secret); never commit the JSON.
+package_name(ENV.fetch("ANDROID_PACKAGE_NAME", "com.strawcoding.strawnote"))
+json_key_file(ENV["PLAY_JSON_KEY_PATH"]) if ENV["PLAY_JSON_KEY_PATH"].to_s.strip != ""

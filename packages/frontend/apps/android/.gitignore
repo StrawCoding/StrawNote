@@ -19,3 +19,11 @@ App/**/*.p8
 *.cer
 App/fastlane/report.xml
 affine.keystore
+key.properties
+local.properties
+*.jks
+*.keystore
+secrets/
+vendor/bundle
+.bundle/
+fastlane/report.xml

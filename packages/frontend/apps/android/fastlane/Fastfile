@@ -1,0 +1,114 @@
+# frozen_string_literal: true
+
+default_platform(:android)
+
+REPO_ROOT = File.expand_path("../../../../..", __dir__)
+ANDROID_APP_ROOT = File.expand_path("../App", __dir__)
+DEFAULT_PACKAGE_NAME = "com.strawcoding.strawnote"
+DEFAULT_PHONE_TRACK = "internal"
+DEFAULT_RELEASE_STATUS = "completed"
+PLAY_EDIT_CONFLICT_MESSAGE = "A change was made to the application outside of this Edit, please create a new edit."
+PLAY_DRAFT_APP_MESSAGE = "Only releases with status draft may be created on draft app"
+PLAY_INTERNAL_ERROR_MESSAGE = "Internal error encountered"
+PLAY_UPLOAD_MAX_ATTEMPTS = 3
+PLAY_UPLOAD_RETRY_DELAY_SECONDS = 15
+
+def require_env!(key)
+  value = ENV[key].to_s.strip
+  UI.user_error!("Missing required environment variable: #{key}") if value.empty?
+  value
+end
+
+def resolve_existing_path(explicit_path)
+  return "" if explicit_path.to_s.strip.empty?
+
+  absolute = File.expand_path(explicit_path)
+  File.exist?(absolute) ? absolute : ""
+end
+
+def glob_last(pattern)
+  Dir.glob(File.join(ANDROID_APP_ROOT, pattern)).sort.last.to_s
+end
+
+def resolve_aab(explicit_path)
+  resolved = resolve_existing_path(explicit_path)
+  return resolved unless resolved.empty?
+
+  found = glob_last("app/build/outputs/bundle/**/*.aab")
+  return found unless found.empty?
+
+  UI.user_error!("Unable to find AAB under App/app/build/outputs/bundle")
+end
+
+def resolve_mapping_path(explicit_path)
+  resolved = resolve_existing_path(explicit_path)
+  return resolved unless resolved.empty?
+
+  glob_last("app/build/outputs/mapping/**/mapping.txt")
+end
+
+def play_edit_conflict?(error)
+  error.message.to_s.include?(PLAY_EDIT_CONFLICT_MESSAGE)
+end
+
+def play_draft_app_required?(error)
+  error.message.to_s.include?(PLAY_DRAFT_APP_MESSAGE)
+end
+
+def play_internal_server_error?(error)
+  error.message.to_s.include?(PLAY_INTERNAL_ERROR_MESSAGE)
+end
+
+def upload_with_retry(params)
+  attempt = 1
+  begin
+    upload_to_play_store(params)
+  rescue StandardError => e
+    if (play_edit_conflict?(e) || play_internal_server_error?(e)) &&
+       attempt < PLAY_UPLOAD_MAX_ATTEMPTS
+      UI.important("Play upload attempt #{attempt} failed (#{e.message}); retrying…")
+      attempt += 1
+      sleep PLAY_UPLOAD_RETRY_DELAY_SECONDS
+      retry
+    end
+    raise
+  end
+end
+
+platform :android do
+  desc "Upload StrawNote AAB to Play internal testing"
+  lane :internal_testing do
+    package_name = ENV.fetch("ANDROID_PACKAGE_NAME", DEFAULT_PACKAGE_NAME)
+    track = ENV.fetch("PLAY_INTERNAL_TRACK", DEFAULT_PHONE_TRACK)
+    release_status = ENV.fetch("PLAY_RELEASE_STATUS", DEFAULT_RELEASE_STATUS)
+    aab = resolve_aab(ENV["AAB_PATH"])
+    mapping = resolve_mapping_path(ENV["PLAY_MAPPING_PATH"])
+
+    UI.message("Uploading #{aab} → #{package_name} track=#{track} status=#{release_status}")
+
+    params = {
+      package_name: package_name,
+      track: track,
+      aab: aab,
+      release_status: release_status,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: true,
+      changes_not_sent_for_review: true
+    }
+    params[:mapping] = mapping unless mapping.to_s.empty?
+
+    begin
+      upload_with_retry(params)
+    rescue StandardError => e
+      if play_draft_app_required?(e)
+        UI.important("Draft app requires draft releases; retrying with release_status=draft")
+        params[:release_status] = "draft"
+        upload_with_retry(params)
+      else
+        raise
+      end
+    end
+  end
+end
