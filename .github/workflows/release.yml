@@ -10,6 +10,16 @@ on:
         required: true
         default: 'server,desktop-macos,desktop-windows,desktop-linux?'
         type: string
+      base_version:
+        description: 'Base semver for pre-release (default: package.json, e.g. 0.27.4)'
+        required: false
+        default: ''
+        type: string
+      pre_id:
+        description: 'Optional pre counter XXXX for {base}-pre-XXXX (auto if empty)'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -25,6 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.plan.outputs.APP_VERSION }}
+      display_version: ${{ steps.plan.outputs.DISPLAY_VERSION }}
       sha: ${{ steps.plan.outputs.GIT_SHORT_HASH }}
       channel: ${{ steps.plan.outputs.BUILD_TYPE }}
       server: ${{ steps.plan.outputs.SERVER }}
@@ -59,6 +70,7 @@ jobs:
               if (!asset) continue;
               const response = await github.rest.repos.getReleaseAsset({...context.repo, asset_id: asset.id, headers: {accept:'application/octet-stream'}});
               const previous = JSON.parse(Buffer.from(response.data).toString('utf8'));
+              // StrawNote pre-releases use canary channel + {base}-pre-{N} versions
               if (previous.request.channel !== 'canary') continue;
               fs.writeFileSync('release-previous.json', JSON.stringify(previous));
               break;
@@ -67,8 +79,9 @@ jobs:
         id: plan
         with:
           targets: ${{ inputs.targets || 'server,desktop-macos,desktop-windows,desktop-linux?' }}
-          tool-image: ${{ vars.STRAWNOTE_RELEASE_TOOL_IMAGE || vars.AFFINE_RELEASE_TOOL_IMAGE || 'ghcr.io/strawcoding/strawnote-release:latest' }}
           created-at: ${{ steps.run.outputs.created-at }}
+          base-version: ${{ inputs.base_version || '' }}
+          pre-id: ${{ inputs.pre_id || '' }}
       - uses: actions/upload-artifact@v4
         with:
           overwrite: true

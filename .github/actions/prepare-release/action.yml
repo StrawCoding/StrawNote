@@ -1,19 +1,31 @@
 name: Prepare Release
-description: Resolve the application release with the published affine-release tool
+description: Resolve StrawNote pre-release plan ({base}-pre-{N})
 inputs:
   targets:
-    description: Targets accepted by affine-release plan
+    description: Targets (comma-separated; append ? for optional platforms)
     required: true
   created-at:
     description: Original GitHub workflow run creation time
     required: true
   tool-image:
-    description: Release tool image tag or digest
-    required: true
+    description: Unused legacy input (kept for workflow compatibility)
+    required: false
+    default: ''
+  pre-id:
+    description: Optional explicit pre-release counter (otherwise auto)
+    required: false
+    default: ''
+  base-version:
+    description: Optional base semver (defaults to package.json version without suffix)
+    required: false
+    default: ''
 outputs:
   APP_VERSION:
-    description: Planned application version
+    description: Planned application version (e.g. 0.27.4-pre-12)
     value: ${{ steps.plan.outputs.APP_VERSION }}
+  DISPLAY_VERSION:
+    description: Human display version (e.g. 0.27.4 pre-12)
+    value: ${{ steps.plan.outputs.DISPLAY_VERSION }}
   GIT_SHORT_HASH:
     description: Application source short SHA
     value: ${{ steps.plan.outputs.GIT_SHORT_HASH }}
@@ -35,36 +47,43 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ github.token }}
-    - name: Pull release tool
-      shell: bash
-      env:
-        TOOL_IMAGE: ${{ inputs.tool-image }}
-      run: docker pull "$TOOL_IMAGE"
-    - name: Resolve release plan
+    - name: Resolve StrawNote pre-release plan
       id: plan
       shell: bash
       env:
-        TOOL_IMAGE: ${{ inputs.tool-image }}
         TARGETS: ${{ inputs.targets }}
         RUN_CREATED_AT: ${{ inputs.created-at }}
+        PRE_ID: ${{ inputs.pre-id }}
+        BASE_VERSION: ${{ inputs.base-version }}
       run: |
         set -euo pipefail
-        previous=()
-        if [ -f release-previous.json ]; then previous=(--previous /work/release-previous.json); fi
-        docker run --rm --user "$(id -u):$(id -g)" -v "$GITHUB_WORKSPACE:/work" "$TOOL_IMAGE" plan \
-          --ref "$GITHUB_REF" --sha "$GITHUB_SHA" --targets "$TARGETS" \
-          --request-id "$GITHUB_REPOSITORY_ID-$GITHUB_RUN_ID" --created-at "$RUN_CREATED_AT" --out /work/release-plan.json "${previous[@]}"
+        args=(
+          --ref "$GITHUB_REF"
+          --sha "$GITHUB_SHA"
+          --targets "$TARGETS"
+          --request-id "${GITHUB_REPOSITORY_ID}-${GITHUB_RUN_ID}"
+          --created-at "$RUN_CREATED_AT"
+          --out release-plan.json
+          --channel canary
+        )
+        if [ -n "${PRE_ID}" ]; then
+          args+=(--pre-id "$PRE_ID")
+        fi
+        if [ -n "${BASE_VERSION}" ]; then
+          args+=(--base "$BASE_VERSION")
+        fi
+        if [ -f release-previous.json ]; then
+          args+=(--previous release-previous.json)
+        fi
+        node ./scripts/plan-pre-release.mjs "${args[@]}"
         {
           echo "APP_VERSION=$(jq -r .version release-plan.json)"
+          echo "DISPLAY_VERSION=$(jq -r .displayVersion release-plan.json)"
           echo "GIT_SHORT_HASH=${GITHUB_SHA:0:9}"
           echo "BUILD_TYPE=$(jq -r .channel release-plan.json)"
-          echo "SKIP=$(jq -r ' .skip // false' release-plan.json)"
+          echo "SKIP=$(jq -r '.skip // false' release-plan.json)"
           echo "SERVER=$(jq 'any(.targets[]; .name == "server")' release-plan.json)"
           echo "DESKTOP_MATRIX=$(jq -c '{include: [.buildMatrix.include[] | select(.target | startswith("desktop-"))]}' release-plan.json)"
           echo "MOBILE_MATRIX=$(jq -c '{include: [.buildMatrix.include[] | select(.target | startswith("mobile-"))]}' release-plan.json)"
         } >> "$GITHUB_OUTPUT"
+        echo "Planned StrawNote pre-release: $(jq -r .displayVersion release-plan.json) ($(jq -r .version release-plan.json))"

@@ -99,11 +99,19 @@ export class StrawNoteUpdateProvider extends Provider<GithubUpdateInfo> {
     const releases = releasesRaw.filter(release => {
       if (release.draft) return false;
       const tag = release.tag_name.toLowerCase();
-      if (channel === 'canary') return tag.includes('canary');
+      if (channel === 'canary') {
+        // StrawNote pre-releases: vX.Y.Z-pre-N (still distributed on canary channel)
+        return tag.includes('canary') || tag.includes('-pre-');
+      }
       if (channel === 'beta') return tag.includes('beta');
       if (channel === 'internal') return tag.includes('internal');
       // stable: exclude prerelease channels
-      return !tag.includes('canary') && !tag.includes('beta') && !tag.includes('internal');
+      return (
+        !tag.includes('canary') &&
+        !tag.includes('beta') &&
+        !tag.includes('internal') &&
+        !tag.includes('-pre-')
+      );
     });
 
     if (releases.length === 0) {
@@ -196,7 +204,13 @@ type VersionDistribution = 'canary' | 'beta' | 'stable';
 type VersionPlatform = 'windows' | 'macos' | 'linux';
 type VersionArch = 'x64' | 'arm64';
 type FileParts =
-  | ['affine' | 'strawnote', string, VersionDistribution, VersionPlatform, VersionArch]
+  | [
+      'affine' | 'strawnote',
+      string,
+      VersionDistribution,
+      VersionPlatform,
+      VersionArch,
+    ]
   | [
       'affine' | 'strawnote',
       string,

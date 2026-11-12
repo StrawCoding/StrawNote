@@ -33,7 +33,7 @@ update_app_stream_version() {
 
   # Use sed to update the version, date, and URL in the releases section
   sed -i.bak -E "s|<release version=\"[^\"]*\" date=\"[^\"]*\">|<release version=\"$new_version\" date=\"$current_date\">|" "$file_path" &&
-  sed -i.bak -E "s|<url>https://github.com/toeverything/AFFiNE/releases/tag/v[^<]*</url>|<url>https://github.com/toeverything/AFFiNE/releases/tag/v$new_version</url>|" "$file_path" || {
+  sed -i.bak -E "s|<url>https://github.com/(toeverything/AFFiNE|StrawCoding/StrawNote)/releases/tag/v[^<]*</url>|<url>https://github.com/StrawCoding/StrawNote/releases/tag/v$new_version</url>|" "$file_path" || {
     # If the sed command fails, print an error message and exit with a non-zero status
     echo "Error: Failed to update the appVersion."
     return 1
@@ -78,7 +78,7 @@ get_ios_version_from_git() {
   # Find the most recent stable/beta tag reachable from HEAD (exclude canary/nightly)
   local latest_tag
   latest_tag=$(git describe --tags --match 'v[0-9]*' \
-    --exclude '*canary*' --exclude '*nightly*' \
+    --exclude '*canary*' --exclude '*nightly*' --exclude '*-pre-*' \
     --abbrev=0 HEAD 2>/dev/null)
 
   if [ -z "$latest_tag" ]; then
@@ -110,8 +110,8 @@ new_version=$1
 if [ -n "$IOS_APP_VERSION" ]; then
   # Manual override via environment variable
   ios_new_version=$IOS_APP_VERSION
-elif echo "$new_version" | grep -qE '(canary|nightly)'; then
-  # Canary/nightly: use the date of the last stable/beta tag
+elif echo "$new_version" | grep -qE '(canary|nightly|pre-)'; then
+  # Canary/nightly/pre: use the date of the last stable/beta tag
   ios_new_version=$(get_ios_version_from_git)
 else
   # Stable/beta release: use today's date
@@ -121,6 +121,6 @@ fi
 echo "iOS MARKETING_VERSION: $ios_new_version (app version: $new_version)"
 
 
-update_app_stream_version "packages/frontend/apps/electron/resources/affine.metainfo.xml" "$new_version"
+update_app_stream_version "packages/frontend/apps/electron/resources/strawnote.metainfo.xml" "$new_version"
 
 update_ios_marketing_version "packages/frontend/apps/ios/App/App.xcodeproj/project.pbxproj" "$ios_new_version"

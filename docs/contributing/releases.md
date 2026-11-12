@@ -1,3 +1,19 @@
+# StrawNote Release Process
+
+StrawNote pre-releases use the version scheme:
+
+```text
+{base}-pre-{N}        # machine / package version, e.g. 0.27.4-pre-12
+{base} pre-{N}        # display form, e.g. 0.27.4 pre-12
+```
+
+Trigger [.github/workflows/release.yml](../../.github/workflows/release.yml) (`Release Candidates`) via `workflow_dispatch`. Optional inputs:
+
+- `base_version`: override base semver (default: `package.json` without suffix)
+- `pre_id`: override `N` (default: next tag / run number)
+
+---
+
 ## AFFiNE Release Process
 
 > In order to make a stable/beta release, you need to get authorization from the AFFiNE test team.
