@@ -9,23 +9,23 @@ import Foundation
 
 enum PricingConfiguration {
   static let proMonthly = ProductConfiguration(
-    productIdentifier: "app.affine.pro.Monthly",
-    revenueCatIdentifier: "app.affine.pro.Monthly",
+    productIdentifier: "com.strawcoding.strawnote.Monthly",
+    revenueCatIdentifier: "com.strawcoding.strawnote.Monthly",
     description: "Monthly",
     isDefaultSelected: false
   )
 
   static let proAnnual = ProductConfiguration(
-    productIdentifier: "app.affine.pro.Annual",
-    revenueCatIdentifier: "app.affine.pro.Annual",
+    productIdentifier: "com.strawcoding.strawnote.Annual",
+    revenueCatIdentifier: "com.strawcoding.strawnote.Annual",
     description: "Annual",
     badge: "Save 15%",
     isDefaultSelected: true
   )
 
   static let aiAnnual = ProductConfiguration(
-    productIdentifier: "app.affine.pro.ai.Annual",
-    revenueCatIdentifier: "app.affine.pro.ai.Annual",
+    productIdentifier: "com.strawcoding.strawnote.ai.Annual",
+    revenueCatIdentifier: "com.strawcoding.strawnote.ai.Annual",
     description: "",
     isDefaultSelected: true
   )

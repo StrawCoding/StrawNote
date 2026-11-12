@@ -68,7 +68,7 @@ private struct AuthRefreshOperation {
 }
 
 private actor AuthSessionBroker {
-  private let tokenService = "app.affine.pro.auth-token"
+  private let tokenService = "com.strawcoding.strawnote.auth-token"
   private var refreshTasks: [String: AuthRefreshOperation] = [:]
   private var mutationEpochs: [String: UInt] = [:]
 
@@ -532,7 +532,7 @@ public class AuthPlugin: CAPPlugin, CAPBridgedPlugin {
   }
 
   private func installationId() -> String {
-    let key = "app.affine.pro.auth-installation-id"
+    let key = "com.strawcoding.strawnote.auth-installation-id"
     if let value = UserDefaults.standard.string(forKey: key) { return value }
     let value = UUID().uuidString
     UserDefaults.standard.set(value, forKey: key)

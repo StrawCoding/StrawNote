@@ -41,7 +41,7 @@
                 <data
                     android:host="authentication"
                     android:pathPattern=".*"
-                    android:scheme="affine" />
+                    android:scheme="strawnote" />
             </intent-filter>
         </activity>
 

@@ -16,8 +16,8 @@ platform :ios do
   lane :archive do
     provisioning_profiles = {}
     {
-      'StrawNote' => ['app.affine.pro', 'BUILD_PROVISION_PROFILE_PATH'],
-      'ShareExtension' => ['app.affine.pro.ShareExtension', 'BUILD_PROVISION_PROFILE_SHARE_EXTENSION_PATH']
+      'StrawNote' => ['com.strawcoding.strawnote', 'BUILD_PROVISION_PROFILE_PATH'],
+      'ShareExtension' => ['com.strawcoding.strawnote.ShareExtension', 'BUILD_PROVISION_PROFILE_SHARE_EXTENSION_PATH']
     }.each do |target, (bundle_identifier, profile_env)|
       profile_path = ENV.fetch(profile_env)
       profile = FastlaneCore::ProvisioningProfile.parse(profile_path)

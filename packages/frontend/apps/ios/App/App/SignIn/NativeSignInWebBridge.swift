@@ -87,7 +87,7 @@ final class NativeSignInWebBridge {
 
   private func openAuthenticationSession(url: URL) async throws -> URL {
     try await withCheckedThrowingContinuation { continuation in
-      let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "affine") { [weak self] callbackURL, error in
+      let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "strawnote") { [weak self] callbackURL, error in
         Task { @MainActor in
           self?.authenticationSession = nil
 
