@@ -65,6 +65,21 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!--
+      CAMERA is merged in from AI attach deps. Play treats CAMERA as implying
+      android.hardware.camera (required) unless we override — that incorrectly
+      filters some tablets. Keep camera optional; AI attach degrades without it.
+    -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" />
+
     <!-- S Pen / stylus: optional hardware, keep installable on phones without pens -->
     <uses-feature
         android:name="android.hardware.faketouch.multitouch.distinct"
@@ -72,4 +87,12 @@
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
+
+    <!-- Explicit tablet/phone screen support (Tab S9 FE = large/xlarge) -->
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+        android:anyDensity="true" />
 </manifest>

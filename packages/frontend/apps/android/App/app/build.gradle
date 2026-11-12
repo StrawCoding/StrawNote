@@ -214,9 +214,18 @@ afterEvaluate {
         def buildType = "${variant.buildType.name.capitalize()}"
         tasks["generate${productFlavor}${buildType}Assets"].dependsOn(tasks["cargoBuild"])
         def variantName = "${variant.name.substring(0,1).toUpperCase()}${variant.name.substring(1)}"
-        def mergeNativeLibsTask = tasks.findByName("merge${variantName}NativeLibs")
-        if (mergeNativeLibsTask != null) {
-            mergeNativeLibsTask.dependsOn(tasks["cargoBuild"])
+        // Ensure AGP re-copies rustJniLibs after cargo rebuild (stale 4KB .so caused
+        // Tab / Android 15 install failures when merge* stayed UP-TO-DATE).
+        [
+            "merge${variantName}JniLibFolders",
+            "merge${variantName}NativeLibs",
+            "strip${variantName}DebugSymbols",
+        ].each { taskName ->
+            def t = tasks.findByName(taskName)
+            if (t != null) {
+                t.dependsOn(tasks["cargoBuild"])
+                t.inputs.dir("${buildDir}/rustJniLibs/android").optional()
+            }
         }
     }
 }
