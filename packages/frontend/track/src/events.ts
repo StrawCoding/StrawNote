@@ -422,6 +422,8 @@ interface PageEvents extends PageDivision {
         'toggleFavorite',
         'openDocInfo',
         'renameDoc',
+        'undo',
+        'redo',
       ];
       docOptions: [
         'open',

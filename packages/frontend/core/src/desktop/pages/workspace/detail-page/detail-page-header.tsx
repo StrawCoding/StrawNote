@@ -6,6 +6,7 @@ import {
   useDraggable,
 } from '@affine/component';
 import { FavoriteButton } from '@affine/core/blocksuite/block-suite-header/favorite';
+import { PageHistoryButtons } from '@affine/core/blocksuite/block-suite-header/history';
 import { InfoButton } from '@affine/core/blocksuite/block-suite-header/info';
 import { JournalWeekDatePicker } from '@affine/core/blocksuite/block-suite-header/journal/date-picker';
 import { JournalTodayButton } from '@affine/core/blocksuite/block-suite-header/journal/today-button';
@@ -104,6 +105,7 @@ export function JournalPageHeader({ page, workspace }: PageHeaderProps) {
       <ViewTitle title={title} />
       <ViewIcon icon="journal" />
       <EditorModeSwitch />
+      <PageHistoryButtons page={page} />
       <div className={styles.journalWeekPicker}>
         <JournalWeekDatePicker page={page} />
       </div>
@@ -156,6 +158,7 @@ export function NormalPageHeader({ page, workspace }: PageHeaderProps) {
       <ViewTitle title={title} />
       <ViewIcon icon={currentMode ?? 'page'} />
       <EditorModeSwitch />
+      <PageHistoryButtons page={page} />
       <BlocksuiteHeaderTitle inputHandleRef={titleInputHandleRef} />
       <TemplateMark />
       <div className={styles.iconButtonContainer}>
