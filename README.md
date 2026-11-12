@@ -1,22 +1,143 @@
+<div align="center">
+
+<img src="packages/frontend/apps/electron/resources/icons/icon.png" alt="StrawNote" width="128" height="128" />
+
 # StrawNote（稻草筆記）
 
-> **本倉庫由 [AFFiNE](https://github.com/toeverything/AFFiNE) 分支而來（Based on / branched from AFFiNE）。**  
-> Upstream remote：`affine` → `https://github.com/toeverything/AFFiNE.git`  
-> 基準分支：`canary`（凍結點見下方 Upstream 資訊）  
-> 本地開發分支：`strawnote`
+**離線優先的知識筆記。Markdown 與手寫自由混排，資料在你手上。**
 
-StrawNote 是在 AFFiNE 開源知識庫／BlockSuite 架構上，朝「Markdown + 手寫（S Pen）自由混排、離線優先、`.straw` 可攜」方向演進的分支產品。上游 AFFiNE 的授權、貢獻者與原始功能說明仍適用於共用程式碼；產品品牌與後續變更以 StrawNote 為準。
+[![Release](https://img.shields.io/github/v/release/StrawCoding/StrawNote?include_prereleases)](https://github.com/StrawCoding/StrawNote/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-### Upstream 資訊
+[倉庫](https://github.com/StrawCoding/StrawNote) · [Releases](https://github.com/StrawCoding/StrawNote/releases) · [Issues](https://github.com/StrawCoding/StrawNote/issues) · [自架 Compose](.docker/selfhost/compose.yml)
+
+</div>
+
+---
+
+## 這是什麼
+
+StrawNote 是 StrawCoding 的筆記產品，基於開源專案 [AFFiNE](https://github.com/toeverything/AFFiNE)（含 [BlockSuite](https://github.com/toeverything/BlockSuite)）分支而來。
+
+產品方向：
+
+- **Markdown + 手寫（S Pen 等）** 自由混排
+- **離線優先**，本機可完整使用
+- **可攜格式**（朝 `.straw` / 文件交換演進）
+- 保留上游文件／畫布／資料庫等知識庫能力
+
+上游 AFFiNE 的授權、貢獻者與共用程式碼權利仍適用；**產品品牌、發版、自架映像與後續功能以 StrawNote 為準**。
+
+---
+
+## 品牌與識別
 
 | 項目 | 值 |
-|---|---|
-| 上游專案 | [toeverything/AFFiNE](https://github.com/toeverything/AFFiNE) |
-| 上游預設分支 | `canary` |
-| 分支起始 commit | `9c6155027`（`feat(server): cleanup embedding after workspace deleted (#15851)`） |
-| 本倉庫分支 | `strawnote`（自 AFFiNE `canary` 分出） |
+| --- | --- |
+| 顯示名稱 | **StrawNote**（稻草筆記） |
+| Monorepo | `@strawnote/monorepo` |
+| App ID | `com.strawcoding.strawnote` |
+| Deep link | `strawnote://`（含 canary / beta / internal / dev） |
+| Electron productName | `StrawNote` |
+| 圖示來源 | `StrawNoteIcon.png` → Electron / 各平台 icon 產物 |
+| 開發分支 | `strawnote` |
+| 內部套件路徑 | 多數仍為 `@affine/*`（避免一次大規模改 import） |
 
-同步上游範例：
+---
+
+## 版本與預發佈
+
+StrawNote pre-release 採：
+
+```text
+0.27.4-pre-12     # 機器／套件版本
+0.27.4 pre-12     # 顯示用
+```
+
+- Workflow：[`.github/workflows/release.yml`](.github/workflows/release.yml)（`Release Candidates`）
+- 可選輸入：`base_version`、`pre_id`
+- 規劃腳本：`node scripts/plan-pre-release.mjs --base 0.27.4 --pre-id 12`
+- 說明：[docs/contributing/releases.md](docs/contributing/releases.md)
+- Channel：`canary`
+- Desktop 自動更新：GitHub Releases API（`StrawCoding/StrawNote`）
+
+正式穩定版流程後續再獨立；目前預設走 pre-release。
+
+---
+
+## 功能現況（摘要）
+
+| 能力 | 狀態 |
+| --- | --- |
+| Web／自架知識庫（文件、畫布、協作基礎） | 可用（繼承 AFFiNE self-host） |
+| Desktop（Electron）品牌／deep-link／updater | StrawNote |
+| Android / iOS 套件 ID | `com.strawcoding.strawnote` |
+| 「下載 App」按鈕 | 暫連官方 AFFiNE 安裝包，並以 UI 彈窗提示「StrawNote 正在努力開發」 |
+| Markdown + 手寫混排 / `.straw` | 產品路線，持續開發中 |
+
+---
+
+## 自架（Self-host）
+
+Compose 與映像：
+
+```bash
+cd .docker/selfhost
+docker compose up -d
+```
+
+- 映像：`ghcr.io/strawcoding/strawnote:stable`
+- Compose：[`.docker/selfhost/compose.yml`](.docker/selfhost/compose.yml)
+
+建置／部署細節見 [docs/BUILDING.md](docs/BUILDING.md)、[docs/developing-server.md](docs/developing-server.md)。  
+官方套件目錄：[GitHub Packages — strawnote](https://github.com/StrawCoding/StrawNote/pkgs/container/strawnote)
+
+> 容器內 runtime 路徑／環境變數名稱可能仍含 `affine`（上游相容）；對外品牌與映像名為 StrawNote。
+
+---
+
+## 本機開發
+
+需求：Node `>=22.12 <23`、Yarn（倉庫既有 workspace）。
+
+```bash
+git clone https://github.com/StrawCoding/StrawNote.git
+cd StrawNote
+git checkout strawnote
+
+yarn install
+yarn dev
+```
+
+更多：
+
+- 總覽建置：[docs/BUILDING.md](docs/BUILDING.md)
+- Desktop：[docs/building-desktop-client-app.md](docs/building-desktop-client-app.md)
+- Server：[docs/developing-server.md](docs/developing-server.md)
+- 貢獻：[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
+
+常用指令：
+
+```bash
+yarn lint
+yarn test
+yarn build
+```
+
+---
+
+## 與上游 AFFiNE
+
+| 項目 | 值 |
+| --- | --- |
+| 上游 | [toeverything/AFFiNE](https://github.com/toeverything/AFFiNE) |
+| Upstream remote | `affine` → `https://github.com/toeverything/AFFiNE.git` |
+| 上游基準分支 | `canary` |
+| 分支起始 commit | `9c6155027` |
+| 本倉庫發版／更新端點 | **僅** `StrawCoding/StrawNote`（不以 AFFiNE Releases 為產品更新源） |
+
+同步範例：
 
 ```bash
 git fetch affine
@@ -24,248 +145,28 @@ git merge affine/canary
 # 或：git rebase affine/canary
 ```
 
+也感謝上游生態：BlockSuite、yjs、Electron、React、Vite 等（見上游依賴與 [AFFiNE network](https://github.com/toeverything/AFFiNE/network/dependencies)）。
+
 ---
 
+## 貢獻與回報
 
+- Bug／功能：[Issues](https://github.com/StrawCoding/StrawNote/issues)
+- 討論：[Discussions](https://github.com/StrawCoding/StrawNote/discussions)
+- 貢獻類型：[docs/types-of-contributions.md](docs/types-of-contributions.md)
 
-### 品牌命名
+合併 PR 前請依倉庫 CLA／貢獻文件完成必要簽署（若 workflow 有啟用）。
 
-- 產品顯示名稱：**StrawNote**（稻草筆記）
-- Deep link scheme：`strawnote://`（含 canary/beta/internal/dev）
-- Electron productName／App ID：`StrawNote`／`com.strawcoding.strawnote*`
-- npm 工作區套件仍為 `@affine/*`（內部模組路徑，避免一次大規模改 import）
-- Android Java package 仍為 `app.affine.pro`（顯示名已改 StrawNote；完整改 package 另開）
+---
 
-### StrawNote 映像／更新來源
+## 授權
 
-- GitHub：https://github.com/StrawCoding/StrawNote
-- Desktop 自動更新：GitHub Releases API（`api.github.com/repos/StrawCoding/StrawNote/releases`）
-- Self-host Docker 映像：`ghcr.io/strawcoding/strawnote:stable`（見 `.docker/selfhost/compose.yml`）
-- 上游 AFFiNE 仍以 remote `affine` 追蹤，僅作合併來源，不作為發版／更新端點
+- 本倉庫沿用上游 **MIT** 授權，見 [LICENSE](./LICENSE)。
+- `packages/backend` 等目錄另有上游定義之授權條款，請一併遵守。
+- StrawNote 商標與品牌資產屬 StrawCoding；AFFiNE 商標屬其權利人。
 
-## 以下為上游 AFFiNE 原始 README（保留供對照）
-
-<div align="center">
-
-<h1 style="border-bottom: none">
-    <b><a href="https://affine.pro">AFFiNE.Pro</a></b><br />
-    Write, Draw and Plan All at Once
-    <br>
-</h1>
-<a href="https://affine.pro/download">
-    <img alt="affine logo" src="https://cdn.affine.pro/Github_hero_image2.png" style="width: 100%">
-</a>
-<br/>
-<p align="center">
-  A privacy-focused, local-first, open-source, and ready-to-use alternative for Notion & Miro. <br />
-  One hyper-fused platform for wildly creative minds.
-</p>
-
-<br/>
-
-<br/>
-<a href="https://www.producthunt.com/posts/affine-3?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-affine&#0045;3" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=440671&theme=light" alt="AFFiNE - One&#0032;app&#0032;for&#0032;all&#0032;&#0045;&#0032;Where&#0032;Notion&#0032;meets&#0032;Miro | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-<br/>
-<br/>
+---
 
 <div align="center">
-    <a href="https://affine.pro">Home Page</a> |
-    <a href="https://affine.pro/redirect/discord">Discord</a> |
-    <a href="https://app.affine.pro">Live Demo</a> |
-    <a href="https://affine.pro/blog/">Blog</a> |
-    <a href="https://docs.affine.pro/">Documentation</a>
+<sub>Based on / branched from <a href="https://github.com/toeverything/AFFiNE">AFFiNE</a> · Maintained by <a href="https://github.com/StrawCoding">StrawCoding</a></sub>
 </div>
-<br/>
-
-[![Releases](https://img.shields.io/github/downloads/StrawCoding/StrawNote/total)](https://github.com/StrawCoding/StrawNote/releases/latest)
-[![All Contributors][all-contributors-badge]](#contributors)
-[![TypeScript-version-icon]](https://www.typescriptlang.org/)
-
-</div>
-
-<br />
-<div align="center">
-<em>Docs, canvas and tables are hyper-merged with AFFiNE - just like the word affine (əˈfʌɪn | a-fine).</em>
-</div>
-<br />
-
-<div align="center">
-<img src="https://github.com/toeverything/AFFiNE/assets/79301703/49a426bb-8d2b-4216-891a-fa5993642253" style="width: 100%"/>
-</div>
-
-## Getting started & staying tuned with us.
-
-Star us, and you will receive all release notifications from GitHub without any delay!
-
-<img src="https://user-images.githubusercontent.com/79301703/230891830-0110681e-8c7e-483b-b6d9-9e42b291b9ef.gif" style="width: 100%"/>
-
-## What is AFFiNE
-
-[AFFiNE](https://affine.pro) is an open-source, all-in-one workspace and an operating system for all the building blocks that assemble your knowledge base and much more -- wiki, knowledge management, presentation and digital assets. It's a better alternative to Notion and Miro.
-
-## Features
-
-**A true canvas for blocks in any form. Docs and whiteboard are now fully merged.**
-
-- Many editor apps claim to be a canvas for productivity, but AFFiNE is one of the very few which allows you to put any building block on an edgeless canvas -- rich text, sticky notes, any embedded web pages, multi-view databases, linked pages, shapes and even slides. We have it all.
-
-**Multimodal AI partner ready to kick in any work**
-
-- Write up professional work report? Turn an outline into expressive and presentable slides? Summary an article into a well-structured mindmap? Sorting your job plan and backlog for tasks? Or... draw and code prototype apps and web pages directly all with one prompt? With you, [AFFiNE AI](https://affine.pro/ai) pushes your creativity to the edge of your imagination, just like [Canvas AI](https://affine.pro/blog/best-canvas-ai) to generate mind map for brainstorming.
-
-**Local-first & Real-time collaborative**
-
-- We love the idea of local-first that you always own your data on your disk, in spite of the cloud. Furthermore, AFFiNE supports real-time sync and collaborations on web and cross-platform clients.
-
-**Self-host & Shape your own AFFiNE**
-
-- You have the freedom to manage, self-host, fork and build your own AFFiNE. Plugin community and third-party blocks are coming soon. More tractions on [Blocksuite](https://blocksuite.io). Check there to learn how to [self-host AFFiNE](https://docs.affine.pro/self-host-affine).
-
-## Acknowledgement
-
-“We shape our tools and thereafter our tools shape us”. A lot of pioneers have inspired us along the way, e.g.:
-
-- Quip & Notion with their great concept of “everything is a block”
-- Trello with their Kanban
-- Airtable & Miro with their no-code programmable datasheets
-- Miro & Whimiscal with their edgeless visual whiteboard
-- Remote & Capacities with their object-based tag system
-
-There is a large overlap of their atomic “building blocks” between these apps. They are not open source, nor do they have a plugin system like Vscode for contributors to customize. We want to have something that contains all the features we love and also goes one step even further.
-
-Thanks for checking us out, we appreciate your interest and sincerely hope that AFFiNE resonates with you! 🎵 Checking https://affine.pro/ for more details ions.
-
-## Contributing
-
-| Bug Reports                                                                                                                                         | Feature Requests                                                                                                                                               | Questions/Discussions                                                         | AFFiNE Community                                                  |
-| --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| [Create a bug report](https://github.com/StrawCoding/StrawNote/issues/new?assignees=&labels=bug%2Cproduct-review&template=BUG-REPORT.yml&title=TITLE) | [Submit a feature request](https://github.com/StrawCoding/StrawNote/issues/new?assignees=&labels=feat%2Cproduct-review&template=FEATURE-REQUEST.yml&title=TITLE) | [Check GitHub Discussion](https://github.com/StrawCoding/StrawNote/discussions) | [Visit the AFFiNE's Discord](https://affine.pro/redirect/discord) |
-| Something isn't working as expected                                                                                                                 | An idea for a new feature, or improvements                                                                                                                     | Discuss and ask questions                                                     | A place to ask, learn and engage with others                      |
-
-Calling all developers, testers, tech writers and more! Contributions of all types are more than welcome, you can read more in [docs/types-of-contributions.md](docs/types-of-contributions.md). If you are interested in contributing code, read our [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) and feel free to check out our GitHub issues to get stuck in to show us what you’re made of.
-
-**Before you start contributing, please sign our [Contributor License Agreement] — it takes less than a minute with your GitHub account. Pull requests cannot be merged until every committer has signed (the `license/cla` check on your PR). Full text: [CLA.md](.github/CLA.md).**
-
-For **bug reports**, **feature requests** and other **suggestions** you can also [create a new issue](https://github.com/StrawCoding/StrawNote/issues/new/choose) and choose the most appropriate template for your feedback.
-
-For **translation** and **language support** you can visit our [Discord](https://affine.pro/redirect/discord).
-
-If you have questions, you are welcome to contact us. One of the best places to get more info and learn more is in the [Discord](https://affine.pro/redirect/discord) where you can engage with other like-minded individuals.
-
-## Templates
-
-AFFiNE now provides pre-built [templates](https://affine.pro/templates) from our team. Following are the Top 10 most popular templates among AFFiNE users,if you want to contribute, you can contribute your own template so other people can use it too.
-
-- [vision board template](https://affine.pro/templates/category-vision-board-template)
-- [one pager template](https://affine.pro/templates/category-one-pager-template-free)
-- [sample lesson plan math template](https://affine.pro/templates/sample-lesson-plan-math-template)
-- [grr lesson plan template free](https://affine.pro/templates/grr-lesson-plan-template-free)
-- [free editable lesson plan template for pre k](https://affine.pro/templates/free-editable-lesson-plan-template-for-pre-k)
-- [high note collection planners](https://affine.pro/templates/high-note-collection-planners)
-- [digital planner](https://affine.pro/templates/category-digital-planner)
-- [ADHD Planner](https://affine.pro/templates/adhd-planner)
-- [Reading Log](https://affine.pro/templates/reading-log)
-- [Cornell Notes Template](https://affine.pro/templates/category-cornell-notes-template)
-
-## Blog
-
-Welcome to the AFFiNE blog section! Here, you’ll find the latest insights, tips, and guides on how to maximize your experience with AFFiNE and AFFiNE AI, the leading Canvas AI tool for flexible note-taking and creative organization.
-
-- [vision board template](https://affine.pro/blog/8-free-printable-vision-board-templates-examples-2023)
-- [ai homework helper](https://affine.pro/blog/ai-homework-helper)
-- [vision board maker](https://affine.pro/blog/vision-board-maker)
-- [itinerary template](https://affine.pro/blog/free-customized-travel-itinerary-planner-templates)
-- [one pager template](https://affine.pro/blog/top-12-one-pager-examples-how-to-create-your-own)
-- [cornell notes template](https://affine.pro/blog/the-cornell-notes-template-and-system-learning-tips)
-- [swot chart template](https://affine.pro/blog/top-10-free-editable-swot-analysis-template-examples)
-- [apps like luna task](https://affine.pro/blog/apps-like-luna-task)
-- [note taking ai from rough notes to mind map](https://affine.pro/blog/dynamic-AI-notes)
-- [canvas ai](https://affine.pro/blog/best-canvas-ai)
-- [one pager](https://affine.pro/blog/top-12-one-pager-examples-how-to-create-your-own)
-- [SOP Template](https://affine.pro/blog/how-to-write-sop-step-by-step-guide-5-best-free-tools-templates)
-- [Chore Chart](https://affine.pro/blog/10-best-free-chore-chart-templates-kids-adults)
-
-## Ecosystem
-
-| Name                                             |                            |                                                                                                                                         |
-| ------------------------------------------------ | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| [@affine/component](packages/frontend/component) | AFFiNE Component Resources | ![](https://img.shields.io/codecov/c/github/toeverything/affine?style=flat-square)                                                      |
-| [@toeverything/theme](packages/common/theme)     | AFFiNE theme               | [![](https://img.shields.io/npm/dm/@toeverything/theme?style=flat-square&color=eee)](https://www.npmjs.com/package/@toeverything/theme) |
-
-## Upstreams
-
-We would also like to give thanks to open-source projects that make AFFiNE possible:
-
-- [Blocksuite](https://github.com/toeverything/BlockSuite) - 💠 BlockSuite is the open-source collaborative editor project behind AFFiNE.
-- [y-octo](https://github.com/y-crdt/y-octo) - 🐙 y-octo is a native, high-performance, thread-safe YJS CRDT implementation, serving as the core engine enabling the AFFiNE Client/Server to achieve "local-first" functionality.
-- [OctoBase](https://github.com/toeverything/OctoBase) - 🐙 OctoBase is the open-source database behind AFFiNE, local-first, yet collaborative. A light-weight, scalable, data engine written in Rust.
-
-- [yjs](https://github.com/yjs/yjs) - Fundamental support of CRDTs for our implementation on state management and data sync on web.
-- [electron](https://github.com/electron/electron) - Build cross-platform desktop apps with JavaScript, HTML, and CSS.
-- [React](https://github.com/facebook/react) - The library for web and native user interfaces.
-- [napi-rs](https://github.com/napi-rs/napi-rs) - A framework for building compiled Node.js add-ons in Rust via Node-API.
-- [Jotai](https://github.com/pmndrs/jotai) - Primitive and flexible state management for React.
-- [async-call-rpc](https://github.com/Jack-Works/async-call-rpc) - A lightweight JSON RPC client & server.
-- [Vite](https://github.com/vitejs/vite) - Next generation frontend tooling.
-- Other upstream [dependencies](https://github.com/toeverything/AFFiNE/network/dependencies).
-
-Thanks a lot to the community for providing such powerful and simple libraries, so that we can focus more on the implementation of the product logic, and we hope that in the future our projects will also provide a more easy-to-use knowledge base for everyone.
-
-## Contributors
-
-We would like to express our gratitude to all the individuals who have already contributed to AFFiNE! If you have any AFFiNE-related project, documentation, tool or template, please feel free to contribute it by submitting a pull request to our curated list on GitHub: [awesome-affine](https://github.com/toeverything/awesome-affine).
-
-<a href="https://github.com/toeverything/affine/graphs/contributors">
-  <img alt="contributors" src="https://opencollective.com/affine/contributors.svg?width=890&button=false" />
-</a>
-
-## Self-Host
-
-Begin with Docker to deploy your own feature-rich, unrestricted version of AFFiNE. Our team is diligently updating to the latest version. For more information on how to self-host AFFiNE, please refer to our [documentation](https://docs.affine.pro/self-host-affine).
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/StrawCoding/StrawNote)
-
-[![Run on Sealos](https://sealos.io/Deploy-on-Sealos.svg)](https://sealos.io/products/app-store/affine)
-
-## Feature Request
-
-For feature requests, please see [discussions](https://github.com/StrawCoding/StrawNote/discussions/categories/ideas).
-
-## Building
-
-### Codespaces
-
-From the GitHub repo main page, click the green "Code" button and select "Create codespace on master". This will open a new Codespace with the (supposedly auto-forked
-AFFiNE repo cloned, built, and ready to go).
-
-### Local
-
-See [BUILDING.md] for instructions on how to build AFFiNE from source code.
-
-## Contributing
-
-We welcome contributions from everyone.
-See [docs/contributing/tutorial.md](./docs/contributing/tutorial.md) for details.
-
-## License
-
-### Editions
-
-- AFFiNE Community Edition (CE) is the current available version, it's free for self-host under the MIT license.
-
-- AFFiNE Enterprise Edition (EE) is yet to be published, it will have more advanced features and enterprise-oriented offerings, including but not exclusive to rebranding and SSO, advanced admin and audit, etc., you may refer to https://affine.pro/pricing for more information
-
-See [LICENSE] for details.
-
-[all-contributors-badge]: https://img.shields.io/github/contributors/toeverything/AFFiNE
-[license]: ./LICENSE
-[building.md]: ./docs/BUILDING.md
-[update page]: https://affine.pro/blog?tag=Release%20Note
-[jobs available]: ./docs/jobs.md
-[latest packages]: https://github.com/StrawCoding/StrawNote/pkgs/container/strawnote
-[contributor license agreement]: https://cla-assistant.io/toeverything/AFFiNE
-[stars-icon]: https://img.shields.io/github/stars/toeverything/AFFiNE.svg?style=flat&logo=github&colorB=red&label=stars
-[codecov]: https://codecov.io/gh/toeverything/affine/branch/canary/graphs/badge.svg?branch=canary
-[typescript-version-icon]: https://img.shields.io/github/package-json/dependency-version/toeverything/affine/dev/typescript
-[react-version-icon]: https://img.shields.io/github/package-json/dependency-version/toeverything/AFFiNE/react?filename=packages%2Ffrontend%2Fcore%2Fpackage.json&color=rgb(97%2C228%2C251)
-[blocksuite-icon]: https://img.shields.io/github/package-json/dependency-version/toeverything/AFFiNE/@blocksuite/store?color=6880ff&filename=packages%2Ffrontend%2Fcore%2Fpackage.json&label=blocksuite
