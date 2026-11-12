@@ -8,6 +8,7 @@ import {
   SocketConnection,
   SPACE_JOIN_BATCH_LIMIT,
   uint8ArrayToBase64,
+  withAckTimeout,
 } from './socket';
 
 interface CloudAwarenessStorageOptions {
@@ -36,6 +37,7 @@ export class CloudAwarenessStorage extends AwarenessStorageBase {
   private readonly activeAwarenessIds = new Set<string>();
   private readonly joinedAwarenessIds = new Set<string>();
   private joinPromise: Promise<void> | undefined;
+  private preferLegacyAwarenessJoin = false;
 
   private joinActiveAwareness(): Promise<void> {
     if (
@@ -71,18 +73,53 @@ export class CloudAwarenessStorage extends AwarenessStorageBase {
               spaceId: this.options.id,
               docId,
             }));
-          const response = await this.socket.emitWithAck('space:join-batch', {
-            spaces,
-            clientVersion: BUILD_CONFIG.appVersion,
-          });
+          if (!this.preferLegacyAwarenessJoin) {
+            try {
+              const response = await withAckTimeout(
+                this.socket.emitWithAck('space:join-batch', {
+                  spaces,
+                  clientVersion: BUILD_CONFIG.appVersion,
+                }),
+                8_000
+              );
 
-          if ('error' in response) {
-            throw new Error(
-              `Awareness join failed: ${response.error.name}: ${response.error.message}`
-            );
+              if ('error' in response) {
+                throw new Error(
+                  `Awareness join failed: ${response.error.name}: ${response.error.message}`
+                );
+              }
+              if (!response.data.success) {
+                throw new Error('Awareness join was rejected');
+              }
+              continue;
+            } catch (error) {
+              const timedOut =
+                error instanceof Error &&
+                error.message.includes('socket ack timed out');
+              if (!timedOut) {
+                throw error;
+              }
+              this.preferLegacyAwarenessJoin = true;
+            }
           }
-          if (!response.data.success) {
-            throw new Error('Awareness join was rejected');
+
+          // 0.27.4 self-host: per-doc awareness rooms via join-awareness.
+          for (const space of spaces) {
+            if (!space.docId) continue;
+            const response = await this.socket.emitWithAck(
+              'space:join-awareness',
+              {
+                spaceType: space.spaceType,
+                spaceId: space.spaceId,
+                docId: space.docId,
+                clientVersion: BUILD_CONFIG.appVersion,
+              }
+            );
+            if ('error' in response) {
+              throw new Error(
+                `Awareness join failed: ${response.error.name}: ${response.error.message}`
+              );
+            }
           }
         }
 
@@ -132,6 +169,11 @@ export class CloudAwarenessStorage extends AwarenessStorageBase {
         spaceType: this.options.type,
         spaceId: this.options.id,
         docIds: [id],
+      });
+      this.socket.emit('space:leave-awareness', {
+        spaceType: this.options.type,
+        spaceId: this.options.id,
+        docId: id,
       });
     };
 
@@ -213,6 +255,7 @@ export class CloudAwarenessStorage extends AwarenessStorageBase {
       status => {
         if (status !== 'connected') {
           this.joinedAwarenessIds.clear();
+          this.preferLegacyAwarenessJoin = false;
         }
         if (status === 'connected') {
           joinAndCollect().catch(err =>

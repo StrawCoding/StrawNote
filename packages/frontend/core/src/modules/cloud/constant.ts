@@ -9,9 +9,10 @@ import { DEFAULT_SELF_HOSTED_SERVER_NAME } from './server-name';
 import type { ServerConfig, ServerMetadata } from './types';
 
 /**
- * Default cloud = AFFiNE official.
- * Native apps cannot use location.origin, so they point at app.affine.pro
- * (or channel-specific AFFiNE hosts). Self-hosted builds still use location.origin.
+ * Default cloud for StrawNote:
+ * - Web selfhost → location.origin
+ * - Native → STRAWNOTE_CLOUD_URL (affine.wastebase.xyz), typed Selfhosted
+ * Official AFFiNE channel hosts remain only for non-StrawNote upstream builds.
  */
 export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
   environment.isSelfHosted
@@ -44,7 +45,7 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
               ? 'http://localhost:8080'
               : location.origin,
             config: {
-              serverName: 'AFFiNE Cloud',
+              serverName: 'StrawNote Cloud',
               features: [
                 ServerFeature.Indexer,
                 ServerFeature.Copilot,
@@ -57,7 +58,7 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
                 OAuthProviderType.Google,
                 OAuthProviderType.Apple,
               ],
-              type: ServerDeploymentType.Affine,
+              type: ServerDeploymentType.Selfhosted,
               credentialsRequirement: {
                 password: {
                   minLength: 8,
@@ -72,12 +73,10 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
             {
               id: 'affine-cloud',
               baseUrl: BUILD_CONFIG.isNative
-                ? BUILD_CONFIG.isIOS
-                  ? 'https://apple.getaffineapp.com'
-                  : STRAWNOTE_CLOUD_URL
+                ? STRAWNOTE_CLOUD_URL
                 : location.origin,
               config: {
-                serverName: 'AFFiNE Cloud',
+                serverName: 'StrawNote Cloud',
                 features: [
                   ServerFeature.Indexer,
                   ServerFeature.Copilot,
@@ -90,7 +89,7 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
                   OAuthProviderType.Google,
                   OAuthProviderType.Apple,
                 ],
-                type: ServerDeploymentType.Affine,
+                type: ServerDeploymentType.Selfhosted,
                 credentialsRequirement: {
                   password: {
                     minLength: 8,
@@ -100,17 +99,19 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
               },
             },
           ]
-        : BUILD_CONFIG.appBuildType === 'beta'
+        : BUILD_CONFIG.appBuildType === 'beta' ||
+            BUILD_CONFIG.appBuildType === 'internal' ||
+            BUILD_CONFIG.appBuildType === 'canary'
           ? [
               {
                 id: 'affine-cloud',
+                // StrawNote Play builds use canary/beta flavors but must still
+                // talk to self-hosted wastebase — not affine.fail / insider.
                 baseUrl: BUILD_CONFIG.isNative
-                  ? BUILD_CONFIG.isIOS
-                    ? 'https://apple.getaffineapp.com'
-                    : 'https://insider.affine.pro'
+                  ? STRAWNOTE_CLOUD_URL
                   : location.origin,
                 config: {
-                  serverName: 'AFFiNE Cloud',
+                  serverName: 'StrawNote Cloud',
                   features: [
                     ServerFeature.Indexer,
                     ServerFeature.Copilot,
@@ -123,7 +124,7 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
                     OAuthProviderType.Google,
                     OAuthProviderType.Apple,
                   ],
-                  type: ServerDeploymentType.Affine,
+                  type: ServerDeploymentType.Selfhosted,
                   credentialsRequirement: {
                     password: {
                       minLength: 8,
@@ -133,67 +134,7 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
                 },
               },
             ]
-          : BUILD_CONFIG.appBuildType === 'internal'
-            ? [
-                {
-                  id: 'affine-cloud',
-                  baseUrl: 'https://insider.affine.pro',
-                  config: {
-                    serverName: 'AFFiNE Cloud',
-                    features: [
-                      ServerFeature.Indexer,
-                      ServerFeature.Copilot,
-                      ServerFeature.CopilotEmbedding,
-                      ServerFeature.OAuth,
-                      ServerFeature.Payment,
-                      ServerFeature.LocalWorkspace,
-                    ],
-                    oauthProviders: [
-                      OAuthProviderType.Google,
-                      OAuthProviderType.Apple,
-                    ],
-                    type: ServerDeploymentType.Affine,
-                    credentialsRequirement: {
-                      password: {
-                        minLength: 8,
-                        maxLength: 32,
-                      },
-                    },
-                  },
-                },
-              ]
-            : BUILD_CONFIG.appBuildType === 'canary'
-              ? [
-                  {
-                    id: 'affine-cloud',
-                    baseUrl: BUILD_CONFIG.isNative
-                      ? 'https://affine.fail'
-                      : location.origin,
-                    config: {
-                      serverName: 'AFFiNE Cloud',
-                      features: [
-                        ServerFeature.Indexer,
-                        ServerFeature.Copilot,
-                        ServerFeature.CopilotEmbedding,
-                        ServerFeature.OAuth,
-                        ServerFeature.Payment,
-                        ServerFeature.LocalWorkspace,
-                      ],
-                      oauthProviders: [
-                        OAuthProviderType.Google,
-                        OAuthProviderType.Apple,
-                      ],
-                      type: ServerDeploymentType.Affine,
-                      credentialsRequirement: {
-                        password: {
-                          minLength: 8,
-                          maxLength: 32,
-                        },
-                      },
-                    },
-                  },
-                ]
-              : [];
+          : [];
 
 export type TelemetryChannel =
   | 'stable'

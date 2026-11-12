@@ -76,6 +76,26 @@ interface ClientEvents {
     spaceId: string;
     docIds: string[];
   };
+  /** Pre-0.27.5 self-hosted servers (no join-batch). */
+  'space:join': [
+    { spaceType: string; spaceId: string; clientVersion: string },
+    { clientId: string; success?: boolean },
+  ];
+  'space:leave': { spaceType: string; spaceId: string };
+  'space:join-awareness': [
+    {
+      spaceType: string;
+      spaceId: string;
+      docId: string;
+      clientVersion: string;
+    },
+    { clientId: string; success?: boolean },
+  ];
+  'space:leave-awareness': {
+    spaceType: string;
+    spaceId: string;
+    docId: string;
+  };
   'space:update-awareness': {
     spaceType: string;
     spaceId: string;
@@ -136,6 +156,25 @@ interface ClientEvents {
 }
 
 export const SPACE_JOIN_BATCH_LIMIT = 100;
+
+/** emitWithAck never settles if the server has no handler — bound it. */
+export function withAckTimeout<T>(promise: Promise<T>, ms = 8_000): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`socket ack timed out after ${ms}ms`));
+    }, ms);
+    promise.then(
+      value => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      error => {
+        clearTimeout(timer);
+        reject(error);
+      }
+    );
+  });
+}
 
 export type ServerEventsMap = {
   [Key in keyof ServerEvents]: (data: ServerEvents[Key]) => void;

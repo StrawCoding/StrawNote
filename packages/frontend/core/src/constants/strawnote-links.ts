@@ -18,7 +18,8 @@ export const STRAWNOTE_SELFHOST_DOCS_URL =
 export const TEMP_OFFICIAL_DESKTOP_DOWNLOAD_URL = 'https://affine.pro/download';
 
 /**
- * Default cloud origin for native builds = AFFiNE official.
- * Self-hosted StrawNote demos remain optional via server switcher.
+ * Default cloud origin for StrawNote native builds = self-hosted.
+ * Official AFFiNE Cloud is a different product; keep wastebase as the default
+ * so Android/iOS sync against the same server users already use on web.
  */
-export const STRAWNOTE_CLOUD_URL = 'https://app.affine.pro';
+export const STRAWNOTE_CLOUD_URL = 'https://affine.wastebase.xyz';

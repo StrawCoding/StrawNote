@@ -15,6 +15,7 @@ import {
   SocketConnection,
   SPACE_JOIN_BATCH_LIMIT,
   uint8ArrayToBase64,
+  withAckTimeout,
 } from './socket';
 
 interface CloudDocStorageOptions extends DocStorageOptions {
@@ -297,16 +298,57 @@ class CloudDocStorageConnection extends SocketConnection {
 
   idConverter: IdConverter | null = null;
   private readonly joinedDocIds = new Set<string>();
+  /** True after a successful legacy space:join (whole-space sync). */
+  private legacySpaceJoined = false;
 
   async joinDoc(docId: string, socket: Socket = this.inner.socket) {
-    const res = await socket.emitWithAck('space:join-batch', {
-      spaces: [
-        { spaceType: this.options.type, spaceId: this.options.id, docId },
-      ],
-      clientVersion: BUILD_CONFIG.appVersion,
-    });
-    if ('error' in res) throw createWebsocketError(res.error);
-    if (!res.data.success) throw new Error('Space join was rejected');
+    if (this.joinedDocIds.has(docId)) {
+      return docId;
+    }
+    // Legacy 0.27.4 joins the whole space once; further docs need no extra join.
+    if (this.legacySpaceJoined) {
+      this.joinedDocIds.add(docId);
+      return docId;
+    }
+
+    const clientVersion = BUILD_CONFIG.appVersion;
+    try {
+      const res = await withAckTimeout(
+        socket.emitWithAck('space:join-batch', {
+          spaces: [
+            {
+              spaceType: this.options.type,
+              spaceId: this.options.id,
+              docId,
+            },
+          ],
+          clientVersion,
+        }),
+        8_000
+      );
+      if ('error' in res) throw createWebsocketError(res.error);
+      if (!res.data.success) throw new Error('Space join was rejected');
+    } catch (batchError) {
+      // Only fall back when the server never ACKs (no join-batch handler).
+      // Explicit errors like DOC_ACTION_DENIED must still reject.
+      const timedOut =
+        batchError instanceof Error &&
+        batchError.message.includes('socket ack timed out');
+      if (!timedOut) {
+        throw batchError;
+      }
+      // 0.27.4 self-host has space:join only; missing join-batch never ACKs.
+      const res = await socket.emitWithAck('space:join', {
+        spaceType: this.options.type,
+        spaceId: this.options.id,
+        clientVersion,
+      });
+      if ('error' in res) throw createWebsocketError(res.error);
+      if (res.data && 'success' in res.data && res.data.success === false) {
+        throw new Error('Space join was rejected');
+      }
+      this.legacySpaceJoined = true;
+    }
     this.joinedDocIds.add(docId);
     return docId;
   }
@@ -340,6 +382,7 @@ class CloudDocStorageConnection extends SocketConnection {
   }) {
     const docIds = [...this.joinedDocIds];
     this.joinedDocIds.clear();
+    this.legacySpaceJoined = false;
     for (
       let offset = 0;
       offset < docIds.length;
@@ -355,6 +398,11 @@ class CloudDocStorageConnection extends SocketConnection {
       spaceType: this.options.type,
       spaceId: this.options.id,
       docIds: [],
+    });
+    // Legacy 0.27.4 servers ignore leave-batch; also emit space:leave.
+    socket.emit('space:leave', {
+      spaceType: this.options.type,
+      spaceId: this.options.id,
     });
     socket.off('space:broadcast-doc-updates', this.onServerUpdates);
     socket.off('space:broadcast-doc-invalidation', this.onServerInvalidation);
