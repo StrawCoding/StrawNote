@@ -70,3 +70,13 @@ Required Secrets：
 2. 內部測試員名單 + opt-in 連結。
 3. 隱私權政策 URL、內容分級、目標對象等商店資訊需在 Console 補齊後才能推正式版／production。
 4. 未明示正式版時只打 `internal`，不上 production。
+
+## Cloud sync hang (2026-11-13)
+
+Root cause: client ≥0.27.5 uses `space:join-batch`; self-host stable 0.27.4 only has `space:join`.
+
+Mitigations:
+
+1. Server shim on `affine.wastebase.xyz` (`AFFiNE/patches/apply-join-batch-shim.py`)
+2. Client fallback in `@affine/nbstore` (timeout → legacy join)
+3. Native default cloud = `https://affine.wastebase.xyz` (Selfhosted)
