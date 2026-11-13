@@ -5,14 +5,14 @@ Default track: `internal`（內部測試）
 
 ## 現況（2026-11-13）
 
-- 已上傳 **internal**：`versionName=0.27.6` / `versionCode=2` / `status=completed`（修 Tab S9 FE 等平板相容）
-- 先前 `0.27.5` / `versionCode=1` 會因以下問題裝不了／被 Play 過濾：
-  1. `CAMERA` 暗示 `android.hardware.camera` **required**（未顯式 optional）
-  2. `libaffine_mobile_native.so` 僅 **4KB** ELF 對齊（targetSdk 36 需 **16KB**）
+- **測試本第一版（internal）**：`versionName=0.27.8` / `versionCode=4` / `status=completed`
+  - 含：平板相容（camera optional + 16KB ELF）、筆記 header 還原／重做、cloud sync join-batch fallback、預設連自架雲
+- 歷史：`0.27.5`/code1 平板被過濾；`0.27.6`–`0.27.7` 為修補過渡版
 - AAB：`canaryRelease` signed with upload keystore；native 以 `.cargo/config.toml` `max-page-size=16384` 建置
-- 驗收：`packages/frontend/apps/android/scripts/check-16k-elf.sh <aab>`
+- 驗收：`packages/frontend/apps/android/scripts/check-16k-elf.sh <aab>`（本版 PASS）
 - GitHub Secrets 已設定（`ANDROID_*` + `PLAY_SERVICE_ACCOUNT_JSON`）
 - Upload key SHA-1：`C8:5E:D4:32:81:5C:C3:4C:83:2A:98:23:ED:87:86:01:A6:0D:89:A0`
+- 測試員 opt-in：https://play.google.com/apps/internaltest/com.strawcoding.strawnote
 
 上傳成功 ≠ 測試員立刻看得到：需 Console 內部測試名單 + opt-in  
 https://play.google.com/apps/internaltest/com.strawcoding.strawnote
