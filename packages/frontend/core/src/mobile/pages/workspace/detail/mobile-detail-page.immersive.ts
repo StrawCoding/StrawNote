@@ -1,3 +1,9 @@
+import {
+  type DocMode,
+  isCanvasEditorMode,
+  isPageEditorMode,
+} from '@blocksuite/affine/model';
+
 export const EDGELESS_IMMERSIVE_TAP_SLOP = 8;
 
 const IMMERSIVE_TAP_EXCLUDE_SELECTORS = [
@@ -45,20 +51,18 @@ export function shouldEnableEdgelessImmersive({
   mode,
   isLandscape,
 }: {
-  mode: 'page' | 'edgeless';
+  mode: DocMode;
   isLandscape: boolean;
 }) {
-  return mode === 'edgeless' && isLandscape;
+  return isCanvasEditorMode(mode) && isLandscape;
 }
 
-export function shouldLockEdgelessDocumentScroll(mode: 'page' | 'edgeless') {
-  return mode === 'edgeless';
+export function shouldLockEdgelessDocumentScroll(mode: DocMode) {
+  return isCanvasEditorMode(mode);
 }
 
-export function shouldTrackMobileDetailPageTitleScroll(
-  mode: 'page' | 'edgeless'
-) {
-  return mode === 'page';
+export function shouldTrackMobileDetailPageTitleScroll(mode: DocMode) {
+  return isPageEditorMode(mode);
 }
 
 export function shouldShowMobileDetailPageTitle(scrollY: number) {

@@ -9,7 +9,7 @@ export const root = style({
   display: 'flex',
   flexDirection: 'column',
   selectors: {
-    '&:has([data-mode="edgeless"])': {
+    '&:has([data-mode="edgeless"]), &:has([data-mode="illustration"])': {
       height: '100dvh',
       maxHeight: '100dvh',
       overflow: 'hidden',
@@ -25,7 +25,8 @@ export const header = style({
 });
 
 export const headerContent = style({
-  maxWidth: `calc(100% - 200px)`,
+  // Back + mode switch (page/illustration/edgeless) + share/menu suffix
+  maxWidth: `calc(100% - 280px)`,
 });
 export const headerTitle = style([
   bodyEmphasized,
@@ -77,7 +78,7 @@ export const affineDocViewport = style({
   containerType: 'inline-size',
   background: cssVarV2('layer/background/primary'),
   selectors: {
-    '&[data-mode="edgeless"]': {
+    '&[data-mode="edgeless"], &[data-mode="illustration"]': {
       position: 'absolute',
       top: 0,
       left: 0,

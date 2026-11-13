@@ -133,6 +133,35 @@ jobs:
       - name: Cap sync
         run: yarn workspace @affine/android cap sync
 
+      - name: Write Firebase config for release build
+        # google-services.json is gitignored; CI needs a stub so process*GoogleServices can run.
+        run: |
+          cat > packages/frontend/apps/android/App/app/google-services.json <<'JSON'
+          {
+            "project_info": {
+              "project_number": "1",
+              "project_id": "strawnote-ci",
+              "storage_bucket": "strawnote-ci.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:1:android:0000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.strawcoding.strawnote"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [{ "current_key": "ci-placeholder" }],
+                "services": {
+                  "appinvite_service": { "other_platform_oauth_client": [] }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          JSON
+
       - name: Build signed canaryRelease AAB
         working-directory: packages/frontend/apps/android/App
         run: |

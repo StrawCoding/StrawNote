@@ -17,6 +17,7 @@ import { ExperimentalFeatureSetting } from './experimental';
 import { SettingGroup } from './group';
 import { OthersGroup } from './others';
 import { DeleteAccount } from './others/delete-account';
+import { PenSettingGroup } from './pen';
 import { RowLayout } from './row.layout';
 import * as styles from './style.css';
 import { PlansGroup } from './subscription';
@@ -124,6 +125,7 @@ const MobileSetting = ({
       <PlansGroup />
       {status === 'authenticated' ? <DevicesGroup /> : null}
       <AppearanceGroup />
+      <PenSettingGroup />
       <AboutGroup />
       <ExperimentalFeatureSetting />
       <SupportGroup />

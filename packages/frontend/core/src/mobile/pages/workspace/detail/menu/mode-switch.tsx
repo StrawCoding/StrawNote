@@ -4,45 +4,58 @@ import {
   useMobileMenuController,
 } from '@affine/component';
 import { EditorService } from '@affine/core/modules/editor';
+import { useI18n } from '@affine/i18n';
 import track from '@affine/track';
 import type { DocMode } from '@blocksuite/affine/model';
 import { useLiveData, useService } from '@toeverything/infra';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import * as styles from './mode-switch.css';
 
-const EdgelessRadioItem: RadioItem = {
-  value: 'edgeless',
-  label: 'Edgeless',
-  testId: 'switch-edgeless-mode-button',
-};
-const PageRadioItem: RadioItem = {
-  value: 'page',
-  label: 'Page',
-  testId: 'switch-page-mode-button',
-};
-const IllustrationRadioItem: RadioItem = {
-  value: 'illustration',
-  label: 'Illustration',
-  testId: 'switch-illustration-mode-button',
-};
-const items = [PageRadioItem, IllustrationRadioItem, EdgelessRadioItem];
-
-export const EditorModeSwitch = () => {
-  const { close } = useMobileMenuController();
+export const EditorModeSwitch = ({
+  compact,
+}: {
+  /** When true, omit menu-close (for header placement outside MobileMenu). */
+  compact?: boolean;
+} = {}) => {
+  const t = useI18n();
+  const menu = useMobileMenuController();
   const editor = useService(EditorService).editor;
   const trash = useLiveData(editor.doc.trash$);
   const isSharedMode = editor.isSharedMode;
   const currentMode = useLiveData(editor.mode$);
+
+  const items = useMemo<RadioItem[]>(
+    () => [
+      {
+        value: 'page',
+        label: t['com.affine.pageMode.page'](),
+        testId: 'switch-page-mode-button',
+      },
+      {
+        value: 'illustration',
+        label: t['com.affine.pageMode.illustration'](),
+        testId: 'switch-illustration-mode-button',
+      },
+      {
+        value: 'edgeless',
+        label: t['com.affine.pageMode.edgeless'](),
+        testId: 'switch-edgeless-mode-button',
+      },
+    ],
+    [t]
+  );
 
   const onToggle = useCallback(
     (mode: DocMode) => {
       editor.setMode(mode);
       editor.setSelector(undefined);
       track.$.header.actions.switchPageMode({ mode });
-      close();
+      if (!compact) {
+        menu.close();
+      }
     },
-    [close, editor]
+    [compact, editor, menu]
   );
 
   if (trash || isSharedMode) {
@@ -50,10 +63,13 @@ export const EditorModeSwitch = () => {
   }
 
   return (
-    <div className={styles.radioWrapper}>
+    <div
+      className={compact ? styles.headerRadioWrapper : styles.radioWrapper}
+      data-testid="mobile-editor-mode-switch"
+    >
       <RadioGroup
-        itemHeight={28}
-        width="100%"
+        itemHeight={compact ? 24 : 28}
+        width={compact ? undefined : '100%'}
         borderRadius={8}
         padding={2}
         gap={4}

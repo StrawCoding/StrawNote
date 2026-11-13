@@ -43,6 +43,7 @@ import { useMobileShellTabs } from '../../../components';
 import { globalVars } from '../../../styles/variables.css';
 import { JournalConflictBlock } from './journal-conflict-block';
 import { JournalDatePicker } from './journal-date-picker';
+import { EditorModeSwitch } from './menu/mode-switch';
 import * as styles from './mobile-detail-page.css';
 import {
   getImmersiveZoomToolbarBottom,
@@ -213,7 +214,8 @@ const DetailPageImpl = ({
     !canEdit ||
     isInTrash ||
     !enableKeyboardToolbar ||
-    (mode === 'edgeless' && !enableEdgelessEditing);
+    ((mode === 'edgeless' || mode === 'illustration') &&
+      !enableEdgelessEditing);
 
   const immersiveZoomToolbarBottom = getImmersiveZoomToolbarBottom({
     immersive,
@@ -337,6 +339,7 @@ const MobileDetailPageHeader = ({
       back
       className={styles.header}
       contentClassName={styles.headerContent}
+      prefix={<EditorModeSwitch compact />}
       suffix={
         <>
           <PageHeaderShareButton />
