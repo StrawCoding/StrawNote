@@ -16,7 +16,9 @@ export class ToolbarViewExtension extends ViewExtensionProvider {
 
   override setup(context: ViewExtensionContext) {
     super.setup(context);
-    if (this.isMobile(context.scope)) return;
+    // Keep page-mode mobile free of the desktop selection toolbar, but enable
+    // it on mobile-edgeless so Lock/Unlock (and other element actions) work.
+    if (context.scope === 'mobile-page') return;
     context.register(toolbarWidget);
   }
 }

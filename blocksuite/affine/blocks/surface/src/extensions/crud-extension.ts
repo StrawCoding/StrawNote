@@ -1,5 +1,6 @@
 import type { SurfaceElementModelMap } from '@blocksuite/affine-model';
 import { EditPropsStore } from '@blocksuite/affine-shared/services';
+import { getUnlockedGfxModels } from '@blocksuite/affine-shared/utils';
 import { type Container, createIdentifier } from '@blocksuite/global/di';
 import { type BlockStdScope, StdIdentifier } from '@blocksuite/std';
 import {
@@ -44,8 +45,11 @@ export class EdgelessCRUDExtension extends Extension {
     }
 
     const gfx = this.std.get(GfxControllerIdentifier);
-    const set = new Set(elements);
-    elements.forEach(element => {
+    const deletable = getUnlockedGfxModels(elements);
+    if (!deletable.length) return;
+
+    const set = new Set(deletable);
+    deletable.forEach(element => {
       if (isConnectable(element)) {
         const connectors = surface.getConnectors(element.id);
         connectors.forEach(connector => set.add(connector));
@@ -53,6 +57,7 @@ export class EdgelessCRUDExtension extends Extension {
     });
 
     set.forEach(element => {
+      if (element.isLocked()) return;
       if (isNoteBlock(element)) {
         const children = gfx.doc.root?.children ?? [];
         if (children.length > 1) {

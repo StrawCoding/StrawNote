@@ -31,6 +31,7 @@ import type {
   ToolbarContext,
 } from '@blocksuite/affine-shared/services';
 import {
+  getUnlockedGfxModels,
   matchModels,
   type ReorderingType,
 } from '@blocksuite/affine-shared/utils';
@@ -378,7 +379,7 @@ export const moreActions = [
     icon: DeleteIcon(),
     variant: 'destructive',
     run(ctx) {
-      const models = ctx.getSurfaceModels();
+      const models = getUnlockedGfxModels(ctx.getSurfaceModels());
       if (!models.length) return;
 
       const edgeless = getEdgelessWith(ctx);

@@ -199,6 +199,9 @@ export class EdgelessClipboardController extends PageClipboard {
     const elements = getSortedCloneElements(
       this.selectionManager.selectedElements
     );
+    // Skip cut-delete when any selected element is locked (same as Backspace).
+    if (elements.some(e => e.isLocked())) return;
+
     this.doc.transact(() => {
       this.crud.deleteElements(elements);
     });

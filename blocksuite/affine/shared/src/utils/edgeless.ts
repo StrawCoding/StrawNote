@@ -6,6 +6,15 @@ import {
 import type { GfxBlockElementModel, GfxModel } from '@blocksuite/std/gfx';
 import type { BlockModel } from '@blocksuite/store';
 
+/**
+ * Elements locked by themselves or by an ancestor must not be deleted.
+ */
+export function getUnlockedGfxModels<T extends { isLocked(): boolean }>(
+  elements: readonly T[]
+): T[] {
+  return elements.filter(element => !element.isLocked());
+}
+
 export function getSelectedRect(selected: GfxModel[]): DOMRect {
   if (selected.length === 0) {
     return new DOMRect();
