@@ -36,6 +36,10 @@ export const DocPrimaryModeValue = ({
         label: t['Page'](),
       },
       {
+        value: 'illustration' as DocMode,
+        label: t['com.affine.header.mode-switch.illustration'](),
+      },
+      {
         value: 'edgeless' as DocMode,
         label: t['Edgeless'](),
       },

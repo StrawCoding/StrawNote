@@ -15,7 +15,8 @@ export const useDetailPageHeaderResponsive = (availableWidth: number) => {
 
   // share button should be hidden once split-view is enabled
   const hideShare = availableWidth < 500 || workbenchViewsCount > 1;
-  const hidePresent = availableWidth < 400 || mode !== 'edgeless';
+  const hidePresent =
+    availableWidth < 400 || (mode !== 'edgeless' && mode !== 'illustration');
   const hideCollect = availableWidth < 300;
   const hideToday = availableWidth < 300;
 

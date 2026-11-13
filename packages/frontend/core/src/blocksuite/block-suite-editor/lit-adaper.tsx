@@ -58,6 +58,8 @@ interface BlocksuiteEditorProps {
   readonly?: boolean;
   shared?: boolean;
   defaultOpenProperty?: DefaultOpenProperty;
+  /** Page-illustration mode: canvas editor with brush as default tool */
+  illustration?: boolean;
 }
 
 const usePatchSpecs = (mode: DocMode, shared?: boolean) => {
@@ -301,7 +303,7 @@ export const BlocksuiteDocEditor = forwardRef<
 export const BlocksuiteEdgelessEditor = forwardRef<
   EdgelessEditor,
   BlocksuiteEditorProps
->(function BlocksuiteEdgelessEditor({ page }, ref) {
+>(function BlocksuiteEdgelessEditor({ page, illustration }, ref) {
   const [specs, portals] = usePatchSpecs('edgeless');
   const editorRef = useRef<EdgelessEditor | null>(null);
 
@@ -322,18 +324,36 @@ export const BlocksuiteEdgelessEditor = forwardRef<
   useEffect(() => {
     if (editorRef.current) {
       editorRef.current.updateComplete
-        .then(() => {
+        .then(async () => {
           // make sure editor can get keyboard events on showing up
           editorRef.current
             ?.querySelector<HTMLElement>('affine-edgeless-root')
             ?.click();
+
+          if (!illustration) return;
+          // Illustration mode: default to brush so pen/S Pen can draw immediately.
+          // Strokes are surface elements → visible when switching to edgeless.
+          const { BrushTool } = await import('@blocksuite/affine/gfx/brush');
+          const { GfxControllerIdentifier } =
+            await import('@blocksuite/affine/std/gfx');
+          const host = editorRef.current?.host;
+          if (!host) return;
+          try {
+            const gfx = host.std.get(GfxControllerIdentifier);
+            gfx.tool.setTool(BrushTool);
+          } catch {
+            // ignore if gfx not ready
+          }
         })
         .catch(console.error);
     }
-  }, []);
+  }, [illustration]);
 
   return (
-    <div className={styles.affineEdgelessDocViewport}>
+    <div
+      className={styles.affineEdgelessDocViewport}
+      data-illustration-mode={illustration ? 'true' : undefined}
+    >
       <LitEdgelessEditor ref={onDocRef} doc={page} specs={specs} />
       {portals}
     </div>

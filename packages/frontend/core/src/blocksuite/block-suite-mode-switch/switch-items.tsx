@@ -4,6 +4,7 @@ import {
   InternalLottie,
 } from '@affine/component/internal-lottie';
 import { useI18n } from '@affine/i18n';
+import { PenIcon } from '@blocksuite/icons/rc';
 import type { HTMLAttributes } from 'react';
 import type React from 'react';
 import { cloneElement, useState } from 'react';
@@ -87,6 +88,32 @@ export const EdgelessSwitchItem = (
       <HoverAnimateController {...props}>
         <InternalLottie options={edgelessLottieOptions} />
       </HoverAnimateController>
+    </Tooltip>
+  );
+};
+
+export const IllustrationSwitchItem = (
+  props: Omit<HoverAnimateControllerProps, 'children'>
+) => {
+  const t = useI18n();
+  return (
+    <Tooltip
+      content={t['com.affine.header.mode-switch.illustration']()}
+      shortcut={['$alt', 'I']}
+      side="bottom"
+    >
+      <div
+        {...props}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 20,
+          height: 20,
+        }}
+      >
+        <PenIcon width={18} height={18} />
+      </div>
     </Tooltip>
   );
 };

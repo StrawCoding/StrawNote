@@ -21,6 +21,12 @@ export class MobileViewExtension extends ViewExtensionProvider<MobileViewOptions
 
   override setup(context: ViewExtensionContext, options?: MobileViewOptions) {
     super.setup(context, options);
+
+    // S Pen / stylus on all platforms (Web / desktop / Android) for edgeless canvas
+    if (this.isEdgeless(context.scope)) {
+      context.register(StylusPenController);
+    }
+
     const isMobile = BUILD_CONFIG.isMobileEdition;
     if (!isMobile) return;
 
@@ -30,10 +36,5 @@ export class MobileViewExtension extends ViewExtensionProvider<MobileViewOptions
     }
 
     context.register(MobileFeatureFlagControl);
-
-    // S Pen / stylus: brush + side-button eraser on edgeless (Android first)
-    if (this.isEdgeless(context.scope)) {
-      context.register(StylusPenController);
-    }
   }
 }

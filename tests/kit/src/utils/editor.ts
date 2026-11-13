@@ -21,7 +21,7 @@ const CODE_BLOCK_LOCATOR = 'affine-code';
 
 export function locateModeSwitchButton(
   page: Page,
-  mode: 'page' | 'edgeless',
+  mode: 'page' | 'edgeless' | 'illustration',
   active?: boolean
 ) {
   // switch is implemented as RadioGroup button,
@@ -53,9 +53,28 @@ export async function ensureInEdgelessMode(page: Page) {
   await page.waitForTimeout(500);
 }
 
-export async function getPageMode(page: Page): Promise<'page' | 'edgeless'> {
+export async function ensureInIllustrationMode(page: Page) {
+  await expect(
+    locateModeSwitchButton(page, 'illustration', true)
+  ).toBeVisible();
+  await expect(page.locator('[data-illustration-mode="true"]')).toBeVisible();
+  await expect(page.locator('affine-edgeless-root')).toBeVisible();
+  await page.waitForTimeout(500);
+}
+
+export async function clickIllustrationModeButton(page: Page) {
+  await locateModeSwitchButton(page, 'illustration').click({ delay: 50 });
+  await ensureInIllustrationMode(page);
+}
+
+export async function getPageMode(
+  page: Page
+): Promise<'page' | 'edgeless' | 'illustration'> {
   if (await locateModeSwitchButton(page, 'page', true).isVisible()) {
     return 'page';
+  }
+  if (await locateModeSwitchButton(page, 'illustration', true).isVisible()) {
+    return 'illustration';
   }
   if (await locateModeSwitchButton(page, 'edgeless', true).isVisible()) {
     return 'edgeless';

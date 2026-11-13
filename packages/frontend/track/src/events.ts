@@ -705,7 +705,7 @@ export type EventArgs = {
   toggle: { type: 'collapse' | 'expand' };
   createDoc: { mode?: 'edgeless' | 'page' };
   quickStart: { with: 'page' | 'edgeless' | 'template' | 'ai' };
-  switchPageMode: { mode: 'edgeless' | 'page' };
+  switchPageMode: { mode: 'edgeless' | 'page' | 'illustration' };
   createShareLink: { mode: 'edgeless' | 'page' };
   copyShareLink: {
     type: 'default' | 'doc' | 'whiteboard' | 'block' | 'element';

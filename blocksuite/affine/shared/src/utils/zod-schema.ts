@@ -85,10 +85,13 @@ export const BrushSchema = z
   .object({
     color: ColorSchema,
     lineWidth: LineWidthSchema,
+    /** Stroke stabilization (perfect-freehand streamline), 0–1 */
+    streamline: z.number().min(0).max(1).default(0.5),
   })
   .default({
     color: DefaultTheme.black,
     lineWidth: LineWidth.Four,
+    streamline: 0.5,
   });
 
 export const HighlighterSchema = z

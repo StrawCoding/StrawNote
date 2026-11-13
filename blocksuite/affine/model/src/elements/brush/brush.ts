@@ -35,6 +35,8 @@ export type BrushProps = BaseElementProps & {
   points: number[][];
   color: Color;
   lineWidth: number;
+  /** Stroke stabilization 0–1 (perfect-freehand streamline) */
+  streamline: number;
 };
 
 export class BrushElementModel extends GfxPrimitiveElementModel<BrushProps> {
@@ -43,7 +45,9 @@ export class BrushElementModel extends GfxPrimitiveElementModel<BrushProps> {
    */
   get commands() {
     if (!this._local.has('commands')) {
-      const stroke = getSolidStrokePoints(this.points ?? [], this.lineWidth);
+      const stroke = getSolidStrokePoints(this.points ?? [], this.lineWidth, {
+        streamline: this.streamline,
+      });
       const commands = getSvgPathFromStroke(stroke);
 
       this._local.set('commands', commands);
@@ -125,6 +129,12 @@ export class BrushElementModel extends GfxPrimitiveElementModel<BrushProps> {
 
   @field()
   accessor color: Color = DefaultTheme.black;
+
+  @watch((_, instance) => {
+    instance['_local'].delete('commands');
+  })
+  @field()
+  accessor streamline: number = 0.5;
 
   @watch((_, instance) => {
     instance['_local'].delete('commands');

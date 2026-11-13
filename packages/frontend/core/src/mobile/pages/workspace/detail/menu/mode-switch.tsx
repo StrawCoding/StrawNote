@@ -21,7 +21,12 @@ const PageRadioItem: RadioItem = {
   label: 'Page',
   testId: 'switch-page-mode-button',
 };
-const items = [PageRadioItem, EdgelessRadioItem];
+const IllustrationRadioItem: RadioItem = {
+  value: 'illustration',
+  label: 'Illustration',
+  testId: 'switch-illustration-mode-button',
+};
+const items = [PageRadioItem, IllustrationRadioItem, EdgelessRadioItem];
 
 export const EditorModeSwitch = () => {
   const { close } = useMobileMenuController();

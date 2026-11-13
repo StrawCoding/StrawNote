@@ -21,7 +21,7 @@ export const PenSettings = () => {
   const { editorSetting } = framework.get(EditorSettingService);
   const settings = useLiveData(editorSetting.settings$);
   const { palettes, getCurrentColor } = usePalettes(
-    DefaultTheme.StrokeColorShortPalettes,
+    DefaultTheme.Palettes,
     DefaultTheme.black
   );
 
@@ -54,6 +54,16 @@ export const PenSettings = () => {
     (value: number[]) => {
       editorSetting.set('brush', {
         lineWidth: value[0],
+      });
+    },
+    [editorSetting]
+  );
+
+  const streamline = settings.brush.streamline ?? 0.5;
+  const setStreamline = useCallback(
+    (value: number[]) => {
+      editorSetting.set('brush', {
+        streamline: value[0] / 100,
       });
     },
     [editorSetting]
@@ -101,6 +111,21 @@ export const PenSettings = () => {
           max={12}
           step={2}
           nodes={[2, 4, 6, 8, 10, 12]}
+        />
+      </SettingRow>
+      <SettingRow
+        name={t['com.affine.settings.editorSettings.edgeless.pen.stability']()}
+        desc={t[
+          'com.affine.settings.editorSettings.edgeless.pen.stability.desc'
+        ]()}
+      >
+        <Slider
+          value={[Math.round(streamline * 100)]}
+          onValueChange={setStreamline}
+          min={0}
+          max={100}
+          step={5}
+          nodes={[0, 25, 50, 75, 100]}
         />
       </SettingRow>
     </>

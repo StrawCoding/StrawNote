@@ -4,8 +4,12 @@ import { EditorService } from '@affine/core/modules/editor';
 import { ViewService, WorkbenchService } from '@affine/core/modules/workbench';
 import { useI18n } from '@affine/i18n';
 import { track } from '@affine/track';
-import type { DocMode } from '@blocksuite/affine/model';
-import { EdgelessIcon, PageIcon } from '@blocksuite/icons/rc';
+import {
+  type DocMode,
+  isCanvasEditorMode,
+  isPageEditorMode,
+} from '@blocksuite/affine/model';
+import { EdgelessIcon, PageIcon, PenIcon } from '@blocksuite/icons/rc';
 import {
   useLiveData,
   useService,
@@ -14,7 +18,11 @@ import {
 import { useCallback, useEffect, useMemo } from 'react';
 
 import { switchItem } from './style.css';
-import { EdgelessSwitchItem, PageSwitchItem } from './switch-items';
+import {
+  EdgelessSwitchItem,
+  IllustrationSwitchItem,
+  PageSwitchItem,
+} from './switch-items';
 
 export interface EditorModeSwitchProps {
   pageId: string;
@@ -34,6 +42,12 @@ const PageRadioItem: RadioItem = {
   testId: 'switch-page-mode-button',
   className: switchItem,
 };
+const IllustrationRadioItem: RadioItem = {
+  value: 'illustration',
+  label: <IllustrationSwitchItem />,
+  testId: 'switch-illustration-mode-button',
+  className: switchItem,
+};
 
 export const EditorModeSwitch = () => {
   const t = useI18n();
@@ -45,25 +59,14 @@ export const EditorModeSwitch = () => {
   const activeView = useLiveData(workbench?.activeView$);
   const isActiveView = activeView?.id && activeView?.id === view?.id;
 
-  const togglePage = useCallback(() => {
-    if (currentMode === 'page' || trash) return;
-    editor.setMode('page');
-    editor.setSelector(undefined);
-    track.$.header.actions.switchPageMode({ mode: 'page' });
-  }, [currentMode, editor, trash]);
-
-  const toggleEdgeless = useCallback(() => {
-    if (currentMode === 'edgeless' || trash) return;
-    editor.setMode('edgeless');
-    editor.setSelector(undefined);
-    track.$.header.actions.switchPageMode({ mode: 'edgeless' });
-  }, [currentMode, editor, trash]);
-
   const onModeChange = useCallback(
     (mode: DocMode) => {
-      mode === 'page' ? togglePage() : toggleEdgeless();
+      if (trash || currentMode === mode) return;
+      editor.setMode(mode);
+      editor.setSelector(undefined);
+      track.$.header.actions.switchPageMode({ mode });
     },
-    [toggleEdgeless, togglePage]
+    [currentMode, editor, trash]
   );
 
   const shouldHide = useCallback(
@@ -73,19 +76,37 @@ export const EditorModeSwitch = () => {
 
   useEffect(() => {
     if (trash || currentMode === undefined || !isActiveView) return;
+    const nextMode: DocMode = isPageEditorMode(currentMode)
+      ? 'edgeless'
+      : 'page';
     return registerAffineCommand({
       id: 'affine:doc-mode-switch',
       category: 'editor:page',
       label:
-        currentMode === 'page'
+        nextMode === 'edgeless'
           ? t['com.affine.cmdk.switch-to-edgeless']()
           : t['com.affine.cmdk.switch-to-page'](),
-      icon: currentMode === 'page' ? <EdgelessIcon /> : <PageIcon />,
+      icon: nextMode === 'edgeless' ? <EdgelessIcon /> : <PageIcon />,
       keyBinding: {
         binding: 'Alt+KeyS',
         capture: true,
       },
-      run: () => onModeChange(currentMode === 'edgeless' ? 'page' : 'edgeless'),
+      run: () => onModeChange(nextMode),
+    });
+  }, [currentMode, isActiveView, onModeChange, t, trash]);
+
+  useEffect(() => {
+    if (trash || currentMode === undefined || !isActiveView) return;
+    return registerAffineCommand({
+      id: 'affine:doc-mode-illustration',
+      category: 'editor:page',
+      label: t['com.affine.header.mode-switch.illustration'](),
+      icon: <PenIcon />,
+      keyBinding: {
+        binding: 'Alt+KeyI',
+        capture: true,
+      },
+      run: () => onModeChange('illustration'),
     });
   }, [currentMode, isActiveView, onModeChange, t, trash]);
 
@@ -95,6 +116,7 @@ export const EditorModeSwitch = () => {
       setMode={onModeChange}
       hidePage={shouldHide('page')}
       hideEdgeless={shouldHide('edgeless')}
+      hideIllustration={shouldHide('illustration')}
     />
   );
 };
@@ -104,6 +126,7 @@ export interface PureEditorModeSwitchProps {
   setMode?: (mode: DocMode) => void;
   hidePage?: boolean;
   hideEdgeless?: boolean;
+  hideIllustration?: boolean;
 }
 
 export const PureEditorModeSwitch = ({
@@ -111,13 +134,15 @@ export const PureEditorModeSwitch = ({
   setMode,
   hidePage,
   hideEdgeless,
+  hideIllustration,
 }: PureEditorModeSwitchProps) => {
   const items = useMemo(
     () => [
       ...(hidePage ? [] : [PageRadioItem]),
+      ...(hideIllustration ? [] : [IllustrationRadioItem]),
       ...(hideEdgeless ? [] : [EdgelessRadioItem]),
     ],
-    [hideEdgeless, hidePage]
+    [hideEdgeless, hideIllustration, hidePage]
   );
   return (
     <RadioGroup
@@ -132,3 +157,6 @@ export const PureEditorModeSwitch = ({
     />
   );
 };
+
+// re-export for callers that branch on canvas vs page
+export { isCanvasEditorMode, isPageEditorMode };

@@ -1,9 +1,25 @@
 import type { SerializedXYWH } from '@blocksuite/global/gfx';
 import { z } from 'zod';
 
-export type DocMode = 'edgeless' | 'page';
+/**
+ * - page: linear document
+ * - edgeless: free canvas
+ * - illustration: page-oriented drawing mode (edgeless editor + brush default);
+ *   strokes live on the shared surface and appear in edgeless
+ */
+export type DocMode = 'edgeless' | 'page' | 'illustration';
 
-export const DocModes = ['edgeless', 'page'] as const;
+export const DocModes = ['edgeless', 'page', 'illustration'] as const;
+
+/** True when the editor should mount the page (doc) editor. */
+export function isPageEditorMode(mode: DocMode): boolean {
+  return mode === 'page';
+}
+
+/** True when the editor should mount the edgeless/canvas editor. */
+export function isCanvasEditorMode(mode: DocMode): boolean {
+  return mode === 'edgeless' || mode === 'illustration';
+}
 
 export type FootNoteReferenceType = 'doc' | 'attachment' | 'url';
 

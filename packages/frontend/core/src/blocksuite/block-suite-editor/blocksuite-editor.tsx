@@ -15,7 +15,11 @@ import { appendParagraphCommand } from '@blocksuite/affine/blocks/paragraph';
 import type { DocTitle } from '@blocksuite/affine/fragments/doc-title';
 import { DisposableGroup } from '@blocksuite/affine/global/disposable';
 import { IS_LINUX } from '@blocksuite/affine/global/env';
-import type { DocMode, RootBlockModel } from '@blocksuite/affine/model';
+import {
+  type DocMode,
+  isPageEditorMode,
+  type RootBlockModel,
+} from '@blocksuite/affine/model';
 import {
   customImageProxyMiddleware,
   ImageProxyService,
@@ -99,7 +103,7 @@ const BlockSuiteEditorImpl = ({
       },
       get host() {
         return (
-          (mode === 'page'
+          (isPageEditorMode(mode)
             ? docRef.current?.host
             : edgelessRef.current?.host) ?? null
         );
@@ -108,7 +112,7 @@ const BlockSuiteEditorImpl = ({
         return page.root as any;
       },
       get updateComplete() {
-        return mode === 'page'
+        return isPageEditorMode(mode)
           ? docRef.current?.updateComplete
           : edgelessRef.current?.updateComplete;
       },
@@ -119,7 +123,9 @@ const BlockSuiteEditorImpl = ({
         return rootRef.current;
       },
       get std() {
-        return mode === 'page' ? docRef.current?.std : edgelessRef.current?.std;
+        return isPageEditorMode(mode)
+          ? docRef.current?.std
+          : edgelessRef.current?.std;
       },
     };
 
@@ -256,7 +262,7 @@ const BlockSuiteEditorImpl = ({
       data-affine-editor-container
       ref={rootRef}
     >
-      {mode === 'page' ? (
+      {isPageEditorMode(mode) ? (
         <BlocksuiteDocEditor
           shared={shared}
           page={page}
@@ -271,6 +277,7 @@ const BlockSuiteEditorImpl = ({
           shared={shared}
           page={page}
           ref={edgelessRef}
+          illustration={mode === 'illustration'}
         />
       )}
     </div>

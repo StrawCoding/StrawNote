@@ -22,7 +22,7 @@ type SpenButtonDetail = {
 };
 
 /**
- * Enables S Pen / stylus drawing on mobile edgeless:
+ * Enables S Pen / stylus drawing on edgeless (Web, desktop, Android):
  * - pen tip → brush (when on default tool or after side-button erase)
  * - barrel / eraser tip → eraser
  * - palm rejection while stylus is active

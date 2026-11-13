@@ -180,7 +180,7 @@ export class EdgelessPenMenu extends EdgelessToolbarToolMixin(
             @select=${this._onPickColor}
             .value=${color}
             .theme=${theme}
-            .palettes=${DefaultTheme.StrokeColorShortPalettes}
+            .palettes=${DefaultTheme.Palettes}
             .shouldKeepColor=${true}
             .hasTransparent=${!this.edgeless.store
               .get(FeatureFlagService)

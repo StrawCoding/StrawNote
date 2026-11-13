@@ -61,7 +61,7 @@ export class Editor extends Entity {
     let commentId = selector?.commentId;
     let key: 'blockIds' | 'elementIds' = 'blockIds';
 
-    if (mode === 'edgeless') {
+    if (mode === 'edgeless' || mode === 'illustration') {
       const elementId = selector?.elementIds?.[0];
       if (elementId) {
         id = elementId;
@@ -99,7 +99,8 @@ export class Editor extends Entity {
   }
 
   toggleMode() {
-    this.mode$.next(this.mode$.value === 'edgeless' ? 'page' : 'edgeless');
+    const current = this.mode$.value;
+    this.mode$.next(current === 'page' ? 'edgeless' : 'page');
   }
 
   setMode(mode: DocMode) {

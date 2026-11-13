@@ -2474,6 +2474,10 @@ export function useStrawNoteI18N(): {
       */
     ["com.affine.header.mode-switch.edgeless"](): string;
     /**
+      * `View in Page Illustration mode`
+      */
+    ["com.affine.header.mode-switch.illustration"](): string;
+    /**
       * `Add tag`
       */
     ["com.affine.header.option.add-tag"](): string;
@@ -5606,6 +5610,14 @@ export function useStrawNoteI18N(): {
       * `Thickness`
       */
     ["com.affine.settings.editorSettings.edgeless.pen.thickness"](): string;
+    /**
+      * `Stroke stability`
+      */
+    ["com.affine.settings.editorSettings.edgeless.pen.stability"](): string;
+    /**
+      * `Higher values smooth shaky strokes; lower values keep more detail.`
+      */
+    ["com.affine.settings.editorSettings.edgeless.pen.stability.desc"](): string;
     /**
       * `Shape`
       */
