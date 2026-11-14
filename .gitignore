@@ -104,3 +104,4 @@ storageState.json
 /blocksuite/framework/std/src/__tests__/gfx/__screenshots__/
 packages/frontend/apps/android/App/key.properties
 packages/frontend/apps/android/App/local.properties
+release-plan.json
