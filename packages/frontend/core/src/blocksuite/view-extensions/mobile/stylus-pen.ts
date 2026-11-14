@@ -15,6 +15,12 @@ export const STYLUS_BUTTON_SECONDARY = 1 << 6; // 64
 /** Short press threshold for detached S Pen side button (ms). */
 export const SPEN_BUTTON_CLICK_MS = 250;
 
+/** Native Android bridge event for detached S Pen side button. */
+export const SPEN_BUTTON_EVENT = 'strawnote:spen-button';
+
+/** Keep rejecting palm touches briefly after the pen lifts. */
+export const PEN_PALM_GRACE_MS = 400;
+
 export type StylusPointerLike = Pick<
   PointerEvent,
   'pointerType' | 'button' | 'buttons'
@@ -31,6 +37,40 @@ export type SpenButtonGesture = 'press' | 'release' | 'click';
 
 export function isStylusPointer(e: StylusPointerLike): boolean {
   return e.pointerType === 'pen' || e.pointerType === 'eraser';
+}
+
+/**
+ * Whether this pointer may ink (draw / erase) on a surface that respects
+ * `fingerPanOnly`. Shared by edgeless prefs + page illustration overlay.
+ */
+export function canInkWithPointer(
+  pointerType: string,
+  activeTool: string,
+  fingerPanOnly: boolean
+): boolean {
+  if (pointerType === 'pen' || pointerType === 'eraser') return true;
+  if (pointerType === 'mouse') return true;
+  if (pointerType === 'touch') {
+    if (activeTool === 'eraser') return true;
+    return !fingerPanOnly;
+  }
+  return true;
+}
+
+/**
+ * Palm rejection while stylus is active (or within grace after tip-up).
+ * Never used to block an intentional finger eraser swipe — callers should
+ * skip this when `activeTool === 'eraser'`.
+ */
+export function shouldRejectPalmTouch(opts: {
+  pointerType: string;
+  penActive: boolean;
+  graceUntilMs: number;
+  nowMs?: number;
+}): boolean {
+  if (opts.pointerType !== 'touch') return false;
+  const now = opts.nowMs ?? Date.now();
+  return opts.penActive || now < opts.graceUntilMs;
 }
 
 export function isEraserTip(e: StylusPointerLike): boolean {

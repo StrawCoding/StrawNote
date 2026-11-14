@@ -7,13 +7,6 @@ import {
 import type { BrushElementModel } from '@blocksuite/affine/model';
 import { ColorScheme, resolveColor } from '@blocksuite/affine/model';
 import type { Store } from '@blocksuite/affine/store';
-import {
-  ColorPickerIcon,
-  EraserIcon,
-  HandIcon,
-  PenIcon,
-  PlusIcon,
-} from '@blocksuite/icons/rc';
 import { useLiveData, useService } from '@toeverything/infra';
 import { useTheme } from 'next-themes';
 import {
@@ -27,12 +20,21 @@ import {
 import { createPortal } from 'react-dom';
 
 import {
+  type StylusInkTool,
+  StylusInkToolbar,
+} from '../view-extensions/mobile/stylus-ink-toolbar';
+import {
+  canInkWithPointer,
   classifySpenButtonGesture,
   isStylusPointer,
+  PEN_PALM_GRACE_MS,
+  shouldRejectPalmTouch,
+  SPEN_BUTTON_EVENT,
   type SpenButtonDetail,
   spenButtonEraserAction,
   type SpenButtonMode,
 } from '../view-extensions/mobile/stylus-pen';
+import { SpenEraserSession } from '../view-extensions/mobile/stylus-pen-session';
 import {
   PAGE_ILLUSTRATION_DEFAULT_COLOR,
   PAGE_ILLUSTRATION_DEFAULT_LINE_WIDTH,
@@ -41,7 +43,6 @@ import {
   clientToPageContentPoint,
   contentLayerOffsetInOverlay,
   isNearPolyline,
-  parseHexColor,
 } from './coords';
 import {
   addPageIllustrationBrush,
@@ -50,23 +51,6 @@ import {
   listPageIllustrationBrushes,
 } from './frame';
 import * as styles from './overlay.css';
-
-const SPEN_BUTTON_EVENT = 'strawnote:spen-button';
-const CUSTOM_COLORS_KEY = 'strawnote.illustration.customColors';
-const PEN_GRACE_MS = 400;
-const LINE_WIDTHS = [2, 4, 6, 8, 10, 12] as const;
-const QUICK_COLORS = [
-  '#000000',
-  '#ffffff',
-  '#e11d48',
-  '#2563eb',
-  '#16a34a',
-  '#ca8a04',
-  '#7c3aed',
-  '#ea580c',
-] as const;
-
-type Tool = 'brush' | 'eraser' | 'pan';
 
 type LiveStroke = {
   points: number[][];
@@ -99,7 +83,6 @@ function strokePath(
 }
 
 function eraseAtPoint(doc: Store, x: number, y: number) {
-  // Finger eraser needs a generous hit radius (stylus tip is precise; finger is not).
   const hit = listPageIllustrationBrushes(doc).find(brush =>
     isNearPolyline(
       [x, y],
@@ -114,35 +97,6 @@ function eraseAtPoint(doc: Store, x: number, y: number) {
   return false;
 }
 
-function loadCustomColors(): string[] {
-  if (typeof localStorage === 'undefined') return [];
-  try {
-    const raw = localStorage.getItem(CUSTOM_COLORS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter((c): c is string => typeof c === 'string')
-      .map(c => parseHexColor(c))
-      .filter((c): c is string => !!c)
-      .slice(0, 16);
-  } catch {
-    return [];
-  }
-}
-
-function saveCustomColors(colors: string[]) {
-  if (typeof localStorage === 'undefined') return;
-  try {
-    localStorage.setItem(
-      CUSTOM_COLORS_KEY,
-      JSON.stringify(colors.slice(0, 16))
-    );
-  } catch {
-    // ignore quota / private mode
-  }
-}
-
 function findIllustrationScroller(root: HTMLElement | null): HTMLElement {
   const mode = root?.closest('[data-mode="illustration"]');
   if (mode instanceof HTMLElement) return mode;
@@ -154,34 +108,27 @@ function findIllustrationScroller(root: HTMLElement | null): HTMLElement {
 export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const colorInputRef = useRef<HTMLInputElement>(null);
-  const hexAddInputRef = useRef<HTMLInputElement>(null);
   const editorSetting = useService(EditorSettingService).editorSetting;
   const settings = useLiveData(editorSetting.settings$);
   const { resolvedTheme } = useTheme();
   const colorScheme =
     resolvedTheme === 'dark' ? ColorScheme.Dark : ColorScheme.Light;
 
-  const [tool, setTool] = useState<Tool>('brush');
+  const [tool, setTool] = useState<StylusInkTool>('brush');
+  const toolRef = useRef<StylusInkTool>(tool);
+  toolRef.current = tool;
+
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [layerOffset, setLayerOffset] = useState({ left: 0, top: 0 });
   const [brushes, setBrushes] = useState<BrushElementModel[]>([]);
   const [live, setLive] = useState<LiveStroke | null>(null);
   const liveRef = useRef<LiveStroke | null>(null);
-  const [customColors, setCustomColors] = useState<string[]>(() =>
-    loadCustomColors()
-  );
-  const [addingColor, setAddingColor] = useState(false);
-  const [hexDraft, setHexDraft] = useState('');
   const drawingRef = useRef(false);
   const fingerPanRef = useRef<FingerPanState | null>(null);
   const penActiveRef = useRef(false);
   const penGraceUntilRef = useRef(0);
-  const toolBeforeSpenRef = useRef<Tool | null>(null);
-  const spenForcedRef = useRef(false);
-  const spenStickyRef = useRef(false);
   const spenDownAtRef = useRef<number | null>(null);
-  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sessionRef = useRef<SpenEraserSession | null>(null);
 
   const brushColor = useMemo(() => {
     try {
@@ -201,17 +148,28 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const fingerPanOnly = settings.stylus?.fingerPanOnly ?? true;
   const buttonMode = (settings.stylus?.buttonMode ?? 'both') as SpenButtonMode;
 
-  const palette = useMemo(() => {
-    const seen = new Set<string>();
-    const out: string[] = [];
-    for (const c of [...QUICK_COLORS, ...customColors]) {
-      const key = c.toLowerCase();
-      if (seen.has(key)) continue;
-      seen.add(key);
-      out.push(c);
-    }
-    return out;
-  }, [customColors]);
+  // Shared S Pen eraser session (same machine as edgeless StylusPenController).
+  useEffect(() => {
+    const session = new SpenEraserSession({
+      getCurrentTool: () => toolRef.current,
+      isEraserTool: t => t === 'eraser',
+      defaultRestoreTool: 'brush',
+      onEnterEraser: () => setTool('eraser'),
+      onExitEraser: previous => {
+        const next = previous as StylusInkTool | null;
+        setTool(
+          next === 'brush' || next === 'eraser' || next === 'pan'
+            ? next
+            : 'brush'
+        );
+      },
+    });
+    sessionRef.current = session;
+    return () => {
+      session.dispose();
+      sessionRef.current = null;
+    };
+  }, []);
 
   const resolveContentEl = useCallback((): HTMLElement | null => {
     const host = rootRef.current?.closest('[data-affine-editor-container]');
@@ -284,69 +242,10 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
     };
   }, [doc, refreshBrushes, resolveContentEl, syncSize]);
 
-  const applySpenAction = useCallback(
-    (action: 'force-eraser' | 'restore' | 'toggle' | 'arm-hold') => {
-      const clearHold = () => {
-        if (holdTimerRef.current != null) {
-          clearTimeout(holdTimerRef.current);
-          holdTimerRef.current = null;
-        }
-      };
-
-      if (action === 'arm-hold') {
-        clearHold();
-        holdTimerRef.current = setTimeout(() => {
-          holdTimerRef.current = null;
-          spenStickyRef.current = false;
-          if (!spenForcedRef.current) {
-            toolBeforeSpenRef.current = tool === 'eraser' ? 'brush' : tool;
-          }
-          spenForcedRef.current = true;
-          setTool('eraser');
-        }, 250);
-        return;
-      }
-
-      clearHold();
-
-      if (action === 'toggle') {
-        if (
-          spenForcedRef.current ||
-          spenStickyRef.current ||
-          tool === 'eraser'
-        ) {
-          spenForcedRef.current = false;
-          spenStickyRef.current = false;
-          setTool(toolBeforeSpenRef.current ?? 'brush');
-          toolBeforeSpenRef.current = null;
-        } else {
-          toolBeforeSpenRef.current = tool === 'eraser' ? 'brush' : tool;
-          spenForcedRef.current = true;
-          spenStickyRef.current = true;
-          setTool('eraser');
-        }
-        return;
-      }
-      if (action === 'force-eraser') {
-        if (!spenForcedRef.current) {
-          toolBeforeSpenRef.current = tool === 'eraser' ? 'brush' : tool;
-        }
-        spenForcedRef.current = true;
-        spenStickyRef.current = false;
-        setTool('eraser');
-        return;
-      }
-      // restore
-      spenForcedRef.current = false;
-      spenStickyRef.current = false;
-      setTool(toolBeforeSpenRef.current ?? 'brush');
-      toolBeforeSpenRef.current = null;
-    },
-    [tool]
-  );
-
   useEffect(() => {
     const onNativeSpenButton = (event: Event) => {
+      const session = sessionRef.current;
+      if (!session) return;
       const detail = (event as CustomEvent<SpenButtonDetail>).detail ?? {};
       const { gesture, nextDownAt } = classifySpenButtonGesture(detail, {
         downAt: spenDownAtRef.current,
@@ -356,40 +255,19 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       const action = spenButtonEraserAction(
         gesture,
         buttonMode,
-        spenForcedRef.current
+        session.isForced
       );
-      if (action) applySpenAction(action);
+      if (action) session.handleAction(action);
     };
     window.addEventListener(SPEN_BUTTON_EVENT, onNativeSpenButton);
     return () => {
       window.removeEventListener(SPEN_BUTTON_EVENT, onNativeSpenButton);
-      if (holdTimerRef.current != null) clearTimeout(holdTimerRef.current);
     };
-  }, [applySpenAction, buttonMode]);
+  }, [buttonMode]);
 
-  /**
-   * Brush/eraser always use touch-action:none so S Pen strokes are never
-   * interpreted as page pan. Finger scroll (when fingerPanOnly) is done by
-   * manually scrolling the illustration viewport.
-   */
-  const canDrawWithPointer = useCallback(
-    (e: ReactPointerEvent, activeTool: Tool) => {
-      if (isStylusPointer(e.nativeEvent) || e.pointerType === 'pen')
-        return true;
-      if (e.pointerType === 'eraser') return true;
-      if (e.pointerType === 'mouse') return true;
-      if (e.pointerType === 'touch') {
-        if (activeTool === 'eraser') return true;
-        return !fingerPanOnly;
-      }
-      return true;
-    },
-    [fingerPanOnly]
-  );
-
-  const isPalmRejectedTouch = useCallback((e: ReactPointerEvent) => {
-    if (e.pointerType !== 'touch') return false;
-    return penActiveRef.current || Date.now() < penGraceUntilRef.current;
+  const selectTool = useCallback((next: StylusInkTool) => {
+    sessionRef.current?.clear();
+    setTool(next);
   }, []);
 
   const onPointerDown = useCallback(
@@ -404,16 +282,18 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         scroller.dataset.illustrationInk = '1';
         scroller.style.touchAction = 'none';
       } else if (
-        // Palm reject only while drawing with brush — never block finger eraser.
         tool !== 'eraser' &&
-        isPalmRejectedTouch(e)
+        shouldRejectPalmTouch({
+          pointerType: e.pointerType,
+          penActive: penActiveRef.current,
+          graceUntilMs: penGraceUntilRef.current,
+        })
       ) {
         e.preventDefault();
         e.stopPropagation();
         return;
       }
 
-      // Brush + fingerPanOnly: finger scrolls the page; pen draws.
       if (
         tool === 'brush' &&
         fingerPanOnly &&
@@ -433,7 +313,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         return;
       }
 
-      if (!canDrawWithPointer(e, tool)) return;
+      if (!canInkWithPointer(e.pointerType, tool, fingerPanOnly)) return;
 
       const content = resolveContentEl();
       if (!content) return;
@@ -465,10 +345,8 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       brushColor,
       brushLineWidth,
       brushStreamline,
-      canDrawWithPointer,
       doc,
       fingerPanOnly,
-      isPalmRejectedTouch,
       refreshBrushes,
       resolveContentEl,
       tool,
@@ -523,7 +401,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
       if (isStylusPointer(e.nativeEvent) || e.pointerType === 'pen') {
         penActiveRef.current = false;
-        penGraceUntilRef.current = Date.now() + PEN_GRACE_MS;
+        penGraceUntilRef.current = Date.now() + PEN_PALM_GRACE_MS;
         const scroller = findIllustrationScroller(rootRef.current);
         delete scroller.dataset.illustrationInk;
         scroller.style.touchAction = '';
@@ -561,33 +439,6 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
     [editorSetting]
   );
 
-  const addCustomColor = useCallback(
-    (raw: string) => {
-      const parsed = parseHexColor(raw);
-      if (!parsed) return;
-      setCustomColors(prev => {
-        const next = [
-          parsed,
-          ...prev.filter(c => c.toLowerCase() !== parsed.toLowerCase()),
-        ].slice(0, 16);
-        saveCustomColors(next);
-        return next;
-      });
-      setBrushColor(parsed);
-      setAddingColor(false);
-      setHexDraft('');
-    },
-    [setBrushColor]
-  );
-
-  const removeCustomColor = useCallback((color: string) => {
-    setCustomColors(prev => {
-      const next = prev.filter(c => c.toLowerCase() !== color.toLowerCase());
-      saveCustomColors(next);
-      return next;
-    });
-  }, []);
-
   const setLineWidth = useCallback(
     (lineWidth: number) => {
       editorSetting.set('brush', { lineWidth });
@@ -623,174 +474,16 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
     : '';
 
   const toolbar = (
-    <div
-      className={styles.toolbar}
-      role="toolbar"
-      aria-label="Illustration tools"
-      data-testid="page-illustration-toolbar"
-    >
-      <button
-        type="button"
-        className={styles.toolButton}
-        data-active={tool === 'brush'}
-        data-testid="page-illustration-tool-brush"
-        title="Pen"
-        aria-label="Pen"
-        onClick={() => setTool('brush')}
-      >
-        <PenIcon width={18} height={18} />
-      </button>
-      <button
-        type="button"
-        className={styles.toolButton}
-        data-active={tool === 'eraser'}
-        data-testid="page-illustration-tool-eraser"
-        title="Eraser"
-        aria-label="Eraser"
-        onClick={() => setTool('eraser')}
-      >
-        <EraserIcon width={18} height={18} />
-      </button>
-      <button
-        type="button"
-        className={styles.toolButton}
-        data-active={tool === 'pan'}
-        data-testid="page-illustration-tool-pan"
-        title="Scroll"
-        aria-label="Scroll"
-        onClick={() => setTool('pan')}
-      >
-        <HandIcon width={18} height={18} />
-      </button>
-      <div className={styles.divider} />
-      {palette.map(c => {
-        const isCustom = customColors.some(
-          x => x.toLowerCase() === c.toLowerCase()
-        );
-        return (
-          <button
-            key={c}
-            type="button"
-            className={styles.colorSwatch}
-            style={{ background: c }}
-            data-testid={`page-illustration-color-${c.slice(1)}`}
-            data-active={brushColor.toLowerCase() === c.toLowerCase()}
-            aria-label={`Color ${c}`}
-            title={isCustom ? `${c} (long-press to remove)` : c}
-            onClick={() => setBrushColor(c)}
-            onContextMenu={e => {
-              if (!isCustom) return;
-              e.preventDefault();
-              removeCustomColor(c);
-            }}
-            onPointerDown={e => {
-              if (!isCustom || e.pointerType === 'mouse') return;
-              const target = e.currentTarget;
-              const timer = window.setTimeout(() => {
-                removeCustomColor(c);
-              }, 550);
-              const clear = () => {
-                window.clearTimeout(timer);
-                target.removeEventListener('pointerup', clear);
-                target.removeEventListener('pointercancel', clear);
-                target.removeEventListener('pointerleave', clear);
-              };
-              target.addEventListener('pointerup', clear);
-              target.addEventListener('pointercancel', clear);
-              target.addEventListener('pointerleave', clear);
-            }}
-          />
-        );
-      })}
-      <button
-        type="button"
-        className={styles.toolButton}
-        data-testid="page-illustration-add-color"
-        title="Add color"
-        aria-label="Add color"
-        data-active={addingColor}
-        onClick={() => {
-          setAddingColor(v => !v);
-          if (!addingColor) {
-            queueMicrotask(() => hexAddInputRef.current?.focus());
-          }
-        }}
-      >
-        <PlusIcon width={18} height={18} />
-      </button>
-      <input
-        ref={colorInputRef}
-        className={styles.hiddenColorInput}
-        type="color"
-        value={
-          brushColor.startsWith('#') && brushColor.length === 7
-            ? brushColor
-            : '#000000'
-        }
-        aria-hidden
-        tabIndex={-1}
-        onChange={e => addCustomColor(e.target.value)}
-      />
-      {addingColor ? (
-        <div className={styles.addColorRow}>
-          <input
-            ref={hexAddInputRef}
-            className={styles.hexInput}
-            data-testid="page-illustration-hex"
-            value={hexDraft}
-            placeholder="#000000"
-            aria-label="Add hex color"
-            onChange={e => setHexDraft(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                addCustomColor(hexDraft);
-              } else if (e.key === 'Escape') {
-                setAddingColor(false);
-                setHexDraft('');
-              }
-            }}
-          />
-          <button
-            type="button"
-            className={styles.toolButton}
-            title="Pick"
-            aria-label="Pick color"
-            onClick={() => colorInputRef.current?.click()}
-          >
-            <ColorPickerIcon width={16} height={16} />
-          </button>
-          <button
-            type="button"
-            className={styles.toolButton}
-            data-testid="page-illustration-add-color-confirm"
-            title="Add"
-            aria-label="Confirm add color"
-            onClick={() => addCustomColor(hexDraft)}
-          >
-            <PlusIcon width={16} height={16} />
-          </button>
-        </div>
-      ) : null}
-      <div className={styles.divider} />
-      {LINE_WIDTHS.map(w => (
-        <button
-          key={w}
-          type="button"
-          className={styles.widthChip}
-          data-active={brushLineWidth === w}
-          data-testid={`page-illustration-width-${w}`}
-          title={`Width ${w}`}
-          aria-label={`Width ${w}`}
-          onClick={() => setLineWidth(w)}
-        >
-          <span
-            className={styles.widthMark}
-            style={{ height: Math.max(2, Math.min(12, w)) }}
-          />
-        </button>
-      ))}
-    </div>
+    <StylusInkToolbar
+      tool={tool}
+      onToolChange={selectTool}
+      brushColor={brushColor}
+      onBrushColorChange={setBrushColor}
+      brushLineWidth={brushLineWidth}
+      onBrushLineWidthChange={setLineWidth}
+      ariaLabel="Illustration tools"
+      testIdPrefix="page-illustration"
+    />
   );
 
   return (
@@ -811,8 +504,6 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
           left: layerOffset.left,
           top: layerOffset.top,
           pointerEvents: tool === 'pan' ? 'none' : 'auto',
-          // Always none for brush/eraser so S Pen never becomes page scroll.
-          // Finger page scroll (brush+fingerPanOnly) is handled manually.
           touchAction: tool === 'pan' ? 'pan-y' : 'none',
           cursor:
             tool === 'eraser'

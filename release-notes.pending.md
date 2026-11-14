@@ -1,3 +1,9 @@
+# 0.28.0.6
+
+- 插畫／Edgeless 共用 S Pen 與墨水模組：`SpenEraserSession`、色票／線寬／`StylusInkToolbar`、palm／fingerPan 規則統一；行為以單元測試＋插畫 e2e 守門，Edgeless 仍用 BlockSuite 工具列但側鍵／prefs 同源
+
+---
+
 # 0.28.0.5
 
 - 插畫 mode：S Pen 畫筆不再被誤判成頁面滑動（brush/eraser `touch-action: none`＋書寫時鎖 viewport）；橡皮擦手指滑動擦除不受 palm-reject 擋下；顏色改預設色票＋「＋」新增 HEX／取色；工具列改 Pen／Eraser／Hand icon，線寬改粗細條

@@ -1,11 +1,15 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+  canInkWithPointer,
   classifySpenButtonGesture,
   isEraserTip,
   isStylusEraseGesture,
   isStylusPointer,
+  PEN_PALM_GRACE_MS,
+  shouldRejectPalmTouch,
   SPEN_BUTTON_CLICK_MS,
+  SPEN_BUTTON_EVENT,
   spenButtonEraserAction,
   STYLUS_BUTTON_PRIMARY,
   stylusToolIntent,
@@ -137,5 +141,52 @@ describe('stylus-pen helpers', () => {
   test('spenButtonEraserAction toggle-mode ignores press', () => {
     expect(spenButtonEraserAction('press', 'toggle', false)).toBe(null);
     expect(spenButtonEraserAction('click', 'toggle', false)).toBe('toggle');
+  });
+
+  test('SPEN_BUTTON_EVENT is stable for native bridge', () => {
+    expect(SPEN_BUTTON_EVENT).toBe('strawnote:spen-button');
+  });
+
+  test('canInkWithPointer respects fingerPanOnly and eraser swipe', () => {
+    expect(canInkWithPointer('pen', 'brush', true)).toBe(true);
+    expect(canInkWithPointer('touch', 'brush', true)).toBe(false);
+    expect(canInkWithPointer('touch', 'brush', false)).toBe(true);
+    expect(canInkWithPointer('touch', 'eraser', true)).toBe(true);
+    expect(canInkWithPointer('mouse', 'brush', true)).toBe(true);
+  });
+
+  test('shouldRejectPalmTouch only for touch during pen/grace', () => {
+    expect(
+      shouldRejectPalmTouch({
+        pointerType: 'touch',
+        penActive: true,
+        graceUntilMs: 0,
+        nowMs: 1000,
+      })
+    ).toBe(true);
+    expect(
+      shouldRejectPalmTouch({
+        pointerType: 'touch',
+        penActive: false,
+        graceUntilMs: 1000 + PEN_PALM_GRACE_MS,
+        nowMs: 1000 + PEN_PALM_GRACE_MS - 1,
+      })
+    ).toBe(true);
+    expect(
+      shouldRejectPalmTouch({
+        pointerType: 'touch',
+        penActive: false,
+        graceUntilMs: 0,
+        nowMs: 1000,
+      })
+    ).toBe(false);
+    expect(
+      shouldRejectPalmTouch({
+        pointerType: 'pen',
+        penActive: true,
+        graceUntilMs: 99999,
+        nowMs: 0,
+      })
+    ).toBe(false);
   });
 });
