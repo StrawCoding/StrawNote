@@ -5,21 +5,22 @@ import {
   HighlighterTool,
 } from '@blocksuite/affine/gfx/brush';
 import { DisposableGroup } from '@blocksuite/affine/global/disposable';
+import { EditorSettingProvider } from '@blocksuite/affine/shared/services';
 import { type BlockStdScope, LifeCycleWatcher } from '@blocksuite/affine/std';
 import { GfxControllerIdentifier } from '@blocksuite/affine/std/gfx';
 
 import {
+  classifySpenButtonGesture,
   isStylusPointer,
+  SPEN_BUTTON_CLICK_MS,
+  type SpenButtonDetail,
+  spenButtonEraserAction,
+  type SpenButtonMode,
   type StylusToolIntent,
   stylusToolIntent,
 } from './stylus-pen';
 
 const SPEN_BUTTON_EVENT = 'strawnote:spen-button';
-
-type SpenButtonDetail = {
-  pressed?: boolean;
-  action?: 'down' | 'up' | 'click';
-};
 
 /**
  * Enables S Pen / stylus drawing on edgeless canvas (Web, desktop, Android):
@@ -28,7 +29,7 @@ type SpenButtonDetail = {
  * - palm rejection while stylus is active
  * - native detached S Pen button via `strawnote:spen-button`
  *
- * Page illustration mode uses PageIllustrationOverlay (pen vs finger) instead.
+ * Page illustration mode listens to the same event inside PageIllustrationOverlay.
  */
 export class StylusPenController extends LifeCycleWatcher {
   static override key = 'strawnote-stylus-pen';
@@ -41,8 +42,22 @@ export class StylusPenController extends LifeCycleWatcher {
 
   private _stylusForcedEraser = false;
 
+  /** Sticky eraser from side-button click; survives tip-up */
+  private _stickyButtonEraser = false;
+
+  private _spenDownAt: number | null = null;
+
+  private _holdTimer: ReturnType<typeof setTimeout> | null = null;
+
   constructor(std: BlockStdScope) {
     super(std);
+  }
+
+  private _clearHoldTimer() {
+    if (this._holdTimer != null) {
+      clearTimeout(this._holdTimer);
+      this._holdTimer = null;
+    }
   }
 
   private get gfx() {
@@ -53,28 +68,59 @@ export class StylusPenController extends LifeCycleWatcher {
     }
   }
 
+  private getStylusPrefs(): {
+    buttonMode: SpenButtonMode;
+    fingerPanOnly: boolean;
+  } {
+    try {
+      const setting = this.std.get(EditorSettingProvider);
+      const stylus = (
+        setting.setting$.value as {
+          stylus?: { buttonMode?: SpenButtonMode; fingerPanOnly?: boolean };
+        }
+      ).stylus;
+      return {
+        buttonMode: stylus?.buttonMode ?? 'both',
+        fingerPanOnly: stylus?.fingerPanOnly ?? true,
+      };
+    } catch {
+      return { buttonMode: 'both', fingerPanOnly: true };
+    }
+  }
+
   override mounted() {
     const host = this.std.host;
     if (!host) return;
 
     const onPointerDown = (event: PointerEvent) => {
-      if (!isStylusPointer(event)) return;
+      if (!isStylusPointer(event)) {
+        if (
+          this.getStylusPrefs().fingerPanOnly &&
+          event.pointerType === 'touch' &&
+          this.gfx?.tool.currentToolName$.peek() === 'brush'
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        return;
+      }
 
       this._penActive = true;
       const intent = stylusToolIntent(event, { autoBrushOnPen: true });
-      this._applyStylusIntent(intent, event);
+      this._applyStylusIntent(intent);
     };
 
     const onPointerMove = (event: PointerEvent) => {
       if (!isStylusPointer(event) || !this._penActive) return;
 
-      // Mid-stroke barrel press/release: switch erase ↔ brush
       const intent = stylusToolIntent(event, { autoBrushOnPen: true });
       if (intent === 'eraser' && !this._stylusForcedEraser) {
-        this._applyStylusIntent('eraser', event);
+        this._stickyButtonEraser = false;
+        this._applyStylusIntent('eraser');
       } else if (
         intent === 'brush' &&
         this._stylusForcedEraser &&
+        !this._stickyButtonEraser &&
         event.buttons !== 0
       ) {
         this._restoreAfterStylusErase();
@@ -85,12 +131,12 @@ export class StylusPenController extends LifeCycleWatcher {
     const onPointerEnd = (event: PointerEvent) => {
       if (!isStylusPointer(event)) return;
       this._penActive = false;
-      if (this._stylusForcedEraser) {
+      // Sticky side-button eraser stays; momentary barrel/hold restores
+      if (this._stylusForcedEraser && !this._stickyButtonEraser) {
         this._restoreAfterStylusErase();
       }
     };
 
-    // Palm rejection: block touch scroll/pan while stylus is writing
     const rejectPalm = (event: TouchEvent) => {
       if (!this._penActive) return;
       event.preventDefault();
@@ -99,25 +145,44 @@ export class StylusPenController extends LifeCycleWatcher {
 
     const onNativeSpenButton = (event: Event) => {
       const detail = (event as CustomEvent<SpenButtonDetail>).detail ?? {};
+      const { gesture, nextDownAt } = classifySpenButtonGesture(detail, {
+        downAt: this._spenDownAt,
+      });
+      this._spenDownAt = nextDownAt;
+      if (!gesture) return;
 
-      // Detached S Pen click: toggle eraser ↔ brush
-      if (detail.action === 'click') {
-        if (this._stylusForcedEraser) {
-          this._restoreAfterStylusErase();
-        } else {
+      const action = spenButtonEraserAction(
+        gesture,
+        this.getStylusPrefs().buttonMode,
+        this._stylusForcedEraser
+      );
+
+      if (action === 'arm-hold') {
+        this._clearHoldTimer();
+        this._holdTimer = setTimeout(() => {
+          this._holdTimer = null;
+          this._stickyButtonEraser = false;
           this._applyStylusIntent('eraser');
-        }
+        }, SPEN_BUTTON_CLICK_MS);
         return;
       }
 
-      const pressed = detail.pressed === true || detail.action === 'down';
-      const released = detail.pressed === false || detail.action === 'up';
+      this._clearHoldTimer();
 
-      if (pressed) {
+      if (action === 'force-eraser') {
+        this._stickyButtonEraser = false;
         this._applyStylusIntent('eraser');
-      }
-      if (released && this._stylusForcedEraser) {
+      } else if (action === 'restore') {
+        this._stickyButtonEraser = false;
         this._restoreAfterStylusErase();
+      } else if (action === 'toggle') {
+        if (this._stylusForcedEraser || this._stickyButtonEraser) {
+          this._stickyButtonEraser = false;
+          this._restoreAfterStylusErase();
+        } else {
+          this._applyStylusIntent('eraser');
+          this._stickyButtonEraser = true;
+        }
       }
     };
 
@@ -136,6 +201,7 @@ export class StylusPenController extends LifeCycleWatcher {
     window.addEventListener(SPEN_BUTTON_EVENT, onNativeSpenButton);
 
     this._disposables.add(() => {
+      this._clearHoldTimer();
       host.removeEventListener('pointerdown', onPointerDown, true);
       host.removeEventListener('pointermove', onPointerMove, true);
       host.removeEventListener('pointerup', onPointerEnd, true);
@@ -150,7 +216,7 @@ export class StylusPenController extends LifeCycleWatcher {
     this._disposables.dispose();
   }
 
-  private _applyStylusIntent(intent: StylusToolIntent, _event?: PointerEvent) {
+  private _applyStylusIntent(intent: StylusToolIntent) {
     if (!intent) return;
     const gfx = this.gfx;
     if (!gfx) return;
@@ -168,18 +234,16 @@ export class StylusPenController extends LifeCycleWatcher {
       return;
     }
 
-    // brush
     if (current === 'default' || current === DefaultTool.toolName) {
       gfx.tool.setTool(BrushTool);
       return;
     }
 
-    if (this._stylusForcedEraser) {
+    if (this._stylusForcedEraser && !this._stickyButtonEraser) {
       this._restoreAfterStylusErase();
     }
 
     if (current === 'eraser' && this._toolBeforeStylusErase === null) {
-      // User manually selected eraser; don't override mid-stroke tip-only
       return;
     }
 
@@ -202,6 +266,7 @@ export class StylusPenController extends LifeCycleWatcher {
     const gfx = this.gfx;
     const previous = this._toolBeforeStylusErase;
     this._stylusForcedEraser = false;
+    this._stickyButtonEraser = false;
     this._toolBeforeStylusErase = null;
     if (!gfx) return;
 
@@ -209,7 +274,6 @@ export class StylusPenController extends LifeCycleWatcher {
       gfx.tool.setTool(HighlighterTool);
       return;
     }
-    // Prefer brush so writing can continue after side-button erase
     gfx.tool.setTool(BrushTool);
   }
 }

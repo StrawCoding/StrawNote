@@ -6,7 +6,7 @@ Package: `com.strawcoding.strawnote`
 
 | Tag 例                    | Workflow                                                                          | Play track   |
 | ------------------------- | --------------------------------------------------------------------------------- | ------------ |
-| `v0.27.11`（非 `*.0`）    | [`play-internal-release.yml`](../.github/workflows/play-internal-release.yml)     | `internal`   |
+| `v0.27.12`（非 `*.0`）    | [`play-internal-release.yml`](../.github/workflows/play-internal-release.yml)     | `internal`   |
 | `v0.28.0`（以 `.0` 結尾） | [`play-production-release.yml`](../.github/workflows/play-production-release.yml) | `production` |
 
 - 打 `v*` 後 CI 建置成功即自動上傳（無需 GitHub Environment 人工 Approve）。
@@ -22,9 +22,9 @@ Package: `com.strawcoding.strawnote`
 
 ## 現況（2026-11-14）
 
-- **最新 internal**：`versionName=0.27.11` / `versionCode=7`（本機遞增；之後 CI tag 改走公式碼）
-  - 含：插畫模式頁面內手寫
-- 歷史：`0.27.10`/code6 鎖定；`0.27.9` S Pen；`0.27.8` 平板＋sync
+- **最新 internal**：`versionName=0.27.12` / `versionCode=27012`（公式碼）
+  - 含：插畫工具列對齊 edgeless、書寫座標修復、S Pen 側鍵短按／按住切橡皮擦、筆設定（手指只平移／HEX）、Android 編輯器設定對等 web
+- 歷史：`0.27.11`/code7 插畫手寫；`0.27.10`/code6 鎖定；`0.27.9` S Pen；`0.27.8` 平板＋sync
 - AAB：`canaryRelease` + upload keystore；native `max-page-size=16384`
 - Secrets：`ANDROID_*` + `PLAY_SERVICE_ACCOUNT_JSON` + `ANDROID_PACKAGE_NAME`
 - Upload key SHA-1：`C8:5E:D4:32:81:5C:C3:4C:83:2A:98:23:ED:87:86:01:A6:0D:89:A0`
@@ -51,7 +51,7 @@ yarn affine @affine/android build
 yarn workspace @affine/android cap sync
 
 cd packages/frontend/apps/android/App
-VERSION_NAME=0.27.12 VERSION_CODE=27012 \
+VERSION_NAME=0.27.13 VERSION_CODE=27013 \
   ./gradlew :app:bundleCanaryRelease --no-daemon
 
 cd ../

@@ -13,6 +13,23 @@ export function clientToPageContentPoint(
   return [x, y];
 }
 
+/**
+ * Position an overlay layer so its (0,0) matches page-content document space
+ * relative to the absolute overlay root (handles both parent-scroll and
+ * contentEl-scroll).
+ */
+export function contentLayerOffsetInOverlay(
+  contentEl: HTMLElement,
+  overlayRoot: HTMLElement
+): { left: number; top: number } {
+  const contentRect = contentEl.getBoundingClientRect();
+  const rootRect = overlayRoot.getBoundingClientRect();
+  return {
+    left: contentRect.left - rootRect.left - contentEl.scrollLeft,
+    top: contentRect.top - rootRect.top - contentEl.scrollTop,
+  };
+}
+
 /** Hit-test a polyline in page content space (approx. stroke half-width). */
 export function isNearPolyline(
   point: [number, number],
@@ -48,4 +65,17 @@ function distanceToSegment(
   let t = ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / len2;
   t = Math.max(0, Math.min(1, t));
   return Math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy));
+}
+
+/** Accept `#RGB` / `#RRGGBB` (optional leading #). Returns normalized `#rrggbb` or null. */
+export function parseHexColor(input: string): string | null {
+  const raw = input.trim().replace(/^#/, '');
+  if (/^[0-9a-fA-F]{3}$/.test(raw)) {
+    const [r, g, b] = raw.split('');
+    return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+  }
+  if (/^[0-9a-fA-F]{6}$/.test(raw)) {
+    return `#${raw.toLowerCase()}`;
+  }
+  return null;
 }

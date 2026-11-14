@@ -5627,9 +5627,61 @@ export function useStrawNoteI18N(): {
       */
     ["com.affine.mobile.setting.pen.title"](): string;
     /**
-      * `Default pen settings for edgeless and illustration modes`
+      * `Default pen settings for edgeless and page illustration modes`
       */
     ["com.affine.mobile.setting.pen.desc"](): string;
+    /**
+      * `Custom hex color`
+      */
+    ["com.affine.mobile.setting.pen.hex"](): string;
+    /**
+      * `Finger pans only`
+      */
+    ["com.affine.mobile.setting.pen.finger-pan-only"](): string;
+    /**
+      * `Only the stylus / S Pen can draw; fingers scroll or pan`
+      */
+    ["com.affine.mobile.setting.pen.finger-pan-only.desc"](): string;
+    /**
+      * `S Pen button`
+      */
+    ["com.affine.mobile.setting.pen.button-mode"](): string;
+    /**
+      * `How the side button switches to eraser`
+      */
+    ["com.affine.mobile.setting.pen.button-mode.desc"](): string;
+    /**
+      * `Click toggle + hold erase`
+      */
+    ["com.affine.mobile.setting.pen.button-mode.both"](): string;
+    /**
+      * `Click to toggle eraser`
+      */
+    ["com.affine.mobile.setting.pen.button-mode.toggle"](): string;
+    /**
+      * `Hold to erase`
+      */
+    ["com.affine.mobile.setting.pen.button-mode.hold"](): string;
+    /**
+      * `Editor`
+      */
+    ["com.affine.mobile.setting.editor.title"](): string;
+    /**
+      * `Editor settings`
+      */
+    ["com.affine.mobile.setting.editor.entry"](): string;
+    /**
+      * `General`
+      */
+    ["com.affine.mobile.setting.editor.general"](): string;
+    /**
+      * `Page`
+      */
+    ["com.affine.mobile.setting.editor.page"](): string;
+    /**
+      * `Edgeless`
+      */
+    ["com.affine.mobile.setting.editor.edgeless"](): string;
     /**
       * `Shape`
       */

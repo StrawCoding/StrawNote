@@ -1,9 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+  classifySpenButtonGesture,
   isEraserTip,
   isStylusEraseGesture,
   isStylusPointer,
+  SPEN_BUTTON_CLICK_MS,
+  spenButtonEraserAction,
   STYLUS_BUTTON_PRIMARY,
   stylusToolIntent,
 } from './stylus-pen';
@@ -89,5 +92,50 @@ describe('stylus-pen helpers', () => {
     expect(
       stylusToolIntent({ pointerType: 'touch', button: 0, buttons: 1 })
     ).toBe(null);
+  });
+
+  test('classifies short down/up as click', () => {
+    const down = classifySpenButtonGesture(
+      { action: 'down', pressed: true },
+      { downAt: null },
+      1000
+    );
+    expect(down.gesture).toBe('press');
+    const up = classifySpenButtonGesture(
+      { action: 'up', pressed: false },
+      { downAt: down.nextDownAt },
+      1000 + SPEN_BUTTON_CLICK_MS - 10
+    );
+    expect(up.gesture).toBe('click');
+  });
+
+  test('classifies long press as press then release', () => {
+    const down = classifySpenButtonGesture(
+      { action: 'down', pressed: true },
+      { downAt: null },
+      1000
+    );
+    const up = classifySpenButtonGesture(
+      { action: 'up', pressed: false },
+      { downAt: down.nextDownAt },
+      1000 + SPEN_BUTTON_CLICK_MS + 50
+    );
+    expect(up.gesture).toBe('release');
+  });
+
+  test('spenButtonEraserAction both-mode arms hold then toggles on click', () => {
+    expect(spenButtonEraserAction('press', 'both', false)).toBe('arm-hold');
+    expect(spenButtonEraserAction('click', 'both', false)).toBe('toggle');
+    expect(spenButtonEraserAction('release', 'both', true)).toBe('restore');
+  });
+
+  test('spenButtonEraserAction hold-mode is momentary', () => {
+    expect(spenButtonEraserAction('press', 'hold', false)).toBe('force-eraser');
+    expect(spenButtonEraserAction('release', 'hold', true)).toBe('restore');
+  });
+
+  test('spenButtonEraserAction toggle-mode ignores press', () => {
+    expect(spenButtonEraserAction('press', 'toggle', false)).toBe(null);
+    expect(spenButtonEraserAction('click', 'toggle', false)).toBe('toggle');
   });
 });

@@ -51,6 +51,21 @@ const AffineEditorSettingSchema = z.object({
   // linux only:
   enableMiddleClickPaste: z.boolean().default(false),
   codeBlockLineNumbers: z.boolean().default(true),
+  /** S Pen / stylus behaviour (edgeless + page illustration) */
+  stylus: z
+    .object({
+      /** Finger pans only; only pen/stylus (and mouse on desktop) can draw */
+      fingerPanOnly: z.boolean().default(true),
+      /**
+       * Side button: hold = momentary erase, toggle = sticky click,
+       * both = short click toggles + long press holds.
+       */
+      buttonMode: z.enum(['hold', 'toggle', 'both']).default('both'),
+    })
+    .default({
+      fingerPanOnly: true,
+      buttonMode: 'both',
+    }),
 });
 
 export const EditorSettingSchema = BSEditorSettingSchema.merge(

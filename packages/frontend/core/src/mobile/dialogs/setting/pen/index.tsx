@@ -1,11 +1,12 @@
-import { Slider } from '@affine/component';
+import { Slider, Switch } from '@affine/component';
 import { EditorSettingService } from '@affine/core/modules/editor-setting';
 import { useI18n } from '@affine/i18n';
 import { DefaultTheme } from '@blocksuite/affine/model';
 import { useLiveData, useService } from '@toeverything/infra';
 import { isEqual } from 'lodash-es';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { parseHexColor } from '../../../../blocksuite/page-illustration/coords';
 import { usePalettes } from '../../../../desktop/dialogs/setting/general-setting/editor/utils';
 import { SettingDropdownSelect } from '../dropdown-select';
 import { SettingGroup } from '../group';
@@ -44,6 +45,24 @@ export const PenSettingGroup = () => {
     [editorSetting]
   );
 
+  const resolvedHex =
+    typeof settings.brush.color === 'string' ? settings.brush.color : '';
+  const [hexDraft, setHexDraft] = useState(
+    resolvedHex.startsWith('#') ? resolvedHex : ''
+  );
+  useEffect(() => {
+    setHexDraft(resolvedHex.startsWith('#') ? resolvedHex : '');
+  }, [resolvedHex]);
+
+  const commitHex = useCallback(() => {
+    const parsed = parseHexColor(hexDraft);
+    if (parsed) {
+      editorSetting.set('brush', { color: parsed });
+    } else {
+      setHexDraft(resolvedHex.startsWith('#') ? resolvedHex : '');
+    }
+  }, [editorSetting, hexDraft, resolvedHex]);
+
   const thickness = settings.brush.lineWidth;
   const setThickness = useCallback(
     (value: number[]) => {
@@ -60,6 +79,41 @@ export const PenSettingGroup = () => {
     [editorSetting]
   );
 
+  const fingerPanOnly = settings.stylus?.fingerPanOnly ?? true;
+  const setFingerPanOnly = useCallback(
+    (checked: boolean) => {
+      editorSetting.set('stylus', { fingerPanOnly: checked });
+    },
+    [editorSetting]
+  );
+
+  const buttonMode = settings.stylus?.buttonMode ?? 'both';
+  const buttonModeOptions = useMemo(
+    () => [
+      {
+        label: t['com.affine.mobile.setting.pen.button-mode.both'](),
+        value: 'both',
+      },
+      {
+        label: t['com.affine.mobile.setting.pen.button-mode.toggle'](),
+        value: 'toggle',
+      },
+      {
+        label: t['com.affine.mobile.setting.pen.button-mode.hold'](),
+        value: 'hold',
+      },
+    ],
+    [t]
+  );
+  const setButtonMode = useCallback(
+    (value: string) => {
+      if (value === 'hold' || value === 'toggle' || value === 'both') {
+        editorSetting.set('stylus', { buttonMode: value });
+      }
+    },
+    [editorSetting]
+  );
+
   return (
     <SettingGroup title={t['com.affine.mobile.setting.pen.title']()}>
       <RowLayout
@@ -70,6 +124,32 @@ export const PenSettingGroup = () => {
           options={colorOptions}
           value={colorValue}
           onChange={setColor}
+        />
+      </RowLayout>
+      <RowLayout label={t['com.affine.mobile.setting.pen.hex']()}>
+        <input
+          data-testid="mobile-pen-hex"
+          value={hexDraft}
+          placeholder="#000000"
+          onChange={e => setHexDraft(e.target.value)}
+          onBlur={commitHex}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              commitHex();
+            }
+          }}
+          style={{
+            width: 96,
+            height: 28,
+            borderRadius: 6,
+            border: '1px solid var(--affine-border-color)',
+            background: 'var(--affine-background-primary-color)',
+            color: 'var(--affine-text-primary-color)',
+            fontFamily: 'ui-monospace, monospace',
+            fontSize: 12,
+            padding: '0 6px',
+          }}
         />
       </RowLayout>
       <RowLayout
@@ -97,6 +177,26 @@ export const PenSettingGroup = () => {
           max={100}
           step={5}
           nodes={[0, 25, 50, 75, 100]}
+        />
+      </RowLayout>
+      <RowLayout
+        label={t['com.affine.mobile.setting.pen.finger-pan-only']()}
+        description={t['com.affine.mobile.setting.pen.finger-pan-only.desc']()}
+      >
+        <Switch
+          data-testid="mobile-pen-finger-pan-only"
+          checked={fingerPanOnly}
+          onChange={setFingerPanOnly}
+        />
+      </RowLayout>
+      <RowLayout
+        label={t['com.affine.mobile.setting.pen.button-mode']()}
+        description={t['com.affine.mobile.setting.pen.button-mode.desc']()}
+      >
+        <SettingDropdownSelect
+          options={buttonModeOptions}
+          value={buttonMode}
+          onChange={setButtonMode}
         />
       </RowLayout>
     </SettingGroup>

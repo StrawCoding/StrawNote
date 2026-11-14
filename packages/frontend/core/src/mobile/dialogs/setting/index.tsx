@@ -13,6 +13,7 @@ import { useCallback, useEffect } from 'react';
 import { AboutGroup } from './about';
 import { AppearanceGroup } from './appearance';
 import { DevicesGroup } from './devices';
+import { EditorSettingGroup } from './editor';
 import { ExperimentalFeatureSetting } from './experimental';
 import { SettingGroup } from './group';
 import { OthersGroup } from './others';
@@ -125,6 +126,7 @@ const MobileSetting = ({
       <PlansGroup />
       {status === 'authenticated' ? <DevicesGroup /> : null}
       <AppearanceGroup />
+      <EditorSettingGroup />
       <PenSettingGroup />
       <AboutGroup />
       <ExperimentalFeatureSetting />
