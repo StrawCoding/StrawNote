@@ -1,3 +1,9 @@
+# 0.28.0.4
+
+- 插畫 mode：橡皮擦可用手指滑動擦除（不再被 fingerPanOnly 擋下）；筆工具列改 viewport `fixed`＋portal，釘在螢幕底部而非文件最底
+
+---
+
 # 0.28.0.3
 
 - Branding：載入／登入不再短暫出現 AFFiNE 圖示或字樣——`Logo1Icon` 改 StrawNote 標、替換 `affine-text-logo`／安裝 GIF、embed tooltip 與 import 文案；自架 rebuild 同步覆蓋 `app-icon-*.ico` 並把 open-in-app 圖示改指 `/StrawNoteIcon.png`

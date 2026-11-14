@@ -115,3 +115,120 @@ test('illustration toolbar exposes pen tools and accepts pen strokes', async ({
     page.getByTestId('page-illustration-tool-eraser')
   ).toHaveAttribute('data-active', 'true');
 });
+
+test('illustration toolbar is fixed to the viewport, not page bottom', async ({
+  page,
+}) => {
+  await clickIllustrationModeButton(page);
+  const toolbar = page.getByTestId('page-illustration-toolbar');
+  await expect(toolbar).toBeVisible();
+
+  const before = await toolbar.evaluate(el => {
+    const cs = getComputedStyle(el);
+    const rect = el.getBoundingClientRect();
+    return {
+      position: cs.position,
+      bottom: rect.bottom,
+      parentIsBody: el.parentElement === document.body,
+    };
+  });
+  expect(before.position).toBe('fixed');
+  expect(before.parentIsBody).toBe(true);
+  expect(before.bottom).toBeLessThanOrEqual(page.viewportSize()!.height);
+
+  // Grow the page so document bottom moves far below the viewport.
+  await page.locator('affine-page-root').evaluate(root => {
+    for (let i = 0; i < 40; i++) {
+      const p = document.createElement('p');
+      p.textContent = `spacer line ${i}`;
+      p.style.minHeight = '48px';
+      root.append(p);
+    }
+  });
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(200);
+
+  const after = await toolbar.evaluate(el => {
+    const rect = el.getBoundingClientRect();
+    return { top: rect.top, bottom: rect.bottom };
+  });
+  const vh = page.viewportSize()!.height;
+  expect(after.bottom).toBeLessThanOrEqual(vh);
+  expect(after.top).toBeGreaterThan(vh * 0.5);
+});
+
+test('illustration eraser accepts finger touch swipe', async ({ page }) => {
+  await clickIllustrationModeButton(page);
+  const overlay = page.getByTestId('page-illustration-overlay');
+  const svg = overlay.locator('svg');
+  const box = await svg.boundingBox();
+  expect(box).toBeTruthy();
+  if (!box) return;
+
+  const startX = box.x + box.width * 0.3;
+  const startY = box.y + box.height * 0.35;
+
+  const firePointer = async (
+    type: 'pointerdown' | 'pointermove' | 'pointerup',
+    pointerType: 'pen' | 'touch' | 'mouse',
+    pointerId: number,
+    x: number,
+    y: number,
+    buttons: number
+  ) => {
+    await svg.evaluate(
+      (el, args) => {
+        el.dispatchEvent(
+          new PointerEvent(args.type, {
+            pointerType: args.pointerType,
+            pointerId: args.pointerId,
+            clientX: args.x,
+            clientY: args.y,
+            pressure: args.buttons ? 0.6 : 0,
+            buttons: args.buttons,
+            button: 0,
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+            isPrimary: true,
+          })
+        );
+      },
+      { type, pointerType, pointerId, x, y, buttons }
+    );
+  };
+
+  // Draw a stroke with pen first
+  await page.getByTestId('page-illustration-tool-brush').click();
+  await expect(
+    page.getByTestId('page-illustration-tool-brush')
+  ).toHaveAttribute('data-active', 'true');
+  await firePointer('pointerdown', 'pen', 1, startX, startY, 1);
+  await firePointer('pointermove', 'pen', 1, startX + 80, startY, 1);
+  await firePointer('pointerup', 'pen', 1, startX + 80, startY, 0);
+  await expect(svg.locator('path')).not.toHaveCount(0, { timeout: 5000 });
+  const beforeCount = await svg.locator('path').count();
+  expect(beforeCount).toBeGreaterThan(0);
+
+  // Finger swipe with eraser should erase (even when fingerPanOnly default)
+  await page.getByTestId('page-illustration-tool-eraser').click();
+  await expect(
+    page.getByTestId('page-illustration-tool-eraser')
+  ).toHaveAttribute('data-active', 'true');
+  await firePointer('pointerdown', 'touch', 2, startX + 10, startY, 1);
+  for (let i = 1; i <= 10; i++) {
+    await firePointer(
+      'pointermove',
+      'touch',
+      2,
+      startX + 10 + i * 8,
+      startY,
+      1
+    );
+  }
+  await firePointer('pointerup', 'touch', 2, startX + 90, startY, 0);
+
+  await expect
+    .poll(async () => svg.locator('path').count(), { timeout: 5000 })
+    .toBeLessThan(beforeCount);
+});

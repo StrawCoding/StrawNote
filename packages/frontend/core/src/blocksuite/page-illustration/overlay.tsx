@@ -10,6 +10,7 @@ import type { Store } from '@blocksuite/affine/store';
 import { useLiveData, useService } from '@toeverything/infra';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import {
   classifySpenButtonGesture,
@@ -75,11 +76,12 @@ function strokePath(
 }
 
 function eraseAtPoint(doc: Store, x: number, y: number) {
+  // Finger eraser needs a generous hit radius (stylus tip is precise; finger is not).
   const hit = listPageIllustrationBrushes(doc).find(brush =>
     isNearPolyline(
       [x, y],
       brushAbsolutePoints(brush),
-      Math.max(12, brush.lineWidth)
+      Math.max(28, brush.lineWidth * 4)
     )
   );
   if (hit) {
@@ -102,6 +104,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const [layerOffset, setLayerOffset] = useState({ left: 0, top: 0 });
   const [brushes, setBrushes] = useState<BrushElementModel[]>([]);
   const [live, setLive] = useState<LiveStroke | null>(null);
+  const liveRef = useRef<LiveStroke | null>(null);
   const [hexDraft, setHexDraft] = useState('');
   const drawingRef = useRef(false);
   const toolBeforeSpenRef = useRef<Tool | null>(null);
@@ -288,12 +291,16 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   }, [applySpenAction, buttonMode]);
 
   const canDrawWithPointer = useCallback(
-    (e: React.PointerEvent) => {
+    (e: React.PointerEvent, activeTool: Tool) => {
       if (isStylusPointer(e.nativeEvent) || e.pointerType === 'pen')
         return true;
       if (e.pointerType === 'eraser') return true;
       if (e.pointerType === 'mouse') return true;
-      if (e.pointerType === 'touch') return !fingerPanOnly;
+      if (e.pointerType === 'touch') {
+        // Eraser tool always accepts finger swipe; brush respects fingerPanOnly.
+        if (activeTool === 'eraser') return true;
+        return !fingerPanOnly;
+      }
       return true;
     },
     [fingerPanOnly]
@@ -302,12 +309,17 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const onPointerDown = useCallback(
     (e: React.PointerEvent<SVGSVGElement>) => {
       if (tool === 'pan') return;
-      if (!canDrawWithPointer(e)) return;
+      if (!canDrawWithPointer(e, tool)) return;
 
       const content = resolveContentEl();
       if (!content) return;
 
-      e.currentTarget.setPointerCapture(e.pointerId);
+      e.preventDefault();
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // Synthetic / already-captured pointers may throw; drawing can continue.
+      }
       drawingRef.current = true;
       const [x, y] = clientToPageContentPoint(e.clientX, e.clientY, content);
 
@@ -316,12 +328,14 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         return;
       }
 
-      setLive({
+      const next: LiveStroke = {
         points: [[x, y, e.pressure || 0.5]],
         color: brushColor,
         lineWidth: brushLineWidth,
         streamline: brushStreamline,
-      });
+      };
+      liveRef.current = next;
+      setLive(next);
     },
     [
       brushColor,
@@ -338,6 +352,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const onPointerMove = useCallback(
     (e: React.PointerEvent<SVGSVGElement>) => {
       if (!drawingRef.current) return;
+      e.preventDefault();
       const content = resolveContentEl();
       if (!content) return;
       const [x, y] = clientToPageContentPoint(e.clientX, e.clientY, content);
@@ -347,14 +362,15 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         return;
       }
       if (tool !== 'brush') return;
-      setLive(prev =>
-        prev
-          ? {
-              ...prev,
-              points: [...prev.points, [x, y, e.pressure || 0.5]],
-            }
-          : prev
-      );
+      setLive(prev => {
+        if (!prev) return prev;
+        const next = {
+          ...prev,
+          points: [...prev.points, [x, y, e.pressure || 0.5]],
+        };
+        liveRef.current = next;
+        return next;
+      });
     },
     [doc, refreshBrushes, resolveContentEl, tool]
   );
@@ -371,17 +387,17 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
       if (tool !== 'brush') return;
 
-      setLive(prev => {
-        if (prev && prev.points.length > 0) {
-          addPageIllustrationBrush(doc, prev.points, {
-            color: prev.color,
-            lineWidth: prev.lineWidth,
-            streamline: prev.streamline,
-          });
-          refreshBrushes();
-        }
-        return null;
-      });
+      const stroke = liveRef.current;
+      liveRef.current = null;
+      setLive(null);
+      if (stroke && stroke.points.length > 0) {
+        addPageIllustrationBrush(doc, stroke.points, {
+          color: stroke.color,
+          lineWidth: stroke.lineWidth,
+          streamline: stroke.streamline,
+        });
+        refreshBrushes();
+      }
     },
     [doc, refreshBrushes, tool]
   );
@@ -433,90 +449,96 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
     ? strokePath(live.points, live.lineWidth, live.streamline)
     : '';
 
+  const toolbar = (
+    <div
+      className={styles.toolbar}
+      role="toolbar"
+      aria-label="Illustration tools"
+      data-testid="page-illustration-toolbar"
+    >
+      <button
+        type="button"
+        className={styles.toolButton}
+        data-active={tool === 'brush'}
+        data-testid="page-illustration-tool-brush"
+        title="Pen"
+        onClick={() => setTool('brush')}
+      >
+        Pen
+      </button>
+      <button
+        type="button"
+        className={styles.toolButton}
+        data-active={tool === 'eraser'}
+        data-testid="page-illustration-tool-eraser"
+        title="Eraser"
+        onClick={() => setTool('eraser')}
+      >
+        Eraser
+      </button>
+      <button
+        type="button"
+        className={styles.toolButton}
+        data-active={tool === 'pan'}
+        data-testid="page-illustration-tool-pan"
+        title="Scroll"
+        onClick={() => setTool('pan')}
+      >
+        Scroll
+      </button>
+      <div className={styles.divider} />
+      {QUICK_COLORS.map(c => (
+        <button
+          key={c}
+          type="button"
+          className={styles.colorSwatch}
+          style={{ background: c }}
+          data-testid={`page-illustration-color-${c.slice(1)}`}
+          data-active={brushColor.toLowerCase() === c}
+          aria-label={`Color ${c}`}
+          onClick={() => setBrushColor(c)}
+        />
+      ))}
+      <input
+        className={styles.hexInput}
+        data-testid="page-illustration-hex"
+        value={hexDraft}
+        placeholder="#000000"
+        aria-label="Hex color"
+        onChange={e => setHexDraft(e.target.value)}
+        onBlur={commitHex}
+        onKeyDown={e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            commitHex();
+          }
+        }}
+      />
+      <div className={styles.divider} />
+      {LINE_WIDTHS.map(w => (
+        <button
+          key={w}
+          type="button"
+          className={styles.widthChip}
+          data-active={brushLineWidth === w}
+          data-testid={`page-illustration-width-${w}`}
+          onClick={() => setLineWidth(w)}
+        >
+          {w}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <div
       ref={rootRef}
       className={styles.root}
       data-testid="page-illustration-overlay"
     >
-      <div
-        className={styles.toolbar}
-        role="toolbar"
-        aria-label="Illustration tools"
-        data-testid="page-illustration-toolbar"
-      >
-        <button
-          type="button"
-          className={styles.toolButton}
-          data-active={tool === 'brush'}
-          data-testid="page-illustration-tool-brush"
-          title="Pen"
-          onClick={() => setTool('brush')}
-        >
-          Pen
-        </button>
-        <button
-          type="button"
-          className={styles.toolButton}
-          data-active={tool === 'eraser'}
-          data-testid="page-illustration-tool-eraser"
-          title="Eraser"
-          onClick={() => setTool('eraser')}
-        >
-          Eraser
-        </button>
-        <button
-          type="button"
-          className={styles.toolButton}
-          data-active={tool === 'pan'}
-          data-testid="page-illustration-tool-pan"
-          title="Scroll"
-          onClick={() => setTool('pan')}
-        >
-          Scroll
-        </button>
-        <div className={styles.divider} />
-        {QUICK_COLORS.map(c => (
-          <button
-            key={c}
-            type="button"
-            className={styles.colorSwatch}
-            style={{ background: c }}
-            data-testid={`page-illustration-color-${c.slice(1)}`}
-            data-active={brushColor.toLowerCase() === c}
-            aria-label={`Color ${c}`}
-            onClick={() => setBrushColor(c)}
-          />
-        ))}
-        <input
-          className={styles.hexInput}
-          data-testid="page-illustration-hex"
-          value={hexDraft}
-          placeholder="#000000"
-          aria-label="Hex color"
-          onChange={e => setHexDraft(e.target.value)}
-          onBlur={commitHex}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              commitHex();
-            }
-          }}
-        />
-        <div className={styles.divider} />
-        {LINE_WIDTHS.map(w => (
-          <button
-            key={w}
-            type="button"
-            className={styles.widthChip}
-            data-active={brushLineWidth === w}
-            data-testid={`page-illustration-width-${w}`}
-            onClick={() => setLineWidth(w)}
-          >
-            {w}
-          </button>
-        ))}
-      </div>
+      {typeof document !== 'undefined'
+        ? createPortal(toolbar, document.body)
+        : null}
       <svg
         className={styles.layer}
         width={size.width || '100%'}
@@ -525,6 +547,13 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
           left: layerOffset.left,
           top: layerOffset.top,
           pointerEvents: tool === 'pan' ? 'none' : 'auto',
+          // Eraser/brush-draw: lock touch so finger swipe draws/erases.
+          // Brush + fingerPanOnly: allow vertical page scroll for fingers;
+          // stylus/pen still receives pointer events.
+          touchAction:
+            tool === 'eraser' || (tool === 'brush' && !fingerPanOnly)
+              ? 'none'
+              : 'pan-y',
           cursor:
             tool === 'eraser'
               ? 'cell'

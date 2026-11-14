@@ -11,16 +11,17 @@ export const root = style({
 export const layer = style({
   position: 'absolute',
   pointerEvents: 'auto',
-  touchAction: 'none',
+  // touchAction set inline per tool (eraser locks; brush+fingerPanOnly pans).
   // Position + size set inline to match page content box.
 });
 
+/** Viewport-fixed pen chrome (not document bottom). Portaled to body. */
 export const toolbar = style({
-  position: 'absolute',
+  position: 'fixed',
   left: '50%',
-  bottom: 16,
+  bottom: 'max(16px, calc(env(safe-area-inset-bottom, 0px) + 12px))',
   transform: 'translateX(-50%)',
-  zIndex: 21,
+  zIndex: 1200,
   display: 'inline-flex',
   alignItems: 'center',
   gap: 6,
@@ -31,7 +32,7 @@ export const toolbar = style({
   boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
   pointerEvents: 'auto',
   width: 'fit-content',
-  maxWidth: 'calc(100% - 24px)',
+  maxWidth: 'calc(100vw - 24px)',
   flexWrap: 'wrap',
   justifyContent: 'center',
 });
