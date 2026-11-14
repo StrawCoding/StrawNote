@@ -47,6 +47,7 @@ import {
   type DefaultOpenProperty,
   WorkspacePropertiesTable,
 } from '../../components/properties';
+import { PageIllustrationOverlay } from '../page-illustration';
 import { BiDirectionalLinkPanel } from './bi-directional-link-panel';
 import { DocIconPicker } from './doc-icon-picker';
 import { BlocksuiteEditorJournalDocTitle } from './journal-doc-title';
@@ -58,7 +59,7 @@ interface BlocksuiteEditorProps {
   readonly?: boolean;
   shared?: boolean;
   defaultOpenProperty?: DefaultOpenProperty;
-  /** Page-illustration mode: canvas editor with brush as default tool */
+  /** Page-illustration mode: page editor + scroll-synced ink overlay */
   illustration?: boolean;
 }
 
@@ -173,6 +174,7 @@ export const BlocksuiteDocEditor = forwardRef<
     titleRef: externalTitleRef,
     defaultOpenProperty,
     readonly,
+    illustration,
   },
   ref
 ) {
@@ -257,7 +259,14 @@ export const BlocksuiteDocEditor = forwardRef<
 
   return (
     <>
-      <div className={styles.affineDocViewport}>
+      <div
+        className={styles.affineDocViewport}
+        data-illustration-mode={illustration ? 'true' : undefined}
+        style={illustration ? { position: 'relative' } : undefined}
+      >
+        {illustration && !readonly && !shared ? (
+          <PageIllustrationOverlay doc={page} />
+        ) : null}
         {!BUILD_CONFIG.isMobileEdition ? (
           <DocIconPicker docId={page.id} readonly={readonly || shared} />
         ) : null}
@@ -303,7 +312,7 @@ export const BlocksuiteDocEditor = forwardRef<
 export const BlocksuiteEdgelessEditor = forwardRef<
   EdgelessEditor,
   BlocksuiteEditorProps
->(function BlocksuiteEdgelessEditor({ page, illustration }, ref) {
+>(function BlocksuiteEdgelessEditor({ page }, ref) {
   const [specs, portals] = usePatchSpecs('edgeless');
   const editorRef = useRef<EdgelessEditor | null>(null);
 
@@ -324,36 +333,18 @@ export const BlocksuiteEdgelessEditor = forwardRef<
   useEffect(() => {
     if (editorRef.current) {
       editorRef.current.updateComplete
-        .then(async () => {
+        .then(() => {
           // make sure editor can get keyboard events on showing up
           editorRef.current
             ?.querySelector<HTMLElement>('affine-edgeless-root')
             ?.click();
-
-          if (!illustration) return;
-          // Illustration mode: default to brush so pen/S Pen can draw immediately.
-          // Strokes are surface elements → visible when switching to edgeless.
-          const { BrushTool } = await import('@blocksuite/affine/gfx/brush');
-          const { GfxControllerIdentifier } =
-            await import('@blocksuite/affine/std/gfx');
-          const host = editorRef.current?.host;
-          if (!host) return;
-          try {
-            const gfx = host.std.get(GfxControllerIdentifier);
-            gfx.tool.setTool(BrushTool);
-          } catch {
-            // ignore if gfx not ready
-          }
         })
         .catch(console.error);
     }
-  }, [illustration]);
+  }, []);
 
   return (
-    <div
-      className={styles.affineEdgelessDocViewport}
-      data-illustration-mode={illustration ? 'true' : undefined}
-    >
+    <div className={styles.affineEdgelessDocViewport}>
       <LitEdgelessEditor ref={onDocRef} doc={page} specs={specs} />
       {portals}
     </div>

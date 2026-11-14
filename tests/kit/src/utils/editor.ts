@@ -57,8 +57,8 @@ export async function ensureInIllustrationMode(page: Page) {
   await expect(
     locateModeSwitchButton(page, 'illustration', true)
   ).toBeVisible();
-  await expect(page.locator('[data-illustration-mode="true"]')).toBeVisible();
-  await expect(page.locator('affine-edgeless-root')).toBeVisible();
+  await expect(page.getByTestId('page-illustration-overlay')).toBeVisible();
+  await expect(page.locator('affine-page-root')).toBeVisible();
   await page.waitForTimeout(500);
 }
 

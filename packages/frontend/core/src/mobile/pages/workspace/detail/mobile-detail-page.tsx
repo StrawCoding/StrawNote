@@ -214,8 +214,7 @@ const DetailPageImpl = ({
     !canEdit ||
     isInTrash ||
     !enableKeyboardToolbar ||
-    ((mode === 'edgeless' || mode === 'illustration') &&
-      !enableEdgelessEditing);
+    (mode === 'edgeless' && !enableEdgelessEditing);
 
   const immersiveZoomToolbarBottom = getImmersiveZoomToolbarBottom({
     immersive,

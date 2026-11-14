@@ -3,6 +3,7 @@ import {
   ColorScheme,
   FrameBlockModel,
   isTransparent,
+  PAGE_ILLUSTRATION_FRAME_TITLE,
 } from '@blocksuite/affine-model';
 import { ThemeProvider } from '@blocksuite/affine-shared/services';
 import { on } from '@blocksuite/affine-shared/utils';
@@ -17,7 +18,7 @@ import {
 import { GfxControllerIdentifier } from '@blocksuite/std/gfx';
 import { consume } from '@lit/context';
 import { themeToVar } from '@toeverything/theme/v2';
-import { LitElement } from 'lit';
+import { LitElement, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
 
 import { mountFrameTitleEditor } from './mount-frame-title-editor.js';
@@ -238,6 +239,11 @@ export class AffineFrameTitle extends SignalWatcher(
   }
 
   override render() {
+    // Page-illustration ink container must stay invisible in edgeless.
+    if (this._frameTitle === PAGE_ILLUSTRATION_FRAME_TITLE) {
+      this.style.display = 'none';
+      return nothing;
+    }
     this._updateStyle();
     return this._frameTitle;
   }

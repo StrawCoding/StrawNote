@@ -61,7 +61,7 @@ export class Editor extends Entity {
     let commentId = selector?.commentId;
     let key: 'blockIds' | 'elementIds' = 'blockIds';
 
-    if (mode === 'edgeless' || mode === 'illustration') {
+    if (mode === 'edgeless') {
       const elementId = selector?.elementIds?.[0];
       if (elementId) {
         id = elementId;

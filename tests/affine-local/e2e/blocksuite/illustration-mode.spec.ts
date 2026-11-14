@@ -20,7 +20,7 @@ test.beforeEach(async ({ page, baseURL }) => {
   await waitForEditorLoad(page);
 });
 
-test('illustration mode switch shows canvas editor and shares surface with edgeless', async ({
+test('illustration mode mounts page editor with ink overlay', async ({
   page,
 }) => {
   await expect(
@@ -29,10 +29,11 @@ test('illustration mode switch shows canvas editor and shares surface with edgel
 
   await clickIllustrationModeButton(page);
   expect(await getPageMode(page)).toBe('illustration');
-  await expect(page.locator('[data-illustration-mode="true"]')).toBeVisible();
-  await expect(page.locator('affine-edgeless-root')).toBeVisible();
+  await expect(page.getByTestId('page-illustration-overlay')).toBeVisible();
+  await expect(page.locator('affine-page-root')).toBeVisible();
+  await expect(page.locator('affine-edgeless-root')).toHaveCount(0);
 
-  // Strokes live on the shared surface — switching to edgeless keeps canvas.
+  // Switching to edgeless still works (whiteboard separate from page ink).
   await clickEdgelessModeButton(page);
   expect(await getPageMode(page)).toBe('edgeless');
   await expect(page.locator('affine-edgeless-root')).toBeVisible();
@@ -45,4 +46,5 @@ test('illustration mode switch shows canvas editor and shares surface with edgel
   await page.keyboard.press('KeyI');
   await page.keyboard.up('Alt');
   await ensureInIllustrationMode(page);
+  await expect(page.getByTestId('page-illustration-overlay')).toBeVisible();
 });

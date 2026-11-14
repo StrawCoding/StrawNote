@@ -1394,7 +1394,7 @@
   "com.affine.settings.editorSettings.edgeless.pen.stability": "Stroke stability",
   "com.affine.settings.editorSettings.edgeless.pen.stability.desc": "Higher values smooth shaky strokes; lower values keep more detail.",
   "com.affine.mobile.setting.pen.title": "Pen / S Pen",
-  "com.affine.mobile.setting.pen.desc": "Default pen settings for edgeless and illustration modes",
+  "com.affine.mobile.setting.pen.desc": "Default pen settings for edgeless and page illustration modes",
   "com.affine.settings.editorSettings.edgeless.shape": "Shape",
   "com.affine.settings.editorSettings.edgeless.shape.border-color": "Border color",
   "com.affine.settings.editorSettings.edgeless.shape.border-style": "Border style",

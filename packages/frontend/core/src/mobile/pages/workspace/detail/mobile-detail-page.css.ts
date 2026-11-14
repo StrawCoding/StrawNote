@@ -9,7 +9,7 @@ export const root = style({
   display: 'flex',
   flexDirection: 'column',
   selectors: {
-    '&:has([data-mode="edgeless"]), &:has([data-mode="illustration"])': {
+    '&:has([data-mode="edgeless"])': {
       height: '100dvh',
       maxHeight: '100dvh',
       overflow: 'hidden',
@@ -78,7 +78,7 @@ export const affineDocViewport = style({
   containerType: 'inline-size',
   background: cssVarV2('layer/background/primary'),
   selectors: {
-    '&[data-mode="edgeless"], &[data-mode="illustration"]': {
+    '&[data-mode="edgeless"]': {
       position: 'absolute',
       top: 0,
       left: 0,
@@ -88,6 +88,12 @@ export const affineDocViewport = style({
       overflow: 'hidden',
       overscrollBehavior: 'none',
       touchAction: 'none',
+    },
+    // Illustration mounts page editor + ink overlay; keep normal page scroll.
+    '&[data-mode="illustration"]': {
+      position: 'relative',
+      overflow: 'auto',
+      touchAction: 'pan-y',
     },
   },
 });

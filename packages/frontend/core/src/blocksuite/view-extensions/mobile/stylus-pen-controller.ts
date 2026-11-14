@@ -22,11 +22,13 @@ type SpenButtonDetail = {
 };
 
 /**
- * Enables S Pen / stylus drawing on edgeless (Web, desktop, Android):
+ * Enables S Pen / stylus drawing on edgeless canvas (Web, desktop, Android):
  * - pen tip → brush (when on default tool or after side-button erase)
  * - barrel / eraser tip → eraser
  * - palm rejection while stylus is active
  * - native detached S Pen button via `strawnote:spen-button`
+ *
+ * Page illustration mode uses PageIllustrationOverlay (pen vs finger) instead.
  */
 export class StylusPenController extends LifeCycleWatcher {
   static override key = 'strawnote-stylus-pen';

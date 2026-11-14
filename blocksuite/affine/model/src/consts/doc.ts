@@ -4,8 +4,9 @@ import { z } from 'zod';
 /**
  * - page: linear document
  * - edgeless: free canvas
- * - illustration: page-oriented drawing mode (edgeless editor + brush default);
- *   strokes live on the shared surface and appear in edgeless
+ * - illustration: page-oriented drawing — mounts the page editor with a
+ *   scroll-synced ink overlay; strokes are stored on the shared surface inside
+ *   a dedicated (hidden-from-edgeless) illustration frame
  */
 export type DocMode = 'edgeless' | 'page' | 'illustration';
 
@@ -13,13 +14,24 @@ export const DocModes = ['edgeless', 'page', 'illustration'] as const;
 
 /** True when the editor should mount the page (doc) editor. */
 export function isPageEditorMode(mode: DocMode): boolean {
-  return mode === 'page';
+  return mode === 'page' || mode === 'illustration';
 }
 
 /** True when the editor should mount the edgeless/canvas editor. */
 export function isCanvasEditorMode(mode: DocMode): boolean {
-  return mode === 'edgeless' || mode === 'illustration';
+  return mode === 'edgeless';
 }
+
+/** True when page ink overlay / pen defaults should be active. */
+export function isIllustrationMode(mode: DocMode): boolean {
+  return mode === 'illustration';
+}
+
+/**
+ * Surface frame that holds page-illustration brush strokes.
+ * Edgeless UI should hide frames with this title.
+ */
+export const PAGE_ILLUSTRATION_FRAME_TITLE = '__strawnote_page_illustration__';
 
 export type FootNoteReferenceType = 'doc' | 'attachment' | 'url';
 

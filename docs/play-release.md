@@ -5,9 +5,9 @@ Default track: `internal`（內部測試）
 
 ## 現況（2026-11-13）
 
-- **最新 internal**：`versionName=0.27.10` / `versionCode=6`
-  - 含：無邊框／插畫模式可鎖定元件（Android 選取工具列啟用 Lock/Unlock；刪除／剪下／橡皮擦跳過已鎖定）
-- 前一版：`0.27.9` / code5（S Pen palm rejection、插畫 mode header、筆穩定度設定）
+- **最新 internal**：`versionName=0.27.11` / `versionCode=7`
+  - 含：插畫模式改為頁面內手寫（Page 編輯器 + scroll 同步 overlay；筆跡存 hidden frame，不進無邊框畫布）
+- 前一版：`0.27.10` / code6（無邊框元件鎖定）；`0.27.9` / code5（S Pen、插畫 header）
 - 歷史：`0.27.8`/code4 平板相容＋sync；`0.27.5`/code1 平板被過濾；`0.27.6`–`0.27.7` 過渡版
 - AAB：`canaryRelease` signed with upload keystore；native 以 `.cargo/config.toml` `max-page-size=16384` 建置
 - 驗收：`packages/frontend/apps/android/scripts/check-16k-elf.sh <aab>`（本版 PASS）

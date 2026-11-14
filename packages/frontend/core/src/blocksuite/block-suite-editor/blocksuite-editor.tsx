@@ -271,13 +271,13 @@ const BlockSuiteEditorImpl = ({
           titleRef={docTitleRef}
           onClickBlank={handleClickPageModeBlank}
           defaultOpenProperty={defaultOpenProperty}
+          illustration={mode === 'illustration'}
         />
       ) : (
         <BlocksuiteEdgelessEditor
           shared={shared}
           page={page}
           ref={edgelessRef}
-          illustration={mode === 'illustration'}
         />
       )}
     </div>

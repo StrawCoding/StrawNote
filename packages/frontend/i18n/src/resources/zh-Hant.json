@@ -1394,7 +1394,7 @@
   "com.affine.settings.editorSettings.edgeless.pen.stability": "筆畫穩定度",
   "com.affine.settings.editorSettings.edgeless.pen.stability.desc": "數值越高越平滑、抖動越少；越低則保留更多細節。",
   "com.affine.mobile.setting.pen.title": "筆／S Pen",
-  "com.affine.mobile.setting.pen.desc": "無邊框與插畫模式的預設筆設定",
+  "com.affine.mobile.setting.pen.desc": "無邊框模式與頁面插畫模式的預設筆設定",
   "com.affine.settings.editorSettings.edgeless.shape": "圖形",
   "com.affine.settings.editorSettings.edgeless.shape.border-color": "邊框顏色",
   "com.affine.settings.editorSettings.edgeless.shape.border-style": "邊框樣式",

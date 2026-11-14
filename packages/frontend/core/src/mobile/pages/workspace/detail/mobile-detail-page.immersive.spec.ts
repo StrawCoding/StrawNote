@@ -17,7 +17,7 @@ import {
 } from './mobile-detail-page.immersive';
 
 describe('mobile detail page immersive helpers', () => {
-  test('enables immersive mode for edgeless/illustration landscape', () => {
+  test('enables immersive mode for edgeless landscape only', () => {
     expect(
       shouldEnableEdgelessImmersive({ mode: 'edgeless', isLandscape: true })
     ).toBe(true);
@@ -26,7 +26,7 @@ describe('mobile detail page immersive helpers', () => {
         mode: 'illustration',
         isLandscape: true,
       })
-    ).toBe(true);
+    ).toBe(false);
     expect(
       shouldEnableEdgelessImmersive({ mode: 'page', isLandscape: true })
     ).toBe(false);
@@ -178,16 +178,16 @@ describe('mobile detail page immersive helpers', () => {
     ).toBeUndefined();
   });
 
-  test('locks document scroll whenever edgeless mode is active', () => {
+  test('locks document scroll only for edgeless (illustration scrolls like page)', () => {
     expect(shouldLockEdgelessDocumentScroll('edgeless')).toBe(true);
-    expect(shouldLockEdgelessDocumentScroll('illustration')).toBe(true);
+    expect(shouldLockEdgelessDocumentScroll('illustration')).toBe(false);
     expect(shouldLockEdgelessDocumentScroll('page')).toBe(false);
   });
 
-  test('tracks title scroll only in page mode', () => {
+  test('tracks title scroll for page and illustration', () => {
     expect(shouldTrackMobileDetailPageTitleScroll('page')).toBe(true);
+    expect(shouldTrackMobileDetailPageTitleScroll('illustration')).toBe(true);
     expect(shouldTrackMobileDetailPageTitleScroll('edgeless')).toBe(false);
-    expect(shouldTrackMobileDetailPageTitleScroll('illustration')).toBe(false);
   });
 
   test('shows title only after crossing the existing scroll threshold', () => {
