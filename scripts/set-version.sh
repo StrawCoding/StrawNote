@@ -31,10 +31,9 @@ update_app_stream_version() {
   # We need to update the version and the url
   current_date=$(date +"%Y-%m-%d")
 
-  # Use sed to update the version, date, and URL in the releases section
-  sed -i.bak -E "s|<release version=\"[^\"]*\" date=\"[^\"]*\">|<release version=\"$new_version\" date=\"$current_date\">|" "$file_path" &&
-  sed -i.bak -E "s|<url>https://github.com/(toeverything/AFFiNE|StrawCoding/StrawNote)/releases/tag/v[^<]*</url>|<url>https://github.com/StrawCoding/StrawNote/releases/tag/v$new_version</url>|" "$file_path" || {
-    # If the sed command fails, print an error message and exit with a non-zero status
+  # Avoid `|` inside regex when using `|` as sed delimiter (repo alternation).
+  sed -i.bak -E "s#<release version=\"[^\"]*\" date=\"[^\"]*\">#<release version=\"$new_version\" date=\"$current_date\">#" "$file_path" &&
+  sed -i.bak -E "s#<url>https://github.com/[^/]+/[^/]+/releases/tag/v[^<]*</url>#<url>https://github.com/StrawCoding/StrawNote/releases/tag/v${new_version}</url>#" "$file_path" || {
     echo "Error: Failed to update the appVersion."
     return 1
   }

@@ -2,29 +2,35 @@
 
 Package: `com.strawcoding.strawnote`
 
+## 版本規範 a.b.c.d
+
+|         |                                                         |
+| ------- | ------------------------------------------------------- |
+| `d = 0` | 正式版 → Play **production**（例 `v0.28.0.0`）          |
+| `d ≠ 0` | 測試版（同舊 pre）→ Play **internal**（例 `v0.28.0.1`） |
+
 ## 雙軌規則（對齊 StrawMoneyBook）
 
-| Tag 例                    | Workflow                                                                          | Play track   |
-| ------------------------- | --------------------------------------------------------------------------------- | ------------ |
-| `v0.27.12`（非 `*.0`）    | [`play-internal-release.yml`](../.github/workflows/play-internal-release.yml)     | `internal`   |
-| `v0.28.0`（以 `.0` 結尾） | [`play-production-release.yml`](../.github/workflows/play-production-release.yml) | `production` |
+| Tag 例                             | Workflow                                                                          | Play track   |
+| ---------------------------------- | --------------------------------------------------------------------------------- | ------------ |
+| `v0.28.0.1`（`d≠0`）               | [`play-internal-release.yml`](../.github/workflows/play-internal-release.yml)     | `internal`   |
+| `v0.28.0.0`（以 `.0` 結尾＝`d=0`） | [`play-production-release.yml`](../.github/workflows/play-production-release.yml) | `production` |
 
-- 打 `v*` 後 CI 建置成功即自動上傳（無需 GitHub Environment 人工 Approve）。
-- **未打 `*.0` 不上公開商店**；預設測試軌＝internal。
-- AAB 上傳成功 ≠ 使用者立刻看得到：internal 仍須 Console 名單 + opt-in  
+- 打 `v*` 後 CI 建置成功即自動上傳。
+- **未打正式 `d=0` tag 不上公開商店**。
+- AAB 上傳成功 ≠ 立刻可見：internal 仍須 opt-in  
   https://play.google.com/apps/internaltest/com.strawcoding.strawnote
-- `workflow_dispatch`：internal 可補傳任意版號；production 要求 `version_name` 以 `.0` 結尾。
+- `workflow_dispatch`：internal 可補傳；production 要求 `version_name` 以 `.0` 結尾。
 
 ### VERSION_CODE（CI）
 
-未手動指定時由 `VERSION_NAME` 推導：`major*1000000 + minor*1000 + patch`  
-例：`0.27.11` → `27011`，`0.28.0` → `28000`。須對 Play 嚴格遞增；本機手動上傳請用更大整數或與 CI 公式一致。
+`a*10000000 + b*100000 + c*1000 + d`  
+例：`0.28.0.0` → `2800000`，`0.28.0.1` → `2800001`。
 
 ## 現況（2026-11-14）
 
-- **最新 internal**：`versionName=0.27.12` / `versionCode=27012`（公式碼）
-  - 含：插畫工具列對齊 edgeless、書寫座標修復、S Pen 側鍵短按／按住切橡皮擦、筆設定（手指只平移／HEX）、Android 編輯器設定對等 web
-- 歷史：`0.27.11`/code7 插畫手寫；`0.27.10`/code6 鎖定；`0.27.9` S Pen；`0.27.8` 平板＋sync
+- **接手正式版**：`versionName=0.28.0.0` / `versionCode=2800000` — **StrawNote 接手版本**
+- 前一測試線：`0.27.12` 插畫工具列／S Pen；`0.27.11` 頁面插畫；`0.27.10` 鎖定
 - AAB：`canaryRelease` + upload keystore；native `max-page-size=16384`
 - Secrets：`ANDROID_*` + `PLAY_SERVICE_ACCOUNT_JSON` + `ANDROID_PACKAGE_NAME`
 - Upload key SHA-1：`C8:5E:D4:32:81:5C:C3:4C:83:2A:98:23:ED:87:86:01:A6:0D:89:A0`
@@ -51,14 +57,13 @@ yarn affine @affine/android build
 yarn workspace @affine/android cap sync
 
 cd packages/frontend/apps/android/App
-VERSION_NAME=0.27.13 VERSION_CODE=27013 \
+VERSION_NAME=0.28.0.0 VERSION_CODE=2800000 \
   ./gradlew :app:bundleCanaryRelease --no-daemon
 
 cd ../
 AAB_PATH="$(find App/app/build/outputs/bundle -name '*.aab' | sort | tail -1)" \
-  fastlane android internal_testing
-# 正式軌：
-# AAB_PATH=... fastlane android production
+  fastlane android production
+# 測試軌（d≠0）：fastlane android internal_testing
 ```
 
 ## Fastlane lanes
@@ -70,8 +75,8 @@ AAB_PATH="$(find App/app/build/outputs/bundle -name '*.aab' | sort | tail -1)" \
 
 1. SA 對此 package 有 releases 權限（已驗證）。
 2. Internal 測試員名單 + opt-in。
-3. 隱私權／分級等商店資訊齊全後，`*.0` tag 才會成功上 production。
-4. 未明示正式版時只打非 `*.0` tag → 只上 internal。
+3. 隱私權／分級等商店資訊齊全後，`d=0` tag 才會成功上 production。
+4. 未明示正式版時只打 `d≠0` tag → 只上 internal。
 
 ## Cloud sync hang (2026-11-13)
 

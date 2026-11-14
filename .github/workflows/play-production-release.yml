@@ -136,15 +136,10 @@ jobs:
           if [ -n "$INPUT_CODE" ]; then
             VERSION_CODE="$INPUT_CODE"
           else
-            MAJOR="${VERSION_NAME%%.*}"
-            REST="${VERSION_NAME#*.}"
-            MINOR="${REST%%.*}"
-            PATCH="${REST#*.}"
-            PATCH="${PATCH%%.*}"
-            MAJOR="${MAJOR:-0}"
-            MINOR="${MINOR:-0}"
-            PATCH="${PATCH:-0}"
-            VERSION_CODE=$((MAJOR * 1000000 + MINOR * 1000 + PATCH))
+            # a.b.c.d → a*1e7 + b*1e5 + c*1e3 + d  (0.28.0.0 → 2800000)
+            IFS='.' read -r MAJOR MINOR PATCH BUILD _ <<< "${VERSION_NAME}"
+            MAJOR="${MAJOR:-0}"; MINOR="${MINOR:-0}"; PATCH="${PATCH:-0}"; BUILD="${BUILD:-0}"
+            VERSION_CODE=$((MAJOR * 10000000 + MINOR * 100000 + PATCH * 1000 + BUILD))
           fi
           echo "VERSION_CODE=${VERSION_CODE}" >> "$GITHUB_ENV"
           echo "Resolved VERSION_NAME=${VERSION_NAME} VERSION_CODE=${VERSION_CODE}"

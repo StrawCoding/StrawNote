@@ -1,64 +1,39 @@
 # StrawNote Release Process
 
-StrawNote pre-releases use the version scheme:
+## Version scheme（a.b.c.d）
 
 ```text
-{base}-pre-{N}        # machine / package version, e.g. 0.27.4-pre-12
-{base} pre-{N}        # display form, e.g. 0.27.4 pre-12
+a.b.c.d
 ```
 
-Trigger [.github/workflows/release.yml](../../.github/workflows/release.yml) (`Release Candidates`) via `workflow_dispatch`. Optional inputs:
+| Segment | Meaning                                                                                    |
+| ------- | ------------------------------------------------------------------------------------------ |
+| `a.b.c` | Product / feature line                                                                     |
+| `d`     | Preview counter；**`d = 0` = 正式版**；**`d ≠ 0` = 測試／預覽**（等同舊 `{base}-pre-{N}`） |
 
-- `base_version`: override base semver (default: `package.json` without suffix)
-- `pre_id`: override `N` (default: next tag / run number)
+Examples:
+
+- `0.28.0.0` — 正式版（Play **production**）
+- `0.28.0.1` — 測試版（Play **internal**）
+- `0.28.1.0` — 下一正式小改
+
+Git tags：`v0.28.0.0` / `v0.28.0.1`。
+
+Play 雙軌（見 [play-release.md](../play-release.md)）：
+
+- tag 以 `.0` 結尾（`d=0`）→ `play-production-release`
+- 其他 `v*` → `play-internal-release`
+
+Bump all workspace `package.json` (+ metainfo / iOS marketing):
+
+```shell
+./scripts/set-version.sh 0.28.0.0
+```
 
 ---
 
-## AFFiNE Release Process
+## Legacy AFFiNE pre-release notes
 
-> In order to make a stable/beta release, you need to get authorization from the AFFiNE test team.
+Older canary used `{base}-pre-{N}`. New StrawNote line uses **a.b.c.d** only.
 
-## Who Can Make a Release?
-
-The AFFiNE core team grants release authorization and enforces the following requirements:
-
-- Commit access to the AFFiNE repository.
-- Access to GitHub Actions.
-
-## How to Make a Release
-
-Before releasing, ensure you have the latest version of the `canary` branch and review the [SemVer](https://semver.org) specification to understand versioning.
-
-### 1. Update the Version in `package.json`
-
-```shell
-./scripts/set-version.sh 0.5.4-canary.5
-```
-
-### 2. Commit Changes and Push to `canary`
-
-```shell
-git add .
-# vX.Y.Z-canary.N
-git commit -m "v0.5.4-canary.5"
-git push origin canary
-```
-
-### 3. Create a Release Action
-
-Trigger a release action in the [Release Desktop App](https://github.com/StrawCoding/StrawNote/actions/workflows/release-desktop-app.yml).
-
-![img.png](assets/release-action.png)
-
-Select the appropriate branch, complete the form, and click `Run workflow`.
-
-### 4. Publish the Release
-
-Once the release action is complete, a draft release will appear on the [Releases page](https://github.com/StrawCoding/StrawNote/releases).
-
-Edit the release notes if necessary, then publish the release.
-
-Ensure that:
-
-- The release tag and title match the version in `package.json`.
-- The release targets the commit you just pushed.
+Trigger desktop RC via [.github/workflows/release.yml](../../.github/workflows/release.yml) when needed; mobile Play ships from the dual-track workflows above.
