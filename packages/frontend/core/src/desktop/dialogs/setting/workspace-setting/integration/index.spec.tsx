@@ -71,7 +71,7 @@ vi.mock('@affine/i18n', () => {
 
 vi.mock('@blocksuite/icons/rc', () => ({
   AiIcon: () => null,
-  Logo1Icon: () => null,
+  Logo1Icon: () => null, // unused; brand mark is StrawNoteLogoIcon
   TodayIcon: () => null,
 }));
 

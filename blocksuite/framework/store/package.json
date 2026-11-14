@@ -38,5 +38,5 @@
     "!dist/__tests__",
     "shim.d.ts"
   ],
-  "version": "0.28.0.2"
+  "version": "0.28.0.3"
 }

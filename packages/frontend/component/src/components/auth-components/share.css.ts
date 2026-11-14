@@ -12,11 +12,11 @@ export const authHeaderWrapper = style({
   marginBottom: '20px',
 });
 globalStyle(`${authHeaderWrapper} .logo`, {
-  fontSize: cssVar('fontH3'),
-  fontWeight: 600,
-  color: cssVar('black'),
+  width: '28px',
+  height: '28px',
   marginRight: '6px',
   verticalAlign: 'middle',
+  borderRadius: '6px',
 });
 
 globalStyle(`${authHeaderWrapper} > p:first-of-type`, {

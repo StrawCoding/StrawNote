@@ -1,5 +1,6 @@
 import { Scrollable } from '@affine/component';
 import { Avatar } from '@affine/component/ui/avatar';
+import { StrawNoteLogoIcon } from '@affine/component/ui/strawnote-logo-icon';
 import { UserPlanButton } from '@affine/core/components/affine/auth/user-plan-button';
 import { useCatchEventCallback } from '@affine/core/components/hooks/use-catch-event-hook';
 import { AuthService } from '@affine/core/modules/cloud';
@@ -8,7 +9,6 @@ import type { SettingTab } from '@affine/core/modules/dialogs/constant';
 import { type WorkspaceMetadata } from '@affine/core/modules/workspace';
 import { useI18n } from '@affine/i18n';
 import { track } from '@affine/track';
-import { Logo1Icon } from '@blocksuite/icons/rc';
 import { useLiveData, useService } from '@toeverything/infra';
 import clsx from 'clsx';
 import {
@@ -91,7 +91,7 @@ export const SignInButton = () => {
       }, [globalDialogService])}
     >
       <div className="avatar not-sign">
-        <Logo1Icon />
+        <StrawNoteLogoIcon width={20} height={20} />
       </div>
 
       <div className="content">

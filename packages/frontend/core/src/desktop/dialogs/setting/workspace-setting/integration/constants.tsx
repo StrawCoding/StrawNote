@@ -1,6 +1,7 @@
+import { StrawNoteLogoIcon } from '@affine/component/ui/strawnote-logo-icon';
 import { IntegrationTypeIcon } from '@affine/core/modules/integration';
 import type { I18nString } from '@affine/i18n';
-import { AiIcon, Logo1Icon, TodayIcon } from '@blocksuite/icons/rc';
+import { AiIcon, TodayIcon } from '@blocksuite/icons/rc';
 import type { ReactNode } from 'react';
 
 import { WorkspaceByokSetting } from '../byok';
@@ -48,7 +49,7 @@ const INTEGRATION_LIST = [
     id: 'web-clipper' as const,
     name: 'com.affine.integration.web-clipper.name',
     desc: 'com.affine.integration.web-clipper.desc',
-    icon: <Logo1Icon />,
+    icon: <StrawNoteLogoIcon width={20} height={20} />,
     link: 'https://chromewebstore.google.com/detail/affine-web-clipper/mpbbkmbdpleomiogkbkkpfoljjpahmoi',
   },
   {

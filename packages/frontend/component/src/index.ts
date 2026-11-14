@@ -30,6 +30,7 @@ export * from './ui/safe-area';
 export * from './ui/scrollbar';
 export * from './ui/skeleton';
 export * from './ui/slider';
+export * from './ui/strawnote-logo-icon';
 export * from './ui/switch';
 export * from './ui/table';
 export * from './ui/tabs';

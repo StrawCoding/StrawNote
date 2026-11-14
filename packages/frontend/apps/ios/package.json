@@ -1,6 +1,6 @@
 {
   "name": "@affine/ios",
-  "version": "0.28.0.2",
+  "version": "0.28.0.3",
   "description": "StrawNote Desktop Web application",
   "type": "module",
   "private": true,
