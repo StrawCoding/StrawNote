@@ -19,6 +19,7 @@ import {
   type StylusToolIntent,
   stylusToolIntent,
 } from './stylus-pen';
+import { retainStylusButtonBridge } from './stylus-pen-bridge';
 import { SpenEraserSession } from './stylus-pen-session';
 
 /**
@@ -26,7 +27,8 @@ import { SpenEraserSession } from './stylus-pen-session';
  * - pen tip → brush (when on default tool or after side-button erase)
  * - barrel / eraser tip → eraser
  * - palm rejection while stylus is active
- * - native detached S Pen button via `strawnote:spen-button`
+ * - detached / hover S Pen button via `strawnote:spen-button`
+ *   (Android Capacitor plugin + web {@link retainStylusButtonBridge})
  *
  * Side-button eraser session is shared with page illustration via
  * {@link SpenEraserSession}.
@@ -101,6 +103,7 @@ export class StylusPenController extends LifeCycleWatcher {
     if (!host) return;
 
     this._session = this._createSession();
+    const releaseBridge = retainStylusButtonBridge();
 
     const onPointerDown = (event: PointerEvent) => {
       if (!isStylusPointer(event)) {
@@ -185,6 +188,7 @@ export class StylusPenController extends LifeCycleWatcher {
     window.addEventListener(SPEN_BUTTON_EVENT, onNativeSpenButton);
 
     this._disposables.add(() => {
+      releaseBridge();
       this._session?.dispose();
       this._session = null;
       host.removeEventListener('pointerdown', onPointerDown, true);

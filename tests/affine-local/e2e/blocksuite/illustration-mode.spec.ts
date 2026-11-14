@@ -122,6 +122,46 @@ test('illustration toolbar exposes pen tools and accepts pen strokes', async ({
   ).toHaveAttribute('data-active', 'true');
 });
 
+test('illustration S Pen barrel on web toggles eraser via pointer bridge', async ({
+  page,
+}) => {
+  await clickIllustrationModeButton(page);
+  await expect(
+    page.getByTestId('page-illustration-tool-brush')
+  ).toHaveAttribute('data-active', 'true');
+
+  // Hover barrel press/release (tip up) — web path without Android plugin.
+  // buttons bit 32 = STYLUS_BUTTON_PRIMARY
+  await page.evaluate(() => {
+    window.dispatchEvent(
+      new PointerEvent('pointermove', {
+        pointerType: 'pen',
+        pointerId: 9,
+        button: -1,
+        buttons: 32,
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+      })
+    );
+    window.dispatchEvent(
+      new PointerEvent('pointermove', {
+        pointerType: 'pen',
+        pointerId: 9,
+        button: -1,
+        buttons: 0,
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+      })
+    );
+  });
+
+  await expect(
+    page.getByTestId('page-illustration-tool-eraser')
+  ).toHaveAttribute('data-active', 'true');
+});
+
 test('illustration toolbar is fixed to the viewport, not page bottom', async ({
   page,
 }) => {

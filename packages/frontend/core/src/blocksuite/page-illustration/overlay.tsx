@@ -33,7 +33,9 @@ import {
   type SpenButtonDetail,
   spenButtonEraserAction,
   type SpenButtonMode,
+  stylusToolIntent,
 } from '../view-extensions/mobile/stylus-pen';
+import { retainStylusButtonBridge } from '../view-extensions/mobile/stylus-pen-bridge';
 import { SpenEraserSession } from '../view-extensions/mobile/stylus-pen-session';
 import {
   PAGE_ILLUSTRATION_DEFAULT_COLOR,
@@ -150,22 +152,27 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
   // Shared S Pen eraser session (same machine as edgeless StylusPenController).
   useEffect(() => {
+    const releaseBridge = retainStylusButtonBridge();
     const session = new SpenEraserSession({
       getCurrentTool: () => toolRef.current,
       isEraserTool: t => t === 'eraser',
       defaultRestoreTool: 'brush',
-      onEnterEraser: () => setTool('eraser'),
+      onEnterEraser: () => {
+        toolRef.current = 'eraser';
+        setTool('eraser');
+      },
       onExitEraser: previous => {
-        const next = previous as StylusInkTool | null;
-        setTool(
-          next === 'brush' || next === 'eraser' || next === 'pan'
-            ? next
-            : 'brush'
-        );
+        const next =
+          previous === 'brush' || previous === 'eraser' || previous === 'pan'
+            ? previous
+            : 'brush';
+        toolRef.current = next;
+        setTool(next);
       },
     });
     sessionRef.current = session;
     return () => {
+      releaseBridge();
       session.dispose();
       sessionRef.current = null;
     };
@@ -267,12 +274,29 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
   const selectTool = useCallback((next: StylusInkTool) => {
     sessionRef.current?.clear();
+    toolRef.current = next;
     setTool(next);
+  }, []);
+
+  const syncStylusToolIntent = useCallback((native: PointerEvent) => {
+    const session = sessionRef.current;
+    if (!session || !isStylusPointer(native)) return;
+    const intent = stylusToolIntent(native, { autoBrushOnPen: true });
+    if (intent === 'eraser' && !session.isForced) {
+      session.enterFromStylusTip();
+    } else if (
+      intent === 'brush' &&
+      session.isForced &&
+      !session.isSticky &&
+      native.buttons !== 0
+    ) {
+      session.onStylusTipUp();
+    }
   }, []);
 
   const onPointerDown = useCallback(
     (e: ReactPointerEvent<SVGSVGElement>) => {
-      if (tool === 'pan') return;
+      if (toolRef.current === 'pan') return;
 
       const stylus = isStylusPointer(e.nativeEvent) || e.pointerType === 'pen';
 
@@ -281,8 +305,10 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         const scroller = findIllustrationScroller(rootRef.current);
         scroller.dataset.illustrationInk = '1';
         scroller.style.touchAction = 'none';
+        // Barrel / eraser tip → same session path as edgeless (works on web).
+        syncStylusToolIntent(e.nativeEvent);
       } else if (
-        tool !== 'eraser' &&
+        toolRef.current !== 'eraser' &&
         shouldRejectPalmTouch({
           pointerType: e.pointerType,
           penActive: penActiveRef.current,
@@ -294,8 +320,10 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         return;
       }
 
+      const activeTool = toolRef.current;
+
       if (
-        tool === 'brush' &&
+        activeTool === 'brush' &&
         fingerPanOnly &&
         e.pointerType === 'touch' &&
         !stylus
@@ -313,7 +341,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         return;
       }
 
-      if (!canInkWithPointer(e.pointerType, tool, fingerPanOnly)) return;
+      if (!canInkWithPointer(e.pointerType, activeTool, fingerPanOnly)) return;
 
       const content = resolveContentEl();
       if (!content) return;
@@ -327,7 +355,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       drawingRef.current = true;
       const [x, y] = clientToPageContentPoint(e.clientX, e.clientY, content);
 
-      if (tool === 'eraser') {
+      if (toolRef.current === 'eraser') {
         if (eraseAtPoint(doc, x, y)) refreshBrushes();
         return;
       }
@@ -349,7 +377,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       fingerPanOnly,
       refreshBrushes,
       resolveContentEl,
-      tool,
+      syncStylusToolIntent,
     ]
   );
 
@@ -365,15 +393,25 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
       if (!drawingRef.current) return;
       e.preventDefault();
+
+      if (isStylusPointer(e.nativeEvent) || e.pointerType === 'pen') {
+        syncStylusToolIntent(e.nativeEvent);
+      }
+
       const content = resolveContentEl();
       if (!content) return;
       const [x, y] = clientToPageContentPoint(e.clientX, e.clientY, content);
 
-      if (tool === 'eraser') {
+      if (toolRef.current === 'eraser') {
+        // Barrel mid-stroke: drop any in-progress brush preview.
+        if (liveRef.current) {
+          liveRef.current = null;
+          setLive(null);
+        }
         if (eraseAtPoint(doc, x, y)) refreshBrushes();
         return;
       }
-      if (tool !== 'brush') return;
+      if (toolRef.current !== 'brush') return;
       setLive(prev => {
         if (!prev) return prev;
         const next = {
@@ -384,7 +422,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         return next;
       });
     },
-    [doc, refreshBrushes, resolveContentEl, tool]
+    [doc, refreshBrushes, resolveContentEl, syncStylusToolIntent]
   );
 
   const endStroke = useCallback(
@@ -405,6 +443,8 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         const scroller = findIllustrationScroller(rootRef.current);
         delete scroller.dataset.illustrationInk;
         scroller.style.touchAction = '';
+        // Momentary barrel / tip-up: restore brush when not sticky.
+        sessionRef.current?.onStylusTipUp();
       }
 
       if (!drawingRef.current) return;
@@ -415,7 +455,11 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         // ignore
       }
 
-      if (tool !== 'brush') return;
+      if (toolRef.current !== 'brush') {
+        liveRef.current = null;
+        setLive(null);
+        return;
+      }
 
       const stroke = liveRef.current;
       liveRef.current = null;
@@ -429,7 +473,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         refreshBrushes();
       }
     },
-    [doc, refreshBrushes, tool]
+    [doc, refreshBrushes]
   );
 
   const setBrushColor = useCallback(
