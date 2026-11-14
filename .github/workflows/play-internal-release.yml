@@ -1,5 +1,6 @@
 # StrawNote — Play internal testing (track=internal)
-# Trigger: push tag v* (e.g. v0.27.5). Default = internal only, not production.
+# Trigger: push tag v* that is NOT *.0 (e.g. v0.27.11). *.0 → play-production-release.
+# workflow_dispatch always targets internal (hotfix / backfill).
 name: play-internal-release
 
 on:
@@ -9,13 +10,13 @@ on:
   workflow_dispatch:
     inputs:
       version_name:
-        description: 'VERSION_NAME without v prefix (e.g. 0.27.5)'
+        description: 'VERSION_NAME without v prefix (e.g. 0.27.11)'
         required: false
         type: string
       version_code:
-        description: 'Android versionCode integer'
+        description: 'Android versionCode integer (empty = derive from VERSION_NAME)'
         required: false
-        default: '1'
+        default: ''
         type: string
 
 concurrency:
@@ -24,6 +25,7 @@ concurrency:
 
 jobs:
   play-internal-release:
+    if: ${{ github.event_name == 'workflow_dispatch' || !endsWith(github.ref_name, '.0') }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:
@@ -112,18 +114,31 @@ jobs:
       - name: Compute version
         run: |
           if [ -n "${{ inputs.version_name }}" ]; then
-            echo "VERSION_NAME=${{ inputs.version_name }}" >> "$GITHUB_ENV"
+            VERSION_NAME="${{ inputs.version_name }}"
           elif [[ "${GITHUB_REF_NAME}" == v* ]]; then
-            echo "VERSION_NAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+            VERSION_NAME="${GITHUB_REF_NAME#v}"
           else
-            echo "VERSION_NAME=$(node -p "require('./package.json').version")" >> "$GITHUB_ENV"
+            VERSION_NAME="$(node -p "require('./package.json').version")"
           fi
-          if [ -n "${{ inputs.version_code }}" ]; then
-            echo "VERSION_CODE=${{ inputs.version_code }}" >> "$GITHUB_ENV"
+          echo "VERSION_NAME=${VERSION_NAME}" >> "$GITHUB_ENV"
+
+          INPUT_CODE="${{ inputs.version_code }}"
+          if [ -n "$INPUT_CODE" ]; then
+            VERSION_CODE="$INPUT_CODE"
           else
-            # tag v0.27.5 → 27005 style fallback; override via input when needed
-            echo "VERSION_CODE=1" >> "$GITHUB_ENV"
+            # 0.27.11 → 27011 ; 1.2.0 → 1002000
+            MAJOR="${VERSION_NAME%%.*}"
+            REST="${VERSION_NAME#*.}"
+            MINOR="${REST%%.*}"
+            PATCH="${REST#*.}"
+            PATCH="${PATCH%%.*}"
+            MAJOR="${MAJOR:-0}"
+            MINOR="${MINOR:-0}"
+            PATCH="${PATCH:-0}"
+            VERSION_CODE=$((MAJOR * 1000000 + MINOR * 1000 + PATCH))
           fi
+          echo "VERSION_CODE=${VERSION_CODE}" >> "$GITHUB_ENV"
+          echo "Resolved VERSION_NAME=${VERSION_NAME} VERSION_CODE=${VERSION_CODE}"
 
       - name: Build Android web assets
         run: yarn affine @affine/android build

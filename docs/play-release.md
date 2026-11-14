@@ -1,22 +1,33 @@
-# StrawNote — Google Play internal release
+# StrawNote — Google Play release（SMB 雙軌）
 
-Package: `com.strawcoding.strawnote`  
-Default track: `internal`（內部測試）
+Package: `com.strawcoding.strawnote`
 
-## 現況（2026-11-13）
+## 雙軌規則（對齊 StrawMoneyBook）
 
-- **最新 internal**：`versionName=0.27.11` / `versionCode=7`
-  - 含：插畫模式改為頁面內手寫（Page 編輯器 + scroll 同步 overlay；筆跡存 hidden frame，不進無邊框畫布）
-- 前一版：`0.27.10` / code6（無邊框元件鎖定）；`0.27.9` / code5（S Pen、插畫 header）
-- 歷史：`0.27.8`/code4 平板相容＋sync；`0.27.5`/code1 平板被過濾；`0.27.6`–`0.27.7` 過渡版
-- AAB：`canaryRelease` signed with upload keystore；native 以 `.cargo/config.toml` `max-page-size=16384` 建置
-- 驗收：`packages/frontend/apps/android/scripts/check-16k-elf.sh <aab>`（本版 PASS）
-- GitHub Secrets 已設定（`ANDROID_*` + `PLAY_SERVICE_ACCOUNT_JSON`）
+| Tag 例                    | Workflow                                                                          | Play track   |
+| ------------------------- | --------------------------------------------------------------------------------- | ------------ |
+| `v0.27.11`（非 `*.0`）    | [`play-internal-release.yml`](../.github/workflows/play-internal-release.yml)     | `internal`   |
+| `v0.28.0`（以 `.0` 結尾） | [`play-production-release.yml`](../.github/workflows/play-production-release.yml) | `production` |
+
+- 打 `v*` 後 CI 建置成功即自動上傳（無需 GitHub Environment 人工 Approve）。
+- **未打 `*.0` 不上公開商店**；預設測試軌＝internal。
+- AAB 上傳成功 ≠ 使用者立刻看得到：internal 仍須 Console 名單 + opt-in  
+  https://play.google.com/apps/internaltest/com.strawcoding.strawnote
+- `workflow_dispatch`：internal 可補傳任意版號；production 要求 `version_name` 以 `.0` 結尾。
+
+### VERSION_CODE（CI）
+
+未手動指定時由 `VERSION_NAME` 推導：`major*1000000 + minor*1000 + patch`  
+例：`0.27.11` → `27011`，`0.28.0` → `28000`。須對 Play 嚴格遞增；本機手動上傳請用更大整數或與 CI 公式一致。
+
+## 現況（2026-11-14）
+
+- **最新 internal**：`versionName=0.27.11` / `versionCode=7`（本機遞增；之後 CI tag 改走公式碼）
+  - 含：插畫模式頁面內手寫
+- 歷史：`0.27.10`/code6 鎖定；`0.27.9` S Pen；`0.27.8` 平板＋sync
+- AAB：`canaryRelease` + upload keystore；native `max-page-size=16384`
+- Secrets：`ANDROID_*` + `PLAY_SERVICE_ACCOUNT_JSON` + `ANDROID_PACKAGE_NAME`
 - Upload key SHA-1：`C8:5E:D4:32:81:5C:C3:4C:83:2A:98:23:ED:87:86:01:A6:0D:89:A0`
-- 測試員 opt-in：https://play.google.com/apps/internaltest/com.strawcoding.strawnote
-
-上傳成功 ≠ 測試員立刻看得到：需 Console 內部測試名單 + opt-in  
-https://play.google.com/apps/internaltest/com.strawcoding.strawnote
 
 ## 本機／伺服器密鑰（勿進 git）
 
@@ -28,49 +39,39 @@ https://play.google.com/apps/internaltest/com.strawcoding.strawnote
 
 `packages/frontend/apps/android/App/key.properties` 與 `local.properties` 已 gitignore。
 
-## 一鍵上傳（本機）
+## 本機上傳
 
 ```bash
 cd /mnt/data/code/project/StrawCoding/StrawNote
 set -a && source /mnt/data/Data/serviceApps/StrawNote/secrets/keystore.env && set +a
-
-# Host C 編譯請用 clang（GCC 15 會踩 sqlite .base64）
 export CC=/usr/bin/clang CXX=/usr/bin/clang++
 export ANDROID_NDK_HOME=/opt/android-sdk/ndk/27.0.12077973
 
-# 1) Web + native assets
 yarn affine @affine/android build
 yarn workspace @affine/android cap sync
 
-# 2) Signed AAB（canaryRelease）
 cd packages/frontend/apps/android/App
-VERSION_NAME=0.27.5 VERSION_CODE=<下一版整數> \
+VERSION_NAME=0.27.12 VERSION_CODE=27012 \
   ./gradlew :app:bundleCanaryRelease --no-daemon
 
-# 3) Fastlane → Play internal
 cd ../
 AAB_PATH="$(find App/app/build/outputs/bundle -name '*.aab' | sort | tail -1)" \
   fastlane android internal_testing
+# 正式軌：
+# AAB_PATH=... fastlane android production
 ```
 
-## GitHub Actions
+## Fastlane lanes
 
-Workflow：`.github/workflows/play-internal-release.yml`  
-Trigger：`v*` tag（例 `v0.27.5`）或 `workflow_dispatch`
+- `fastlane android internal_testing` — track=`PLAY_INTERNAL_TRACK`（預設 `internal`）
+- `fastlane android production` — track=`PLAY_PRODUCTION_TRACK`（預設 `production`）
 
-Required Secrets：
+## Play Console（人工前置）
 
-- `ANDROID_KEYSTORE_BASE64`
-- `ANDROID_KEYSTORE_PASSWORD` / `ANDROID_KEY_ALIAS` / `ANDROID_KEY_PASSWORD`
-- `PLAY_SERVICE_ACCOUNT_JSON`
-- `ANDROID_PACKAGE_NAME`=`com.strawcoding.strawnote`
-
-## Play Console（人工）
-
-1. App 已存在且 SA 可 edits（已驗證）。
-2. 內部測試員名單 + opt-in 連結。
-3. 隱私權政策 URL、內容分級、目標對象等商店資訊需在 Console 補齊後才能推正式版／production。
-4. 未明示正式版時只打 `internal`，不上 production。
+1. SA 對此 package 有 releases 權限（已驗證）。
+2. Internal 測試員名單 + opt-in。
+3. 隱私權／分級等商店資訊齊全後，`*.0` tag 才會成功上 production。
+4. 未明示正式版時只打非 `*.0` tag → 只上 internal。
 
 ## Cloud sync hang (2026-11-13)
 
