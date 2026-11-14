@@ -30,6 +30,27 @@ Bump all workspace `package.json` (+ metainfo / iOS marketing):
 ./scripts/set-version.sh 0.28.0.0
 ```
 
+### Release notes（必填）
+
+每次打 tag 前更新根目錄 [`release-notes.pending.md`](../../release-notes.pending.md)：
+
+```markdown
+# 0.28.0.1
+
+- 修正……
+- 新增……
+
+---
+```
+
+`play-internal-release` / `play-production-release` 在上傳 Play 前會：
+
+1. 讀取 `---` 前的非標題條目
+2. 建立 **GitHub Release**（`body` = 版本變更 + GitHub 自動 commit 摘要）
+3. 附上 AAB（與 mapping 若有）
+
+缺檔或空白 notes → workflow 失敗，不發版。
+
 ---
 
 ## Legacy AFFiNE pre-release notes

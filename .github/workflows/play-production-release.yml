@@ -208,12 +208,34 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+      - name: Prepare GitHub Release body
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          NOTES_FILE="release-notes.pending.md"
+          RELEASE_BODY_PATH="${{ runner.temp }}/github-release-body.md"
+          printf '' > "$RELEASE_BODY_PATH"
+          if [ ! -f "$NOTES_FILE" ]; then
+            echo "::error::$NOTES_FILE is required for tag releases (write update notes before tagging)"
+            exit 1
+          fi
+          CONTENT=$(awk 'BEGIN{p=1} /^---$/{p=0} p && !/^#/ && !/^[[:space:]]*$/{print}' "$NOTES_FILE" || true)
+          if [ -z "$CONTENT" ]; then
+            echo "::error::$NOTES_FILE has no release notes before --- (required for every release)"
+            exit 1
+          fi
+          {
+            printf '## 版本變更\n\n%s\n' "$CONTENT"
+          } > "$RELEASE_BODY_PATH"
+          echo "Prepared release body from $NOTES_FILE"
+          cat "$RELEASE_BODY_PATH"
+
       - name: Publish GitHub Release
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
+          body_path: ${{ runner.temp }}/github-release-body.md
           generate_release_notes: true
           fail_on_unmatched_files: false
           files: |

@@ -16,11 +16,12 @@ Package: `com.strawcoding.strawnote`
 | `v0.28.0.1`（`d≠0`）               | [`play-internal-release.yml`](../.github/workflows/play-internal-release.yml)     | `internal`   |
 | `v0.28.0.0`（以 `.0` 結尾＝`d=0`） | [`play-production-release.yml`](../.github/workflows/play-production-release.yml) | `production` |
 
-- 打 `v*` 後 CI 建置成功即自動上傳。
+- 打 `v*` 後 CI 建置成功即：**建立 GitHub Release（附更新說明）** → 上傳 Play。
+- **每次發版必填** 根目錄 [`release-notes.pending.md`](../release-notes.pending.md)（`---` 前的條目會進 Release body）；缺檔或空白 → tag workflow 失敗。
 - **未打正式 `d=0` tag 不上公開商店**。
 - AAB 上傳成功 ≠ 立刻可見：internal 仍須 opt-in  
   https://play.google.com/apps/internaltest/com.strawcoding.strawnote
-- `workflow_dispatch`：internal 可補傳；production 要求 `version_name` 以 `.0` 結尾。
+- `workflow_dispatch`：internal 可補傳；production 要求 `version_name` 以 `.0` 結尾（dispatch 不建 GitHub Release，仍建議先寫 notes）。
 
 ### VERSION_CODE（CI）
 
@@ -29,7 +30,8 @@ Package: `com.strawcoding.strawnote`
 
 ## 現況（2026-11-14）
 
-- **接手正式版**：`versionName=0.28.0.0` / `versionCode=2800000` — **StrawNote 接手版本**
+- **接手正式版**：`v0.28.0.0` / `versionCode=2800000` — **StrawNote 接手版本**
+- **開發線**：`0.28.0.1`（未打 tag 前不上架）— 發版必附 GitHub Release notes
 - 前一測試線：`0.27.12` 插畫工具列／S Pen；`0.27.11` 頁面插畫；`0.27.10` 鎖定
 - AAB：`canaryRelease` + upload keystore；native `max-page-size=16384`
 - Secrets：`ANDROID_*` + `PLAY_SERVICE_ACCOUNT_JSON` + `ANDROID_PACKAGE_NAME`
