@@ -1,3 +1,9 @@
+# 0.28.0.5
+
+- 插畫 mode：S Pen 畫筆不再被誤判成頁面滑動（brush/eraser `touch-action: none`＋書寫時鎖 viewport）；橡皮擦手指滑動擦除不受 palm-reject 擋下；顏色改預設色票＋「＋」新增 HEX／取色；工具列改 Pen／Eraser／Hand icon，線寬改粗細條
+
+---
+
 # 0.28.0.4
 
 - 插畫 mode：橡皮擦可用手指滑動擦除（不再被 fingerPanOnly 擋下）；筆工具列改 viewport `fixed`＋portal，釘在螢幕底部而非文件最底

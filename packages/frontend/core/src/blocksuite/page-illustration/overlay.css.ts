@@ -11,7 +11,7 @@ export const root = style({
 export const layer = style({
   position: 'absolute',
   pointerEvents: 'auto',
-  // touchAction set inline per tool (eraser locks; brush+fingerPanOnly pans).
+  // touchAction set inline: brush/eraser = none (S Pen must not scroll).
   // Position + size set inline to match page content box.
 });
 
@@ -24,7 +24,7 @@ export const toolbar = style({
   zIndex: 1200,
   display: 'inline-flex',
   alignItems: 'center',
-  gap: 6,
+  gap: 4,
   padding: '6px 8px',
   borderRadius: 12,
   background: 'var(--affine-background-overlay-panel-color, rgba(0,0,0,0.72))',
@@ -43,12 +43,14 @@ export const toolButton = style({
   background: 'transparent',
   color: 'inherit',
   borderRadius: 8,
-  padding: '8px 10px',
-  fontSize: 12,
-  lineHeight: 1,
+  padding: 0,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   cursor: 'pointer',
-  minWidth: 40,
-  minHeight: 36,
+  width: 36,
+  height: 36,
+  flexShrink: 0,
   selectors: {
     '&[data-active="true"]': {
       background: 'rgba(255,255,255,0.22)',
@@ -64,6 +66,12 @@ export const colorSwatch = style({
   padding: 0,
   cursor: 'pointer',
   flexShrink: 0,
+  selectors: {
+    '&[data-active="true"]': {
+      boxShadow: '0 0 0 2px rgba(255,255,255,0.9)',
+      borderColor: 'rgba(0,0,0,0.35)',
+    },
+  },
 });
 
 export const hexInput = style({
@@ -78,20 +86,47 @@ export const hexInput = style({
   fontFamily: 'ui-monospace, monospace',
 });
 
+export const hiddenColorInput = style({
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  opacity: 0,
+  pointerEvents: 'none',
+  overflow: 'hidden',
+});
+
+export const addColorRow = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 4,
+});
+
 export const widthChip = style({
   appearance: 'none',
   border: '1px solid rgba(255,255,255,0.2)',
   background: 'transparent',
   color: 'inherit',
   borderRadius: 6,
-  padding: '4px 6px',
-  fontSize: 11,
+  padding: 0,
   cursor: 'pointer',
+  width: 28,
+  height: 28,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
   selectors: {
     '&[data-active="true"]': {
       background: 'rgba(255,255,255,0.22)',
     },
   },
+});
+
+export const widthMark = style({
+  display: 'block',
+  width: 14,
+  borderRadius: 999,
+  background: 'currentColor',
 });
 
 export const divider = style({

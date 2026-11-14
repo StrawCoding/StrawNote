@@ -50,8 +50,8 @@
   </description>
   <launchable type="desktop-id">strawnote.desktop</launchable>
   <releases>
-    <release version="0.28.0.4" date="2026-11-14">
-      <url>https://github.com/StrawCoding/StrawNote/releases/tag/v0.28.0.4</url>
+    <release version="0.28.0.5" date="2026-11-14">
+      <url>https://github.com/StrawCoding/StrawNote/releases/tag/v0.28.0.5</url>
     </release>
   </releases>
 </component>

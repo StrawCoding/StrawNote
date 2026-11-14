@@ -7,9 +7,23 @@ import {
 import type { BrushElementModel } from '@blocksuite/affine/model';
 import { ColorScheme, resolveColor } from '@blocksuite/affine/model';
 import type { Store } from '@blocksuite/affine/store';
+import {
+  ColorPickerIcon,
+  EraserIcon,
+  HandIcon,
+  PenIcon,
+  PlusIcon,
+} from '@blocksuite/icons/rc';
 import { useLiveData, useService } from '@toeverything/infra';
 import { useTheme } from 'next-themes';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type PointerEvent as ReactPointerEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 
 import {
@@ -38,6 +52,8 @@ import {
 import * as styles from './overlay.css';
 
 const SPEN_BUTTON_EVENT = 'strawnote:spen-button';
+const CUSTOM_COLORS_KEY = 'strawnote.illustration.customColors';
+const PEN_GRACE_MS = 400;
 const LINE_WIDTHS = [2, 4, 6, 8, 10, 12] as const;
 const QUICK_COLORS = [
   '#000000',
@@ -46,6 +62,8 @@ const QUICK_COLORS = [
   '#2563eb',
   '#16a34a',
   '#ca8a04',
+  '#7c3aed',
+  '#ea580c',
 ] as const;
 
 type Tool = 'brush' | 'eraser' | 'pan';
@@ -55,6 +73,11 @@ type LiveStroke = {
   color: string;
   lineWidth: number;
   streamline: number;
+};
+
+type FingerPanState = {
+  lastY: number;
+  scroller: HTMLElement;
 };
 
 function brushAbsolutePoints(brush: BrushElementModel): [number, number][] {
@@ -91,8 +114,48 @@ function eraseAtPoint(doc: Store, x: number, y: number) {
   return false;
 }
 
+function loadCustomColors(): string[] {
+  if (typeof localStorage === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(CUSTOM_COLORS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((c): c is string => typeof c === 'string')
+      .map(c => parseHexColor(c))
+      .filter((c): c is string => !!c)
+      .slice(0, 16);
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomColors(colors: string[]) {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    localStorage.setItem(
+      CUSTOM_COLORS_KEY,
+      JSON.stringify(colors.slice(0, 16))
+    );
+  } catch {
+    // ignore quota / private mode
+  }
+}
+
+function findIllustrationScroller(root: HTMLElement | null): HTMLElement {
+  const mode = root?.closest('[data-mode="illustration"]');
+  if (mode instanceof HTMLElement) return mode;
+  const parent = root?.parentElement;
+  if (parent instanceof HTMLElement) return parent;
+  return (document.scrollingElement as HTMLElement | null) ?? document.body;
+}
+
 export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const colorInputRef = useRef<HTMLInputElement>(null);
+  const hexAddInputRef = useRef<HTMLInputElement>(null);
   const editorSetting = useService(EditorSettingService).editorSetting;
   const settings = useLiveData(editorSetting.settings$);
   const { resolvedTheme } = useTheme();
@@ -105,8 +168,15 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const [brushes, setBrushes] = useState<BrushElementModel[]>([]);
   const [live, setLive] = useState<LiveStroke | null>(null);
   const liveRef = useRef<LiveStroke | null>(null);
+  const [customColors, setCustomColors] = useState<string[]>(() =>
+    loadCustomColors()
+  );
+  const [addingColor, setAddingColor] = useState(false);
   const [hexDraft, setHexDraft] = useState('');
   const drawingRef = useRef(false);
+  const fingerPanRef = useRef<FingerPanState | null>(null);
+  const penActiveRef = useRef(false);
+  const penGraceUntilRef = useRef(0);
   const toolBeforeSpenRef = useRef<Tool | null>(null);
   const spenForcedRef = useRef(false);
   const spenStickyRef = useRef(false);
@@ -131,9 +201,17 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const fingerPanOnly = settings.stylus?.fingerPanOnly ?? true;
   const buttonMode = (settings.stylus?.buttonMode ?? 'both') as SpenButtonMode;
 
-  useEffect(() => {
-    setHexDraft(brushColor.startsWith('#') ? brushColor : '');
-  }, [brushColor]);
+  const palette = useMemo(() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const c of [...QUICK_COLORS, ...customColors]) {
+      const key = c.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(c);
+    }
+    return out;
+  }, [customColors]);
 
   const resolveContentEl = useCallback((): HTMLElement | null => {
     const host = rootRef.current?.closest('[data-affine-editor-container]');
@@ -174,7 +252,6 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
     const onScroll = () => syncSize();
     el?.addEventListener('scroll', onScroll, { passive: true });
-    // Parent viewport may be the scroller
     const viewport = root?.parentElement;
     viewport?.addEventListener('scroll', onScroll, { passive: true });
 
@@ -290,14 +367,18 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
     };
   }, [applySpenAction, buttonMode]);
 
+  /**
+   * Brush/eraser always use touch-action:none so S Pen strokes are never
+   * interpreted as page pan. Finger scroll (when fingerPanOnly) is done by
+   * manually scrolling the illustration viewport.
+   */
   const canDrawWithPointer = useCallback(
-    (e: React.PointerEvent, activeTool: Tool) => {
+    (e: ReactPointerEvent, activeTool: Tool) => {
       if (isStylusPointer(e.nativeEvent) || e.pointerType === 'pen')
         return true;
       if (e.pointerType === 'eraser') return true;
       if (e.pointerType === 'mouse') return true;
       if (e.pointerType === 'touch') {
-        // Eraser tool always accepts finger swipe; brush respects fingerPanOnly.
         if (activeTool === 'eraser') return true;
         return !fingerPanOnly;
       }
@@ -306,9 +387,52 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
     [fingerPanOnly]
   );
 
+  const isPalmRejectedTouch = useCallback((e: ReactPointerEvent) => {
+    if (e.pointerType !== 'touch') return false;
+    return penActiveRef.current || Date.now() < penGraceUntilRef.current;
+  }, []);
+
   const onPointerDown = useCallback(
-    (e: React.PointerEvent<SVGSVGElement>) => {
+    (e: ReactPointerEvent<SVGSVGElement>) => {
       if (tool === 'pan') return;
+
+      const stylus = isStylusPointer(e.nativeEvent) || e.pointerType === 'pen';
+
+      if (stylus) {
+        penActiveRef.current = true;
+        const scroller = findIllustrationScroller(rootRef.current);
+        scroller.dataset.illustrationInk = '1';
+        scroller.style.touchAction = 'none';
+      } else if (
+        // Palm reject only while drawing with brush — never block finger eraser.
+        tool !== 'eraser' &&
+        isPalmRejectedTouch(e)
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      // Brush + fingerPanOnly: finger scrolls the page; pen draws.
+      if (
+        tool === 'brush' &&
+        fingerPanOnly &&
+        e.pointerType === 'touch' &&
+        !stylus
+      ) {
+        e.preventDefault();
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          // ignore
+        }
+        fingerPanRef.current = {
+          lastY: e.clientY,
+          scroller: findIllustrationScroller(rootRef.current),
+        };
+        return;
+      }
+
       if (!canDrawWithPointer(e, tool)) return;
 
       const content = resolveContentEl();
@@ -343,6 +467,8 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       brushStreamline,
       canDrawWithPointer,
       doc,
+      fingerPanOnly,
+      isPalmRejectedTouch,
       refreshBrushes,
       resolveContentEl,
       tool,
@@ -350,7 +476,15 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   );
 
   const onPointerMove = useCallback(
-    (e: React.PointerEvent<SVGSVGElement>) => {
+    (e: ReactPointerEvent<SVGSVGElement>) => {
+      if (fingerPanRef.current) {
+        e.preventDefault();
+        const dy = e.clientY - fingerPanRef.current.lastY;
+        fingerPanRef.current.lastY = e.clientY;
+        fingerPanRef.current.scroller.scrollTop -= dy;
+        return;
+      }
+
       if (!drawingRef.current) return;
       e.preventDefault();
       const content = resolveContentEl();
@@ -376,7 +510,25 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   );
 
   const endStroke = useCallback(
-    (e: React.PointerEvent<SVGSVGElement>) => {
+    (e: ReactPointerEvent<SVGSVGElement>) => {
+      if (fingerPanRef.current) {
+        fingerPanRef.current = null;
+        try {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        } catch {
+          // ignore
+        }
+        return;
+      }
+
+      if (isStylusPointer(e.nativeEvent) || e.pointerType === 'pen') {
+        penActiveRef.current = false;
+        penGraceUntilRef.current = Date.now() + PEN_GRACE_MS;
+        const scroller = findIllustrationScroller(rootRef.current);
+        delete scroller.dataset.illustrationInk;
+        scroller.style.touchAction = '';
+      }
+
       if (!drawingRef.current) return;
       drawingRef.current = false;
       try {
@@ -409,11 +561,32 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
     [editorSetting]
   );
 
-  const commitHex = useCallback(() => {
-    const parsed = parseHexColor(hexDraft);
-    if (parsed) setBrushColor(parsed);
-    else setHexDraft(brushColor.startsWith('#') ? brushColor : '');
-  }, [brushColor, hexDraft, setBrushColor]);
+  const addCustomColor = useCallback(
+    (raw: string) => {
+      const parsed = parseHexColor(raw);
+      if (!parsed) return;
+      setCustomColors(prev => {
+        const next = [
+          parsed,
+          ...prev.filter(c => c.toLowerCase() !== parsed.toLowerCase()),
+        ].slice(0, 16);
+        saveCustomColors(next);
+        return next;
+      });
+      setBrushColor(parsed);
+      setAddingColor(false);
+      setHexDraft('');
+    },
+    [setBrushColor]
+  );
+
+  const removeCustomColor = useCallback((color: string) => {
+    setCustomColors(prev => {
+      const next = prev.filter(c => c.toLowerCase() !== color.toLowerCase());
+      saveCustomColors(next);
+      return next;
+    });
+  }, []);
 
   const setLineWidth = useCallback(
     (lineWidth: number) => {
@@ -462,9 +635,10 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         data-active={tool === 'brush'}
         data-testid="page-illustration-tool-brush"
         title="Pen"
+        aria-label="Pen"
         onClick={() => setTool('brush')}
       >
-        Pen
+        <PenIcon width={18} height={18} />
       </button>
       <button
         type="button"
@@ -472,9 +646,10 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         data-active={tool === 'eraser'}
         data-testid="page-illustration-tool-eraser"
         title="Eraser"
+        aria-label="Eraser"
         onClick={() => setTool('eraser')}
       >
-        Eraser
+        <EraserIcon width={18} height={18} />
       </button>
       <button
         type="button"
@@ -482,38 +657,121 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         data-active={tool === 'pan'}
         data-testid="page-illustration-tool-pan"
         title="Scroll"
+        aria-label="Scroll"
         onClick={() => setTool('pan')}
       >
-        Scroll
+        <HandIcon width={18} height={18} />
       </button>
       <div className={styles.divider} />
-      {QUICK_COLORS.map(c => (
-        <button
-          key={c}
-          type="button"
-          className={styles.colorSwatch}
-          style={{ background: c }}
-          data-testid={`page-illustration-color-${c.slice(1)}`}
-          data-active={brushColor.toLowerCase() === c}
-          aria-label={`Color ${c}`}
-          onClick={() => setBrushColor(c)}
-        />
-      ))}
-      <input
-        className={styles.hexInput}
-        data-testid="page-illustration-hex"
-        value={hexDraft}
-        placeholder="#000000"
-        aria-label="Hex color"
-        onChange={e => setHexDraft(e.target.value)}
-        onBlur={commitHex}
-        onKeyDown={e => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            commitHex();
+      {palette.map(c => {
+        const isCustom = customColors.some(
+          x => x.toLowerCase() === c.toLowerCase()
+        );
+        return (
+          <button
+            key={c}
+            type="button"
+            className={styles.colorSwatch}
+            style={{ background: c }}
+            data-testid={`page-illustration-color-${c.slice(1)}`}
+            data-active={brushColor.toLowerCase() === c.toLowerCase()}
+            aria-label={`Color ${c}`}
+            title={isCustom ? `${c} (long-press to remove)` : c}
+            onClick={() => setBrushColor(c)}
+            onContextMenu={e => {
+              if (!isCustom) return;
+              e.preventDefault();
+              removeCustomColor(c);
+            }}
+            onPointerDown={e => {
+              if (!isCustom || e.pointerType === 'mouse') return;
+              const target = e.currentTarget;
+              const timer = window.setTimeout(() => {
+                removeCustomColor(c);
+              }, 550);
+              const clear = () => {
+                window.clearTimeout(timer);
+                target.removeEventListener('pointerup', clear);
+                target.removeEventListener('pointercancel', clear);
+                target.removeEventListener('pointerleave', clear);
+              };
+              target.addEventListener('pointerup', clear);
+              target.addEventListener('pointercancel', clear);
+              target.addEventListener('pointerleave', clear);
+            }}
+          />
+        );
+      })}
+      <button
+        type="button"
+        className={styles.toolButton}
+        data-testid="page-illustration-add-color"
+        title="Add color"
+        aria-label="Add color"
+        data-active={addingColor}
+        onClick={() => {
+          setAddingColor(v => !v);
+          if (!addingColor) {
+            queueMicrotask(() => hexAddInputRef.current?.focus());
           }
         }}
+      >
+        <PlusIcon width={18} height={18} />
+      </button>
+      <input
+        ref={colorInputRef}
+        className={styles.hiddenColorInput}
+        type="color"
+        value={
+          brushColor.startsWith('#') && brushColor.length === 7
+            ? brushColor
+            : '#000000'
+        }
+        aria-hidden
+        tabIndex={-1}
+        onChange={e => addCustomColor(e.target.value)}
       />
+      {addingColor ? (
+        <div className={styles.addColorRow}>
+          <input
+            ref={hexAddInputRef}
+            className={styles.hexInput}
+            data-testid="page-illustration-hex"
+            value={hexDraft}
+            placeholder="#000000"
+            aria-label="Add hex color"
+            onChange={e => setHexDraft(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addCustomColor(hexDraft);
+              } else if (e.key === 'Escape') {
+                setAddingColor(false);
+                setHexDraft('');
+              }
+            }}
+          />
+          <button
+            type="button"
+            className={styles.toolButton}
+            title="Pick"
+            aria-label="Pick color"
+            onClick={() => colorInputRef.current?.click()}
+          >
+            <ColorPickerIcon width={16} height={16} />
+          </button>
+          <button
+            type="button"
+            className={styles.toolButton}
+            data-testid="page-illustration-add-color-confirm"
+            title="Add"
+            aria-label="Confirm add color"
+            onClick={() => addCustomColor(hexDraft)}
+          >
+            <PlusIcon width={16} height={16} />
+          </button>
+        </div>
+      ) : null}
       <div className={styles.divider} />
       {LINE_WIDTHS.map(w => (
         <button
@@ -522,9 +780,14 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
           className={styles.widthChip}
           data-active={brushLineWidth === w}
           data-testid={`page-illustration-width-${w}`}
+          title={`Width ${w}`}
+          aria-label={`Width ${w}`}
           onClick={() => setLineWidth(w)}
         >
-          {w}
+          <span
+            className={styles.widthMark}
+            style={{ height: Math.max(2, Math.min(12, w)) }}
+          />
         </button>
       ))}
     </div>
@@ -540,6 +803,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         ? createPortal(toolbar, document.body)
         : null}
       <svg
+        ref={svgRef}
         className={styles.layer}
         width={size.width || '100%'}
         height={size.height || '100%'}
@@ -547,13 +811,9 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
           left: layerOffset.left,
           top: layerOffset.top,
           pointerEvents: tool === 'pan' ? 'none' : 'auto',
-          // Eraser/brush-draw: lock touch so finger swipe draws/erases.
-          // Brush + fingerPanOnly: allow vertical page scroll for fingers;
-          // stylus/pen still receives pointer events.
-          touchAction:
-            tool === 'eraser' || (tool === 'brush' && !fingerPanOnly)
-              ? 'none'
-              : 'pan-y',
+          // Always none for brush/eraser so S Pen never becomes page scroll.
+          // Finger page scroll (brush+fingerPanOnly) is handled manually.
+          touchAction: tool === 'pan' ? 'pan-y' : 'none',
           cursor:
             tool === 'eraser'
               ? 'cell'

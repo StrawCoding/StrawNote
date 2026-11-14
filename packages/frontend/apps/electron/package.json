@@ -1,7 +1,7 @@
 {
   "name": "@affine/electron",
   "private": true,
-  "version": "0.28.0.4",
+  "version": "0.28.0.5",
   "main": "./dist/main.js",
   "author": "StrawCoding",
   "repository": {

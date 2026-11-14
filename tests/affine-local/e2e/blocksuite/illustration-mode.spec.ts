@@ -56,6 +56,12 @@ test('illustration toolbar exposes pen tools and accepts pen strokes', async ({
   await expect(page.getByTestId('page-illustration-toolbar')).toBeVisible();
   await expect(page.getByTestId('page-illustration-tool-brush')).toBeVisible();
   await expect(page.getByTestId('page-illustration-tool-eraser')).toBeVisible();
+  await expect(page.getByTestId('page-illustration-add-color')).toBeVisible();
+  await expect(
+    page.getByTestId('page-illustration-color-000000')
+  ).toBeVisible();
+  // Hex field appears only when adding a preset color
+  await page.getByTestId('page-illustration-add-color').click();
   await expect(page.getByTestId('page-illustration-hex')).toBeVisible();
 
   await page.getByTestId('page-illustration-tool-brush').click();
@@ -155,6 +161,18 @@ test('illustration toolbar is fixed to the viewport, not page bottom', async ({
   const vh = page.viewportSize()!.height;
   expect(after.bottom).toBeLessThanOrEqual(vh);
   expect(after.top).toBeGreaterThan(vh * 0.5);
+});
+
+test('illustration brush locks touch-action so S Pen does not scroll', async ({
+  page,
+}) => {
+  await clickIllustrationModeButton(page);
+  await page.getByTestId('page-illustration-tool-brush').click();
+  const svg = page.getByTestId('page-illustration-overlay').locator('svg');
+  await expect(svg).toHaveCSS('touch-action', 'none');
+
+  await page.getByTestId('page-illustration-tool-eraser').click();
+  await expect(svg).toHaveCSS('touch-action', 'none');
 });
 
 test('illustration eraser accepts finger touch swipe', async ({ page }) => {
