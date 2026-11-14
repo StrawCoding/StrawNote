@@ -1,7 +1,7 @@
 {
   "name": "@affine/server",
   "private": true,
-  "version": "0.28.0.1",
+  "version": "0.28.0.2",
   "description": "Affine Node.js server",
   "type": "module",
   "scripts": {
@@ -155,7 +155,7 @@
     "env": {
       "NODE_ENV": "development",
       "AFFINE_ENV": "dev",
-      "AFFINE_SERVER_EXTERNAL_URL": "http://localhost:8080",
+      "AFFINE_SERVER_EXTERNAL_URL": "http://localhost:18080",
       "DEBUG": "affine:*",
       "FORCE_COLOR": true,
       "DEBUG_COLORS": true

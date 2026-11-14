@@ -1,7 +1,7 @@
 {
   "name": "@affine/electron",
   "private": true,
-  "version": "0.28.0.1",
+  "version": "0.28.0.2",
   "main": "./dist/main.js",
   "author": "StrawCoding",
   "repository": {
@@ -22,7 +22,7 @@
   },
   "scripts": {
     "start": "electron .",
-    "dev": "cross-env DEV_SERVER_URL=http://localhost:8080 r ./scripts/dev.ts",
+    "dev": "cross-env DEV_SERVER_URL=http://localhost:18080 r ./scripts/dev.ts",
     "dev:prod": "r ./scripts/dev.ts",
     "build": "cross-env NODE_ENV=production r ./scripts/build-layers.ts",
     "build:dev": "r ./scripts/build-layers.ts",

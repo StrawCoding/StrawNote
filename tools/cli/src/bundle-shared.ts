@@ -27,9 +27,11 @@ export function assertRspackSupportedPackageName(name: string) {
   );
 }
 
+// Host :8080 is occupied by 1Panel SFTPGo on wastebase; default to 18080.
+// Override with AFFINE_DEV_PORT when needed.
 export const DEFAULT_DEV_SERVER_CONFIG: RspackDevServerConfiguration = {
   host: '0.0.0.0',
-  port: Number(process.env.AFFINE_DEV_PORT || 8080),
+  port: Number(process.env.AFFINE_DEV_PORT || 18080),
   allowedHosts: 'all',
   hot: false,
   liveReload: true,
@@ -41,7 +43,7 @@ export const DEFAULT_DEV_SERVER_CONFIG: RspackDevServerConfiguration = {
     // see: https://webpack.js.org/configuration/dev-server/#websocketurl
     // must be an explicit ws/wss URL because custom protocols (e.g. assets://)
     // cannot be used to construct WebSocket endpoints in Electron
-    webSocketURL: `ws://0.0.0.0:${process.env.AFFINE_DEV_PORT || 8080}/ws`,
+    webSocketURL: `ws://0.0.0.0:${process.env.AFFINE_DEV_PORT || 18080}/ws`,
   },
   historyApiFallback: {
     rewrites: [

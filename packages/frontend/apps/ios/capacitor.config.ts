@@ -26,7 +26,7 @@ const config: CapacitorConfig & AppConfig = {
     loggingBehavior: 'none',
   },
   server: {
-    // url: 'http://localhost:8080',
+    // url: 'http://localhost:18080',
   },
   plugins: {
     CapacitorCookies: {

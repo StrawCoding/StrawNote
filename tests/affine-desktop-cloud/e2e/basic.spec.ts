@@ -7,7 +7,7 @@ import {
 import { waitForEditorLoad } from '@affine-test/kit/utils/page-logic';
 import { createLocalWorkspace } from '@affine-test/kit/utils/workspace';
 
-process.env.DEV_SERVER_URL = 'http://localhost:8080';
+process.env.DEV_SERVER_URL = 'http://localhost:18080';
 
 let user: {
   name: string;

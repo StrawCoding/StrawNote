@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-export let coreUrl = 'http://localhost:8080';
+export let coreUrl = 'http://localhost:18080';
 
 export function setCoreUrl(url: string) {
   coreUrl = url;

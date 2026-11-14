@@ -26,7 +26,7 @@ export class TestUtils {
       process.env.PLAYWRIGHT_EMAIL &&
       !process.env.PLAYWRIGHT_PASSWORD
     ) {
-      setCoreUrl(process.env.PLAYWRIGHT_CORE_URL || 'http://localhost:8080');
+      setCoreUrl(process.env.PLAYWRIGHT_CORE_URL || 'http://localhost:18080');
       this.isProduction = true;
     }
   }

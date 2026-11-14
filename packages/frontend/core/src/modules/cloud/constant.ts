@@ -42,7 +42,7 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
           {
             id: 'affine-cloud',
             baseUrl: BUILD_CONFIG.isElectron
-              ? 'http://localhost:8080'
+              ? 'http://localhost:18080'
               : location.origin,
             config: {
               serverName: 'StrawNote Cloud',
@@ -148,7 +148,7 @@ const OFFICIAL_TELEMETRY_ENDPOINTS: Record<TelemetryChannel, string> = {
   beta: 'https://insider.affine.pro',
   internal: 'https://insider.affine.pro',
   canary: 'https://affine.fail',
-  local: 'http://localhost:8080',
+  local: 'http://localhost:18080',
 };
 
 export function getOfficialTelemetryEndpoint(

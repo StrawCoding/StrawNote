@@ -38,7 +38,7 @@ export const test = base.extend<TestUtilsFixtures>({
       const context = await browser.newContext();
       await skipOnboarding(context);
       const page = await context.newPage();
-      await page.goto('http://localhost:8080/', { timeout: 240 * 1000 });
+      await page.goto('http://localhost:18080/', { timeout: 240 * 1000 });
       const user = await createRandomAIUser();
       await page.getByTestId('sidebar-user-avatar').click({
         delay: 200,

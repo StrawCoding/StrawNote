@@ -29,7 +29,7 @@
       "type": "chrome",
       "request": "launch",
       "name": "Debug AFFiNE Web",
-      "url": "http://localhost:8080"
+      "url": "http://localhost:18080"
     }
   ]
 }

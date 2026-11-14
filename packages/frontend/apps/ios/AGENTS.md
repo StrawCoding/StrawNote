@@ -13,7 +13,7 @@ This is the StrawNote iOS application built with Capacitor, React, and TypeScrip
 - `yarn dev` - Start development server with live reload
 - `yarn build` - Build the web application
 - `yarn sync` - Sync web assets with Capacitor iOS project
-- `yarn sync:dev` - Sync with development server (CAP_SERVER_URL=http://localhost:8080)
+- `yarn sync:dev` - Sync with development server (CAP_SERVER_URL=http://localhost:18080)
 - `yarn xcode` - Open Xcode project
 - `yarn codegen` - Generate GraphQL and Rust bindings
 - `xcodebuild -workspace App.xcworkspace -scheme App -destination 'platform=iOS Simulator,name=iPhone 15' build | xcbeautify` - Build iOS project with xcbeautify

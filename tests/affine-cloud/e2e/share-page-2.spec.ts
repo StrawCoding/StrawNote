@@ -114,7 +114,7 @@ test('The reference links in the shared page should be accessible normally and c
 test('Should show no permission page when the share page is not found', async ({
   page,
 }) => {
-  await page.goto('http://localhost:8080/workspace/abc/123');
+  await page.goto('http://localhost:18080/workspace/abc/123');
 
   await expect(
     page.getByText(

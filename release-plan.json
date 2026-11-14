@@ -1,0 +1,56 @@
+{
+  "version": "0.27.4-pre-12",
+  "channel": "canary",
+  "skip": false,
+  "ref": "refs/heads/strawnote",
+  "sha": "8bb6014c809f9207086e9e5213a556e91c0a465b",
+  "requestId": "local-0",
+  "createdAt": "2026-11-12T15:04:10.110Z",
+  "targets": [
+    {
+      "name": "server",
+      "required": true
+    },
+    {
+      "name": "desktop-macos",
+      "required": true
+    },
+    {
+      "name": "desktop-windows",
+      "required": true
+    },
+    {
+      "name": "desktop-linux",
+      "required": false
+    }
+  ],
+  "buildMatrix": {
+    "include": [
+      {
+        "target": "desktop-macos",
+        "platform": "darwin",
+        "arch": "x64",
+        "required": true
+      },
+      {
+        "target": "desktop-macos",
+        "platform": "darwin",
+        "arch": "arm64",
+        "required": true
+      },
+      {
+        "target": "desktop-windows",
+        "platform": "win32",
+        "arch": "x64",
+        "required": true
+      },
+      {
+        "target": "desktop-linux",
+        "platform": "linux",
+        "arch": "x64",
+        "required": false
+      }
+    ]
+  },
+  "displayVersion": "0.27.4 pre-12"
+}

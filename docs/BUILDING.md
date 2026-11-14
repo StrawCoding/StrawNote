@@ -127,7 +127,7 @@ yarn affine @affine/server-native build
 yarn dev
 ```
 
-You will be prompted to choose which package to run — pick **`@affine/web`** for the web app, then open **<http://localhost:8080>**.
+You will be prompted to choose which package to run — pick **`@affine/web`** for the web app, then open **<http://localhost:18080>** (default `AFFINE_DEV_PORT`; host `:8080` is reserved by SFTPGo on wastebase).
 
 You can skip the prompt with the `-p` (`--package`) flag:
 

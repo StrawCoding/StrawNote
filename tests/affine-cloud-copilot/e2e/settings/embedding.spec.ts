@@ -73,7 +73,7 @@ test.describe('AISettings/Embedding', () => {
             data: {
               serverConfig: {
                 version: '1.0.0',
-                baseUrl: 'http://localhost:8080',
+                baseUrl: 'http://localhost:18080',
                 name: 'StrawNote',
                 features: [],
                 type: 'cloud',

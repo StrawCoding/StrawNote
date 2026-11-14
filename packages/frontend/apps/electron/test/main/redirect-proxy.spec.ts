@@ -74,7 +74,7 @@ describe('redirect proxy allowlist', () => {
     vi.resetModules();
     process.env.BUILD_TYPE = 'stable';
     process.env.NODE_ENV = 'development';
-    process.env.DEV_SERVER_URL = 'http://localhost:8080';
+    process.env.DEV_SERVER_URL = 'http://localhost:18080';
 
     const { validateRedirectProxyUrl } =
       await import('../../src/main/security/redirect-proxy');

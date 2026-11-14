@@ -24,7 +24,7 @@ test('stale first-open state still restores one local workspace', async ({
   });
   const page = await context.newPage();
 
-  await page.goto('http://localhost:8080/');
+  await page.goto('http://localhost:18080/');
   await page.waitForFunction(() => window.currentWorkspace !== undefined);
   const firstWorkspace = await page.evaluate(async () => {
     if (!window.currentWorkspace) {
@@ -39,7 +39,7 @@ test('stale first-open state still restores one local workspace', async ({
 
   expect(firstWorkspace?.flavour).toBe('local');
   await page.goto(
-    `http://localhost:8080/workspace/${firstWorkspace?.id ?? ''}/home`
+    `http://localhost:18080/workspace/${firstWorkspace?.id ?? ''}/home`
   );
   await expect(page.getByRole('searchbox')).toBeVisible();
   await page

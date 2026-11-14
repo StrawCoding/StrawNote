@@ -35,8 +35,8 @@ if (process.env.CI) {
 if (process.env.DEV_SERVER_URL) {
   const devServerUrl = new URL(process.env.DEV_SERVER_URL);
   assert(
-    devServerUrl.origin === 'http://localhost:8080',
-    'DEV_SERVER_URL must be http://localhost:8080'
+    devServerUrl.origin === 'http://localhost:18080',
+    'DEV_SERVER_URL must be http://localhost:18080'
   );
   config.webServer = [
     {
@@ -46,7 +46,7 @@ if (process.env.DEV_SERVER_URL) {
       env: {
         COVERAGE: process.env.COVERAGE || 'false',
       },
-      url: 'http://localhost:8080',
+      url: 'http://localhost:18080',
     },
   ];
 }

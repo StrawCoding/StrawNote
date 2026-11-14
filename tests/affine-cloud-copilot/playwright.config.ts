@@ -16,7 +16,7 @@ const config: PlaywrightTestConfig = {
   timeout: 120_000,
   outputDir: testResultDir,
   use: {
-    baseURL: 'http://localhost:8080/',
+    baseURL: 'http://localhost:18080/',
     browserName:
       (process.env.BROWSER as PlaywrightWorkerOptions['browserName']) ??
       'chromium',
@@ -41,7 +41,7 @@ const config: PlaywrightTestConfig = {
       env: {
         COVERAGE: process.env.COVERAGE || 'false',
       },
-      url: 'http://localhost:8080',
+      url: 'http://localhost:18080',
     },
     {
       command: 'yarn run -T affine dev -p @affine/server',

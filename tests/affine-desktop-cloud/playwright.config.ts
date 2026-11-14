@@ -37,7 +37,7 @@ const config: PlaywrightTestConfig = {
         COVERAGE: process.env.COVERAGE || 'false',
         DISTRIBUTION: 'desktop',
       },
-      url: 'http://localhost:8080',
+      url: 'http://localhost:18080',
     },
     {
       command: 'yarn run -T affine dev -p @affine/server',

@@ -71,7 +71,7 @@ describe('canonicalAuthEndpoint', () => {
     ['https://AFFINE.PRO/path?query=1', 'https://affine.pro'],
     ['https://affine.pro:443', 'https://affine.pro'],
     ['http://localhost:80/path', 'http://localhost'],
-    ['http://localhost:8080/path', 'http://localhost:8080'],
+    ['http://localhost:18080/path', 'http://localhost:18080'],
     ['capacitor://localhost/path', 'capacitor://localhost/path'],
     ['invalid endpoint', 'invalid endpoint'],
   ])('normalizes %s', (endpoint, expected) => {
