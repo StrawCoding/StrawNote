@@ -4,6 +4,12 @@
 
 ---
 
+# 0.28.0.18
+
+- 品牌：分頁標題全域同步 `DocumentTitle`（Web／Mobile）；favicon／apple-touch 自 `StrawNoteIcon.png` 重產；onboarding 標誌改稻草圖；修 en／hi／nb 殘留 AFFiNE 文案；新增 `scripts/audit-affine-user-branding.sh`
+
+---
+
 # 0.28.0.17
 
 - 無界墨水工具列即時顯示（含遺漏的 helper 檔，修 v0.28.0.16 建置）
