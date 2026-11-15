@@ -39,6 +39,7 @@ import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { EdgelessMobileInkChrome } from '../../../../blocksuite/view-extensions/mobile/edgeless-mobile-ink-chrome';
 import { useMobileShellTabs } from '../../../components';
 import { globalVars } from '../../../styles/variables.css';
 import { JournalConflictBlock } from './journal-conflict-block';
@@ -56,6 +57,7 @@ import {
   shouldShowMobileDetailPageTitle,
   shouldTrackMobileDetailPageTitleScroll,
 } from './mobile-detail-page.immersive';
+import { computeMobileDetailReadonly } from './mobile-detail-readonly';
 import { PageHeaderMenuButton } from './page-header-more-button';
 import { PageHeaderShareButton } from './page-header-share-button';
 
@@ -210,11 +212,13 @@ const DetailPageImpl = ({
 
   const canEdit = useGuard('Doc_Update', doc.id);
 
-  const readonly =
-    !canEdit ||
-    isInTrash ||
-    !enableKeyboardToolbar ||
-    (mode === 'edgeless' && !enableEdgelessEditing);
+  const readonly = computeMobileDetailReadonly({
+    canEdit,
+    isInTrash: !!isInTrash,
+    mode,
+    enableKeyboardToolbar,
+    enableEdgelessEditing,
+  });
 
   const immersiveZoomToolbarBottom = getImmersiveZoomToolbarBottom({
     immersive,
@@ -248,6 +252,7 @@ const DetailPageImpl = ({
         >
           <AffineErrorBoundary key={doc.id} className={styles.errorBoundary}>
             <PageDetailEditor onLoad={onLoad} readonly={readonly} />
+            <EdgelessMobileInkChrome readonly={readonly} />
           </AffineErrorBoundary>
         </div>
       </div>

@@ -34,6 +34,14 @@ globalStyle('body:has(>#app-tabs) edgeless-toolbar-widget', {
   bottom: globalVars.appTabSafeArea,
 });
 
+globalStyle('body:has(>#app-tabs) [data-testid="edgeless-ink-toolbar"]', {
+  bottom: `calc(10px + ${globalVars.appTabSafeArea})`,
+});
+
+globalStyle('body:has([data-edgeless-ink-chrome]) edgeless-toolbar-widget', {
+  display: 'none',
+});
+
 globalStyle('html', {
   height: '100dvh',
   overflowY: 'auto',

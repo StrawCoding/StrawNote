@@ -1,3 +1,9 @@
+# 0.28.0.13
+
+- Android 無界（Edgeless）：掛載與插畫相同的 `StylusInkToolbar`（筆／橡皮／手掌＋色票／線寬），同步 Gfx 工具並隱藏原生底部 BlockSuite 工具列；修正唯讀邏輯（無界不再被鍵盤工具列旗標誤鎖、插畫維持可編輯）
+
+---
+
 # 0.28.0.12
 
 - Android：有新版本時彈出更新提示，按鈕「下次提醒／忽略／前往更新」（對照 Play／`app-update.json`）

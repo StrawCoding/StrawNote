@@ -33,8 +33,8 @@ export type StylusInkToolbarProps = {
 
 /**
  * Shared fixed ink toolbar (Pen / Eraser / [Hand] + swatches + widths).
- * Used by page illustration; edgeless keeps BlockSuite chrome but shares
- * palette constants + editorSetting brush prefs via the same helpers.
+ * Used by page illustration and mobile edgeless ink chrome; shares palette
+ * constants + editorSetting brush prefs via the same helpers.
  */
 export function StylusInkToolbar({
   tool,
