@@ -1408,7 +1408,6 @@
   "com.affine.mobile.setting.editor.general": "一般",
   "com.affine.mobile.setting.editor.page": "頁面",
   "com.affine.mobile.setting.editor.edgeless": "無邊框",
-
   "com.affine.settings.editorSettings.edgeless.shape": "圖形",
   "com.affine.settings.editorSettings.edgeless.shape.border-color": "邊框顏色",
   "com.affine.settings.editorSettings.edgeless.shape.border-style": "邊框樣式",
@@ -2643,5 +2642,11 @@
   "com.affine.download.strawnote-developing-tip": "StrawNote 桌面版尚在開發中，目前將先導向臨時下載頁。",
   "com.affine.download.strawnote-developing-hint": "StrawNote 桌面版開發中，下載暫用臨時頁面。",
   "com.affine.download.strawnote-developing-title": "StrawNote 正在努力開發",
-  "com.affine.download.strawnote-developing-confirm": "前往下載"
+  "com.affine.download.strawnote-developing-confirm": "前往下載",
+  "com.affine.strawnote.app-update.title": "發現新版本",
+  "com.affine.strawnote.app-update.message": "StrawNote {{latest}} 已可更新（目前 {{current}}）。",
+  "com.affine.strawnote.app-update.version-line": "最新 {{latest}} · 目前 {{current}}",
+  "com.affine.strawnote.app-update.later": "下次提醒",
+  "com.affine.strawnote.app-update.ignore": "忽略",
+  "com.affine.strawnote.app-update.go": "前往更新"
 }

@@ -60,6 +60,7 @@ import { useTheme } from 'next-themes';
 import { Suspense, useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 
+import { AndroidAppUpdatePrompt } from './app-update-bridge';
 import { AffineTheme } from './plugins/affine-theme';
 import { AIButton } from './plugins/ai-button';
 import { Auth } from './plugins/auth';
@@ -505,6 +506,7 @@ export function App() {
               <ThemeProvider />
               <AndroidBackAdapter />
               <AndroidSPenAdapter />
+              <AndroidAppUpdatePrompt />
               <RouterProvider router={router} />
             </AffineContext>
           </MobileModalConfigProvider>

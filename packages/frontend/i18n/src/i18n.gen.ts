@@ -9961,6 +9961,36 @@ export function useStrawNoteI18N(): {
       */
     ["com.affine.download.strawnote-developing-confirm"](): string;
     /**
+      * `New version available`
+      */
+    ["com.affine.strawnote.app-update.title"](): string;
+    /**
+      * `StrawNote {{latest}} is available (you have {{current}}).`
+      */
+    ["com.affine.strawnote.app-update.message"](options: Readonly<{
+        latest: string;
+        current: string;
+    }>): string;
+    /**
+      * `Latest {{latest}} · Current {{current}}`
+      */
+    ["com.affine.strawnote.app-update.version-line"](options: Readonly<{
+        latest: string;
+        current: string;
+    }>): string;
+    /**
+      * `Remind later`
+      */
+    ["com.affine.strawnote.app-update.later"](): string;
+    /**
+      * `Ignore`
+      */
+    ["com.affine.strawnote.app-update.ignore"](): string;
+    /**
+      * `Update now`
+      */
+    ["com.affine.strawnote.app-update.go"](): string;
+    /**
       * `An internal error occurred.`
       */
     ["error.INTERNAL_SERVER_ERROR"](): string;

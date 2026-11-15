@@ -9,6 +9,14 @@ Package: `com.strawcoding.strawnote`
 | `d = 0` | 正式版 → Play **production**（例 `v0.28.0.0`）          |
 | `d ≠ 0` | 測試版（同舊 pre）→ Play **internal**（例 `v0.28.0.1`） |
 
+## Android 應用內更新提示
+
+- 啟動後若遠端 `app-update.json`（或 GitHub latest release）版本較新，彈窗三鍵：
+  - **下次提醒**：24 小時內不再提示
+  - **忽略**：略過此版（直到更新的版本號）
+  - **前往更新**：開 Google Play
+- Manifest：[`packages/frontend/core/public/app-update.json`](../packages/frontend/core/public/app-update.json)（`scripts/set-version.sh` 會同步）
+
 ## 雙軌規則（對齊 StrawMoneyBook）
 
 | Tag 例                             | Workflow                                                                          | Play track   |
@@ -31,7 +39,7 @@ Package: `com.strawcoding.strawnote`
 ## 現況（2026-11-14）
 
 - **接手正式版**：`v0.28.0.0` / `versionCode=2800000` — **StrawNote 接手版本**
-- **開發線**：`0.28.0.9` — 插畫 Web 可滑動＋Android S Pen 可畫；發版必附 GitHub Release notes
+- **開發線**：`0.28.0.12` — Android 新版本彈窗（下次提醒／忽略／前往更新）；發版必附 GitHub Release notes
 - 前一測試線：`0.27.12` 插畫工具列／S Pen；`0.27.11` 頁面插畫；`0.27.10` 鎖定
 - AAB：`canaryRelease` + upload keystore；native `max-page-size=16384`
 - Secrets：`ANDROID_*` + `PLAY_SERVICE_ACCOUNT_JSON` + `ANDROID_PACKAGE_NAME`

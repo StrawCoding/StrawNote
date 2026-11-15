@@ -123,3 +123,23 @@ echo "iOS MARKETING_VERSION: $ios_new_version (app version: $new_version)"
 update_app_stream_version "packages/frontend/apps/electron/resources/strawnote.metainfo.xml" "$new_version"
 
 update_ios_marketing_version "packages/frontend/apps/ios/App/App.xcodeproj/project.pbxproj" "$ios_new_version"
+
+update_android_app_update_manifest() {
+  local file_path=$1
+  local new_version=$2
+  local play_url='https://play.google.com/store/apps/details?id=com.strawcoding.strawnote'
+
+  mkdir -p "$(dirname "$file_path")"
+  cat >"$file_path" <<EOF
+{
+  "latestVersion": "${new_version}",
+  "playUrl": "${play_url}",
+  "message": ""
+}
+EOF
+  echo "app-update.json updated to ${new_version}"
+}
+
+update_android_app_update_manifest \
+  "packages/frontend/core/public/app-update.json" \
+  "$new_version"

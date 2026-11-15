@@ -2729,5 +2729,11 @@
   "com.affine.download.strawnote-developing-tip": "StrawNote 桌面版仍在开发中，目前将先导向临时下载页。",
   "com.affine.download.strawnote-developing-hint": "StrawNote 桌面版开发中，下载暂用临时页面。",
   "com.affine.download.strawnote-developing-title": "StrawNote 正在努力开发",
-  "com.affine.download.strawnote-developing-confirm": "前往下载"
+  "com.affine.download.strawnote-developing-confirm": "前往下载",
+  "com.affine.strawnote.app-update.title": "发现新版本",
+  "com.affine.strawnote.app-update.message": "StrawNote {{latest}} 已可更新（当前 {{current}}）。",
+  "com.affine.strawnote.app-update.version-line": "最新 {{latest}} · 当前 {{current}}",
+  "com.affine.strawnote.app-update.later": "下次提醒",
+  "com.affine.strawnote.app-update.ignore": "忽略",
+  "com.affine.strawnote.app-update.go": "前往更新"
 }
