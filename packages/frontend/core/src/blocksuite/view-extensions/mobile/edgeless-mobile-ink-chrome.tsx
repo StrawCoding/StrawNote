@@ -2,18 +2,19 @@ import { useSignalValue } from '@affine/core/modules/doc-info/utils';
 import { EditorService } from '@affine/core/modules/editor';
 import { EditorSettingService } from '@affine/core/modules/editor-setting';
 import { ColorScheme, resolveColor } from '@blocksuite/affine/model';
-import { GfxControllerIdentifier } from '@blocksuite/affine/std/gfx';
 import { useLiveData, useService } from '@toeverything/infra';
 import { useTheme } from 'next-themes';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import {
   gfxToolNameToInkTool,
   inkToolToGfxTool,
 } from './edgeless-mobile-ink-tool';
+import { shouldUseEdgelessMobileInkChrome } from './edgeless-mobile-ink-visibility';
 import { type StylusInkTool, StylusInkToolbar } from './stylus-ink-toolbar';
 import { INK_TOOL_PICK_EVENT } from './stylus-pen';
+import { useEdgelessGfx } from './use-edgeless-gfx';
 
 const EDGELESS_INK_DEFAULT_COLOR = '#000000';
 
@@ -27,21 +28,24 @@ export function EdgelessMobileInkChrome({ readonly }: { readonly?: boolean }) {
   const colorScheme =
     resolvedTheme === 'dark' ? ColorScheme.Dark : ColorScheme.Light;
 
-  const gfx = useMemo(() => {
-    try {
-      return editorContainer?.host?.std.get(GfxControllerIdentifier) ?? null;
-    } catch {
-      return null;
-    }
-  }, [editorContainer]);
+  const useInkChrome = shouldUseEdgelessMobileInkChrome(mode, readonly);
+  const gfx = useEdgelessGfx(useInkChrome ? editorContainer : null);
 
   const gfxToolName = useSignalValue(gfx?.tool.currentToolName$);
   const [tool, setTool] = useState<StylusInkTool>('brush');
+  const pendingToolRef = useRef<StylusInkTool | null>(null);
 
   useEffect(() => {
     if (!gfxToolName) return;
     setTool(gfxToolNameToInkTool(gfxToolName));
   }, [gfxToolName]);
+
+  useEffect(() => {
+    const pending = pendingToolRef.current;
+    if (!gfx || pending === null) return;
+    pendingToolRef.current = null;
+    gfx.tool.setTool(inkToolToGfxTool(pending));
+  }, [gfx]);
 
   const brushColor = useMemo(() => {
     try {
@@ -60,7 +64,9 @@ export function EdgelessMobileInkChrome({ readonly }: { readonly?: boolean }) {
   const onToolChange = useCallback(
     (next: StylusInkTool) => {
       setTool(next);
+      pendingToolRef.current = next;
       if (!gfx) return;
+      pendingToolRef.current = null;
       gfx.tool.setTool(inkToolToGfxTool(next));
       window.dispatchEvent(new CustomEvent(INK_TOOL_PICK_EVENT));
     },
@@ -81,22 +87,15 @@ export function EdgelessMobileInkChrome({ readonly }: { readonly?: boolean }) {
     [editorSetting]
   );
 
-  const visible =
-    BUILD_CONFIG.isMobileEdition &&
-    mode === 'edgeless' &&
-    !readonly &&
-    !!editorContainer &&
-    !!gfx;
-
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    document.body.toggleAttribute('data-edgeless-ink-chrome', visible);
+    document.body.toggleAttribute('data-edgeless-ink-chrome', useInkChrome);
     return () => {
       delete document.body.dataset.edgelessInkChrome;
     };
-  }, [visible]);
+  }, [useInkChrome]);
 
-  if (!visible) return null;
+  if (!useInkChrome) return null;
 
   const toolbar = (
     <StylusInkToolbar
