@@ -2,6 +2,7 @@ import {
   type AwarenessRecord,
   AwarenessStorageBase,
 } from '../../storage/awareness';
+import { toProtocolClientVersion } from '../../utils/protocol-client-version';
 import type { SpaceType } from '../../utils/universal-id';
 import {
   base64ToUint8Array,
@@ -78,7 +79,9 @@ export class CloudAwarenessStorage extends AwarenessStorageBase {
               const response = await withAckTimeout(
                 this.socket.emitWithAck('space:join-batch', {
                   spaces,
-                  clientVersion: BUILD_CONFIG.appVersion,
+                  clientVersion: toProtocolClientVersion(
+                    BUILD_CONFIG.appVersion
+                  ),
                 }),
                 8_000
               );
@@ -112,7 +115,7 @@ export class CloudAwarenessStorage extends AwarenessStorageBase {
                 spaceType: space.spaceType,
                 spaceId: space.spaceId,
                 docId: space.docId,
-                clientVersion: BUILD_CONFIG.appVersion,
+                clientVersion: toProtocolClientVersion(BUILD_CONFIG.appVersion),
               }
             );
             if ('error' in response) {

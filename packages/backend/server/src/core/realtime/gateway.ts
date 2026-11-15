@@ -27,6 +27,7 @@ import {
   checkCanaryDateClientVersion,
   EventBus,
   GatewayErrorWrapper,
+  normalizeClientVersionForSemver,
   OnEvent,
   UnsupportedClientVersion,
 } from '../../base';
@@ -44,15 +45,14 @@ const MIN_REALTIME_CLIENT_VERSION = new semver.Range('>=0.26.0-0', {
 
 function normalizeRealtimeClientVersion(clientVersion: string): string | null {
   const canaryCheck = checkCanaryDateClientVersion(clientVersion);
-  if (!canaryCheck.matched) {
-    return clientVersion;
+  if (canaryCheck.matched) {
+    if (!env.namespaces.canary) {
+      return null;
+    }
+    return canaryCheck.allowed ? canaryCheck.normalized : null;
   }
 
-  if (!env.namespaces.canary) {
-    return null;
-  }
-
-  return canaryCheck.allowed ? canaryCheck.normalized : null;
+  return normalizeClientVersionForSemver(clientVersion);
 }
 
 @WebSocketGateway()

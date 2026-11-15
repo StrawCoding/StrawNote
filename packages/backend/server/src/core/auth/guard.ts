@@ -16,6 +16,7 @@ import {
   Config,
   getClientVersionFromRequest,
   getRequestResponseFromContext,
+  normalizeClientVersionForSemver,
   parseCookies,
   UnsupportedClientVersion,
 } from '../../base';
@@ -253,11 +254,15 @@ export class AuthGuard implements CanActivate, OnModuleInit {
       }
     }
 
+    const comparableVersion = clientVersion
+      ? normalizeClientVersionForSemver(clientVersion)
+      : undefined;
+
     const configRange = this.getVersionRange(requiredVersion);
     if (
       configRange &&
-      (!clientVersion ||
-        !semver.satisfies(clientVersion, configRange, {
+      (!comparableVersion ||
+        !semver.satisfies(comparableVersion, configRange, {
           includePrerelease: true,
         }))
     ) {
@@ -270,8 +275,8 @@ export class AuthGuard implements CanActivate, OnModuleInit {
     }
 
     if (
-      !clientVersion ||
-      !semver.satisfies(clientVersion, hardRange, {
+      !comparableVersion ||
+      !semver.satisfies(comparableVersion, hardRange, {
         includePrerelease: true,
       })
     ) {

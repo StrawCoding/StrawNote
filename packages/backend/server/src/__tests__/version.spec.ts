@@ -258,3 +258,9 @@ test('should compare release versions for available upgrades', t => {
   t.true(hasNewerVersion('0.26.5', '0.26.6-beta.1'));
   t.false(hasNewerVersion('0.26.6-beta.2', '0.26.6-beta.1'));
 });
+
+test('should treat StrawNote a.b.c.d preview versions as a.b.c for upgrades', t => {
+  t.false(hasNewerVersion('0.28.0.9', '0.28.0.8'));
+  t.true(hasNewerVersion('0.28.0.9', '0.28.1.0'));
+  t.true(hasNewerVersion('0.27.4', '0.28.0.10'));
+});

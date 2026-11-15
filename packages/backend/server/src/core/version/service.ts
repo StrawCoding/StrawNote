@@ -4,6 +4,7 @@ import semver from 'semver';
 import {
   checkCanaryDateClientVersion,
   Config,
+  normalizeClientVersionForSemver,
   UnsupportedClientVersion,
 } from '../../base';
 
@@ -17,6 +18,9 @@ export class VersionService {
 
   async checkVersion(clientVersion?: string) {
     const requiredVersion = this.config.client.versionControl.requiredVersion;
+    const comparableVersion = clientVersion
+      ? normalizeClientVersionForSemver(clientVersion)
+      : undefined;
 
     if (clientVersion && env.namespaces.canary) {
       const canaryCheck = checkCanaryDateClientVersion(clientVersion);
@@ -39,8 +43,8 @@ export class VersionService {
 
     if (
       configRange &&
-      (!clientVersion ||
-        !semver.satisfies(clientVersion, configRange, {
+      (!comparableVersion ||
+        !semver.satisfies(comparableVersion, configRange, {
           includePrerelease: true,
         }))
     ) {
@@ -52,8 +56,8 @@ export class VersionService {
 
     if (
       hardRange &&
-      (!clientVersion ||
-        !semver.satisfies(clientVersion, hardRange, {
+      (!comparableVersion ||
+        !semver.satisfies(comparableVersion, hardRange, {
           includePrerelease: true,
         }))
     ) {

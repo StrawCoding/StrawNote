@@ -1,3 +1,9 @@
+# 0.28.0.11
+
+- 修復 online／雲端同步：StrawNote `a.b.c.d` 四段版本被伺服器 semver 判為無效（UNSUPPORTED_CLIENT_VERSION），導致「實時同步連線失敗」。協議端改送 `a.b.c`，後端／自架映像亦正規化四段版本
+
+---
+
 # 0.28.0.10
 
 - 修復 online／雲端同步：self-host CORS 允許私網 `http://192.168.x.x:18080`（yarn:dev LAN）Origin；dev proxy 剝除 Origin，避免 WebSocket 被擋導致雲端失敗

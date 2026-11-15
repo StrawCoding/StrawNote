@@ -92,11 +92,39 @@ export function checkCanaryDateClientVersion(
   };
 }
 
+/**
+ * StrawNote uses a.b.c.d (d = preview). Strict semver rejects 4-part versions, so
+ * coerce them to a.b.c before range checks / satisfies.
+ */
+export function normalizeClientVersionForSemver(
+  version: string
+): string | null {
+  const trimmed = version.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const canary = parseCanaryDateClientVersion(trimmed);
+  if (canary) {
+    return semver.valid(canary.normalized, { loose: true });
+  }
+
+  const valid = semver.valid(trimmed, { loose: true });
+  if (valid) {
+    return valid;
+  }
+
+  // a.b.c.d → a.b.c (preview digit is packaging-only)
+  const fourPart = /^v?(\d+)\.(\d+)\.(\d+)\.(\d+)(?:[-+].*)?$/i.exec(trimmed);
+  if (fourPart) {
+    return `${fourPart[1]}.${fourPart[2]}.${fourPart[3]}`;
+  }
+
+  return semver.coerce(trimmed)?.version ?? null;
+}
+
 function normalizeComparableVersion(version: string): string | null {
-  const canary = parseCanaryDateClientVersion(version);
-  return semver.valid(canary?.normalized ?? version.trim(), {
-    loose: true,
-  });
+  return normalizeClientVersionForSemver(version);
 }
 
 export function hasNewerVersion(

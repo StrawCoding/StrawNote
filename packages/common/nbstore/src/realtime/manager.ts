@@ -15,6 +15,7 @@ import { getRealtimeInputKey } from '@affine/realtime';
 import { Observable, Subject } from 'rxjs';
 
 import { type Socket, SocketConnection } from '../impls/cloud/socket';
+import { toProtocolClientVersion } from '../utils/protocol-client-version';
 
 const DEFAULT_REQUEST_TIMEOUT = 10_000;
 
@@ -223,7 +224,7 @@ export class RealtimeManager {
         socket.emitWithAck('realtime:request', {
           op,
           input,
-          clientVersion: BUILD_CONFIG.appVersion,
+          clientVersion: toProtocolClientVersion(BUILD_CONFIG.appVersion),
         }),
         timeout,
         aborted,
@@ -394,7 +395,7 @@ export class RealtimeManager {
         {
           topic: subscription.topic,
           input: subscription.input,
-          clientVersion: BUILD_CONFIG.appVersion,
+          clientVersion: toProtocolClientVersion(BUILD_CONFIG.appVersion),
         },
         subscription.inputKey
       );

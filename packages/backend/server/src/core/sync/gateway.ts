@@ -90,15 +90,19 @@ const SOCKET_PRESENCE_USER_ID_KEY = 'affinePresenceUserId';
 
 function normalizeWsClientVersion(clientVersion: string): string | null {
   const canaryCheck = checkCanaryDateClientVersion(clientVersion);
-  if (!canaryCheck.matched) {
-    return clientVersion;
+  if (canaryCheck.matched) {
+    if (!env.namespaces.canary) {
+      return null;
+    }
+    return canaryCheck.allowed ? canaryCheck.normalized : null;
   }
 
-  if (!env.namespaces.canary) {
-    return null;
-  }
-
-  return canaryCheck.allowed ? canaryCheck.normalized : null;
+  // StrawNote a.b.c.d is not strict semver; coerce for range tests.
+  return (
+    semver.valid(clientVersion, { loose: true }) ??
+    semver.coerce(clientVersion)?.version ??
+    null
+  );
 }
 
 function isBatchWsClientVersion(clientVersion: string): boolean {

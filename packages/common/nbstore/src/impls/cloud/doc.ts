@@ -8,6 +8,7 @@ import {
   SnapshotDocStorageBase,
 } from '../../storage';
 import { getIdConverter, type IdConverter } from '../../utils/id-converter';
+import { toProtocolClientVersion } from '../../utils/protocol-client-version';
 import type { SpaceType } from '../../utils/universal-id';
 import {
   base64ToUint8Array,
@@ -311,7 +312,7 @@ class CloudDocStorageConnection extends SocketConnection {
       return docId;
     }
 
-    const clientVersion = BUILD_CONFIG.appVersion;
+    const clientVersion = toProtocolClientVersion(BUILD_CONFIG.appVersion);
     try {
       const res = await withAckTimeout(
         socket.emitWithAck('space:join-batch', {

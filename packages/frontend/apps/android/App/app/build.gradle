@@ -25,9 +25,9 @@ if (strawnoteKeystorePropertiesFile.exists()) {
     strawnoteKeystorePropertiesFile.withInputStream { strawnoteKeystoreProperties.load(it) }
 }
 
-def strawnoteVersionName = (System.getenv('VERSION_NAME') ?: System.getenv('CI_VERSION_NAME') ?: '0.28.0.10').replaceFirst(/^v/, '')
-// a.b.c.d → a*10000000 + b*100000 + c*1000 + d  (0.28.0.10 → 2800010)
-def strawnoteVersionCode = (System.getenv('VERSION_CODE') ?: '2800010') as int
+def strawnoteVersionName = (System.getenv('VERSION_NAME') ?: System.getenv('CI_VERSION_NAME') ?: '0.28.0.11').replaceFirst(/^v/, '')
+// a.b.c.d → a*10000000 + b*100000 + c*1000 + d  (0.28.0.11 → 2800011)
+def strawnoteVersionCode = (System.getenv('VERSION_CODE') ?: '2800011') as int
 
 android {
     namespace = "com.strawcoding.strawnote"
