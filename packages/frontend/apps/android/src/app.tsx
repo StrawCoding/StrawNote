@@ -1,6 +1,7 @@
 import { notify } from '@affine/component';
 import { getStoreManager } from '@affine/core/blocksuite/manager/store';
 import { AffineContext } from '@affine/core/components/context';
+import { DocumentTitle } from '@affine/core/components/document-title';
 import { AppFallback } from '@affine/core/mobile/components/app-fallback';
 import { MobileModalConfigProvider } from '@affine/core/mobile/components/mobile-modal-config-provider';
 import { configureMobileModules } from '@affine/core/mobile/modules';
@@ -501,6 +502,7 @@ export function App() {
     <Suspense fallback={<AppFallback />}>
       <FrameworkRoot framework={frameworkProvider}>
         <I18nProvider>
+          <DocumentTitle />
           <MobileModalConfigProvider>
             <AffineContext store={getCurrentStore()}>
               <ThemeProvider />

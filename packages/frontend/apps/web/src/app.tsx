@@ -1,4 +1,5 @@
 import { AffineContext } from '@affine/core/components/context';
+import { DocumentTitle } from '@affine/core/components/document-title';
 import { AppContainer } from '@affine/core/desktop/components/app-container';
 import { router } from '@affine/core/desktop/router';
 import { configureCommonModules } from '@affine/core/modules';
@@ -97,6 +98,7 @@ export function App() {
       <FrameworkRoot framework={frameworkProvider}>
         <CacheProvider value={cache}>
           <I18nProvider>
+            <DocumentTitle />
             <AffineContext store={getCurrentStore()}>
               <RouterProvider router={router} />
             </AffineContext>

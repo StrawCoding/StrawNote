@@ -5,7 +5,6 @@ import { SWRConfigProvider } from '@affine/core/components/providers/swr-config-
 import { WorkspaceSideEffects } from '@affine/core/components/providers/workspace-side-effects';
 import { AIIsland } from '@affine/core/desktop/components/ai-island';
 import { AppContainer } from '@affine/core/desktop/components/app-container';
-import { DocumentTitle } from '@affine/core/desktop/components/document-title';
 import { WorkspaceDialogs } from '@affine/core/desktop/dialogs';
 import { PeekViewManagerModal } from '@affine/core/modules/peek-view';
 import { QuotaCheck } from '@affine/core/modules/quota';
@@ -29,7 +28,6 @@ export const WorkspaceLayout = function WorkspaceLayout({
       <AiLoginRequiredModal />
       <WorkspaceSideEffects />
       <PeekViewManagerModal />
-      <DocumentTitle />
 
       <WorkspaceLayoutInner>{children}</WorkspaceLayoutInner>
       {/* should show after workspace loaded */}
