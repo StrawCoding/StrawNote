@@ -14,6 +14,8 @@ import {
 import type { PointerEventState } from '@blocksuite/std';
 import { BaseTool, type GfxModel } from '@blocksuite/std/gfx';
 
+import { collectDefaultErasableTargets } from './eraser-erasable.js';
+
 class EraserOverlay extends Overlay {
   d = '';
 
@@ -147,10 +149,12 @@ export class EraserTool extends BaseTool {
     const [x, y] = this.gfx.viewport.toModelCoord(point.x, point.y);
     this._eraserPoints = [[x, y]];
     this._prevPoint = [x, y];
-    this._erasable = new Set([
-      ...this.gfx.layer.canvasElements,
-      ...this.gfx.layer.blocks,
-    ]);
+    this._erasable = new Set(
+      collectDefaultErasableTargets(
+        this.gfx.layer.canvasElements,
+        this.gfx.layer.blocks
+      )
+    );
     this._loop();
 
     this._surfaceComponent?.renderer.addOverlay(this._overlay);

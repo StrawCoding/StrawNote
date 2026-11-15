@@ -1,7 +1,7 @@
 {
   "name": "@affine/realtime",
   "type": "module",
-  "version": "0.28.0.14",
+  "version": "0.28.0.15",
   "private": true,
   "sideEffects": false,
   "exports": {
