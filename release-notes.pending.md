@@ -1,3 +1,9 @@
+# 0.28.0.9
+
+- 修復插畫 mode：**Web 可滑動**（brush 層改 `touch-action: pan-y`，不再整頁鎖死）；**Android S Pen 可畫**（不再把 WebView 誤報的 stylus bit 當擦除、原生端停用 web 側鍵雙橋以免工具卡在橡皮擦）
+
+---
+
 # 0.28.0.8
 
 - 內部測試累積更新（請改裝此版）：插畫 S Pen 不誤滑、橡皮擦滑動、icon／色票工具列、與 Edgeless 共用 S Pen 模組、**Web 側鍵可用**（0.28.0.3–0.28.0.7）

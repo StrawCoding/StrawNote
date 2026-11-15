@@ -346,7 +346,10 @@ const DetailPageImpl = memo(function DetailPageImpl() {
                   'affine-page-viewport',
                   styles.affineDocViewport,
                   styles.editorContainer,
-                  { [styles.pageModeViewportContentBox]: mode === 'page' }
+                  {
+                    [styles.pageModeViewportContentBox]:
+                      mode === 'page' || mode === 'illustration',
+                  }
                 )}
               >
                 <PageDetailEditor onLoad={onLoad} readonly={readonly} />
@@ -359,7 +362,9 @@ const DetailPageImpl = memo(function DetailPageImpl() {
             </Scrollable.Root>
             <EditorOutlineViewer
               editor={editorContainer?.host ?? null}
-              show={mode === 'page' && !isSideBarOpen}
+              show={
+                (mode === 'page' || mode === 'illustration') && !isSideBarOpen
+              }
               openOutlinePanel={openOutlinePanel}
             />
           </AffineErrorBoundary>

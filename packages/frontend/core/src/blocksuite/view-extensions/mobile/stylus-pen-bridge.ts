@@ -69,8 +69,30 @@ const state: BridgeState = {
  *
  * Idempotent retain/release — safe from edgeless controller + illustration.
  */
+function shouldInstallWebBridge(): boolean {
+  if (typeof window === 'undefined') return false;
+  // Android Capacitor already has SPenPlugin — dual bridges sticky-toggle eraser
+  // and can leave the tool stuck so S Pen never draws.
+  try {
+    if (BUILD_CONFIG.isNative || BUILD_CONFIG.isAndroid) return false;
+  } catch {
+    // BUILD_CONFIG missing in some unit tests
+  }
+  const cap = (
+    window as unknown as {
+      Capacitor?: { isNativePlatform?: () => boolean };
+    }
+  ).Capacitor;
+  if (cap?.isNativePlatform?.()) return false;
+  return true;
+}
+
 export function retainStylusButtonBridge(): () => void {
   if (typeof window === 'undefined') {
+    return () => {};
+  }
+
+  if (!shouldInstallWebBridge()) {
     return () => {};
   }
 

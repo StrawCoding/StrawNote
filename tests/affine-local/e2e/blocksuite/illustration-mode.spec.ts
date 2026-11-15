@@ -203,16 +203,69 @@ test('illustration toolbar is fixed to the viewport, not page bottom', async ({
   expect(after.top).toBeGreaterThan(vh * 0.5);
 });
 
-test('illustration brush locks touch-action so S Pen does not scroll', async ({
+test('illustration brush allows pan-y scroll; eraser and active stroke lock', async ({
   page,
 }) => {
   await clickIllustrationModeButton(page);
   await page.getByTestId('page-illustration-tool-brush').click();
   const svg = page.getByTestId('page-illustration-overlay').locator('svg');
-  await expect(svg).toHaveCSS('touch-action', 'none');
+  // fingerPanOnly default: browser may scroll; pen strokes preventDefault.
+  await expect(svg).toHaveCSS('touch-action', 'pan-y');
 
   await page.getByTestId('page-illustration-tool-eraser').click();
   await expect(svg).toHaveCSS('touch-action', 'none');
+
+  await page.getByTestId('page-illustration-tool-brush').click();
+  const box = await svg.boundingBox();
+  expect(box).toBeTruthy();
+  if (!box) return;
+  await svg.dispatchEvent('pointerdown', {
+    pointerType: 'pen',
+    pointerId: 7,
+    clientX: box.x + 20,
+    clientY: box.y + 20,
+    pressure: 0.5,
+    buttons: 1,
+    button: 0,
+    bubbles: true,
+  });
+  await expect(svg).toHaveCSS('touch-action', 'none');
+  await svg.dispatchEvent('pointerup', {
+    pointerType: 'pen',
+    pointerId: 7,
+    clientX: box.x + 20,
+    clientY: box.y + 20,
+    pressure: 0,
+    buttons: 0,
+    button: 0,
+    bubbles: true,
+  });
+  await expect(svg).toHaveCSS('touch-action', 'pan-y');
+});
+
+test('illustration mode page can scroll under brush overlay', async ({
+  page,
+}) => {
+  await clickIllustrationModeButton(page);
+  await page.getByTestId('page-illustration-tool-brush').click();
+
+  await page.locator('affine-page-root').evaluate(root => {
+    for (let i = 0; i < 50; i++) {
+      const p = document.createElement('p');
+      p.textContent = `scroll spacer ${i}`;
+      p.style.minHeight = '64px';
+      root.append(p);
+    }
+  });
+
+  const viewport = page.locator('.affine-page-viewport').first();
+  const before = await viewport.evaluate(el => el.scrollTop);
+  await viewport.evaluate(el => {
+    el.scrollTop = 400;
+  });
+  const after = await viewport.evaluate(el => el.scrollTop);
+  expect(after).toBeGreaterThan(before);
+  expect(after).toBeGreaterThanOrEqual(300);
 });
 
 test('illustration eraser accepts finger touch swipe', async ({ page }) => {

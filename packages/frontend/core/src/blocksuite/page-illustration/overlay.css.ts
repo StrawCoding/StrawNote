@@ -11,5 +11,6 @@ export const root = style({
 export const layer = style({
   position: 'absolute',
   pointerEvents: 'auto',
-  // touchAction set inline: brush/eraser = none (S Pen must not scroll).
+  // touchAction set inline via illustrationLayerTouchAction:
+  // brush+fingerPanOnly → pan-y (web scroll); pen stroke → none.
 });

@@ -26,6 +26,7 @@ import {
 import {
   canInkWithPointer,
   classifySpenButtonGesture,
+  illustrationLayerTouchAction,
   isStylusPointer,
   PEN_PALM_GRACE_MS,
   shouldRejectPalmTouch,
@@ -61,11 +62,6 @@ type LiveStroke = {
   streamline: number;
 };
 
-type FingerPanState = {
-  lastY: number;
-  scroller: HTMLElement;
-};
-
 function brushAbsolutePoints(brush: BrushElementModel): [number, number][] {
   const bound = Bound.deserialize(brush.xywh);
   return (brush.points ?? []).map(([x, y]) => [x + bound.x, y + bound.y]) as [
@@ -99,14 +95,6 @@ function eraseAtPoint(doc: Store, x: number, y: number) {
   return false;
 }
 
-function findIllustrationScroller(root: HTMLElement | null): HTMLElement {
-  const mode = root?.closest('[data-mode="illustration"]');
-  if (mode instanceof HTMLElement) return mode;
-  const parent = root?.parentElement;
-  if (parent instanceof HTMLElement) return parent;
-  return (document.scrollingElement as HTMLElement | null) ?? document.body;
-}
-
 export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -126,7 +114,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const [live, setLive] = useState<LiveStroke | null>(null);
   const liveRef = useRef<LiveStroke | null>(null);
   const drawingRef = useRef(false);
-  const fingerPanRef = useRef<FingerPanState | null>(null);
+  const [strokeActive, setStrokeActive] = useState(false);
   const penActiveRef = useRef(false);
   const penGraceUntilRef = useRef(0);
   const spenDownAtRef = useRef<number | null>(null);
@@ -302,9 +290,6 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
       if (stylus) {
         penActiveRef.current = true;
-        const scroller = findIllustrationScroller(rootRef.current);
-        scroller.dataset.illustrationInk = '1';
-        scroller.style.touchAction = 'none';
         // Barrel / eraser tip → same session path as edgeless (works on web).
         syncStylusToolIntent(e.nativeEvent);
       } else if (
@@ -322,22 +307,14 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
       const activeTool = toolRef.current;
 
+      // Brush + fingerPanOnly: layer uses touch-action pan-y — leave touch to
+      // the browser so web/desktop can scroll. Do not capture / preventDefault.
       if (
         activeTool === 'brush' &&
         fingerPanOnly &&
         e.pointerType === 'touch' &&
         !stylus
       ) {
-        e.preventDefault();
-        try {
-          e.currentTarget.setPointerCapture(e.pointerId);
-        } catch {
-          // ignore
-        }
-        fingerPanRef.current = {
-          lastY: e.clientY,
-          scroller: findIllustrationScroller(rootRef.current),
-        };
         return;
       }
 
@@ -353,6 +330,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         // Synthetic / already-captured pointers may throw; drawing can continue.
       }
       drawingRef.current = true;
+      setStrokeActive(true);
       const [x, y] = clientToPageContentPoint(e.clientX, e.clientY, content);
 
       if (toolRef.current === 'eraser') {
@@ -383,14 +361,6 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
   const onPointerMove = useCallback(
     (e: ReactPointerEvent<SVGSVGElement>) => {
-      if (fingerPanRef.current) {
-        e.preventDefault();
-        const dy = e.clientY - fingerPanRef.current.lastY;
-        fingerPanRef.current.lastY = e.clientY;
-        fingerPanRef.current.scroller.scrollTop -= dy;
-        return;
-      }
-
       if (!drawingRef.current) return;
       e.preventDefault();
 
@@ -427,28 +397,16 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
   const endStroke = useCallback(
     (e: ReactPointerEvent<SVGSVGElement>) => {
-      if (fingerPanRef.current) {
-        fingerPanRef.current = null;
-        try {
-          e.currentTarget.releasePointerCapture(e.pointerId);
-        } catch {
-          // ignore
-        }
-        return;
-      }
-
       if (isStylusPointer(e.nativeEvent) || e.pointerType === 'pen') {
         penActiveRef.current = false;
         penGraceUntilRef.current = Date.now() + PEN_PALM_GRACE_MS;
-        const scroller = findIllustrationScroller(rootRef.current);
-        delete scroller.dataset.illustrationInk;
-        scroller.style.touchAction = '';
         // Momentary barrel / tip-up: restore brush when not sticky.
         sessionRef.current?.onStylusTipUp();
       }
 
       if (!drawingRef.current) return;
       drawingRef.current = false;
+      setStrokeActive(false);
       try {
         e.currentTarget.releasePointerCapture(e.pointerId);
       } catch {
@@ -548,7 +506,11 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
           left: layerOffset.left,
           top: layerOffset.top,
           pointerEvents: tool === 'pan' ? 'none' : 'auto',
-          touchAction: tool === 'pan' ? 'pan-y' : 'none',
+          touchAction: illustrationLayerTouchAction(
+            tool,
+            fingerPanOnly,
+            strokeActive
+          ),
           cursor:
             tool === 'eraser'
               ? 'cell'

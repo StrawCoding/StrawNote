@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest';
 import {
   canInkWithPointer,
   classifySpenButtonGesture,
+  illustrationLayerTouchAction,
   isEraserTip,
   isStylusEraseGesture,
   isStylusPointer,
@@ -40,14 +41,15 @@ describe('stylus-pen helpers', () => {
     ).toBe(true);
   });
 
-  test('barrel button bits and secondary button map to erase', () => {
+  test('barrel button identity maps to erase; stylus bits alone do not', () => {
+    // Android WebView often sets STYLUS_PRIMARY on plain tip — must still brush.
     expect(
       isStylusEraseGesture({
         pointerType: 'pen',
         button: 0,
         buttons: 1 | STYLUS_BUTTON_PRIMARY,
       })
-    ).toBe(true);
+    ).toBe(false);
 
     expect(
       isStylusEraseGesture({
@@ -76,7 +78,7 @@ describe('stylus-pen helpers', () => {
     ).toBe(false);
   });
 
-  test('stylusToolIntent maps tip→brush and barrel→eraser', () => {
+  test('stylusToolIntent maps tip→brush and barrel button→eraser', () => {
     expect(
       stylusToolIntent({ pointerType: 'pen', button: 0, buttons: 1 })
     ).toBe('brush');
@@ -85,6 +87,14 @@ describe('stylus-pen helpers', () => {
       stylusToolIntent({
         pointerType: 'pen',
         button: 0,
+        buttons: 1 | STYLUS_BUTTON_PRIMARY,
+      })
+    ).toBe('brush');
+
+    expect(
+      stylusToolIntent({
+        pointerType: 'pen',
+        button: 5,
         buttons: 1 | STYLUS_BUTTON_PRIMARY,
       })
     ).toBe('eraser');
@@ -96,6 +106,14 @@ describe('stylus-pen helpers', () => {
     expect(
       stylusToolIntent({ pointerType: 'touch', button: 0, buttons: 1 })
     ).toBe(null);
+  });
+
+  test('illustrationLayerTouchAction allows pan-y for brush+fingerPanOnly', () => {
+    expect(illustrationLayerTouchAction('brush', true, false)).toBe('pan-y');
+    expect(illustrationLayerTouchAction('brush', true, true)).toBe('none');
+    expect(illustrationLayerTouchAction('eraser', true, false)).toBe('none');
+    expect(illustrationLayerTouchAction('pan', true, false)).toBe('pan-y');
+    expect(illustrationLayerTouchAction('brush', false, false)).toBe('none');
   });
 
   test('classifies short down/up as click', () => {

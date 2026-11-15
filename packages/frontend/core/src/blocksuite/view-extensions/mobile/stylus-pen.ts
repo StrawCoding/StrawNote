@@ -78,22 +78,38 @@ export function isEraserTip(e: StylusPointerLike): boolean {
 }
 
 /**
- * True when the stylus side/barrel button is held, or the eraser tip is used.
- * Used to map S Pen button → eraser tool.
+ * True when the stylus should ink as eraser (not brush).
+ *
+ * Do **not** treat `buttons` stylus bits alone while the tip is down — several
+ * Android WebViews report STYLUS_PRIMARY on plain tip contact, which incorrectly
+ * forced eraser and made S Pen appear unable to draw. Hover / detached barrel
+ * uses {@link retainStylusButtonBridge} / native SPenPlugin instead.
+ *
+ * Tip+barrel while drawing is detected via Chromium `button` 2/5, or eraser tip.
  */
 export function isStylusEraseGesture(e: StylusPointerLike): boolean {
   if (isEraserTip(e)) return true;
   if (e.pointerType !== 'pen') return false;
 
-  if (
-    (e.buttons & STYLUS_BUTTON_PRIMARY) !== 0 ||
-    (e.buttons & STYLUS_BUTTON_SECONDARY) !== 0
-  ) {
-    return true;
-  }
-
-  // Chromium often maps barrel to secondary mouse button (2) or button index 5
+  // Chromium maps barrel to secondary (2) or pen eraser button (5)
   return e.button === 2 || e.button === 5;
+}
+
+/**
+ * touch-action for the illustration ink layer.
+ * Brush + fingerPanOnly → pan-y so web/mobile can scroll; pen strokes call
+ * preventDefault. Eraser needs none so finger swipe can erase.
+ */
+export function illustrationLayerTouchAction(
+  tool: string,
+  fingerPanOnly: boolean,
+  strokeActive: boolean
+): 'none' | 'pan-y' {
+  if (strokeActive) return 'none';
+  if (tool === 'pan') return 'pan-y';
+  if (tool === 'eraser') return 'none';
+  if (tool === 'brush' && fingerPanOnly) return 'pan-y';
+  return 'none';
 }
 
 export type StylusToolIntent = 'brush' | 'eraser' | null;
