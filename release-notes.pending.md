@@ -1,3 +1,9 @@
+# 0.28.0.8
+
+- 內部測試累積更新（請改裝此版）：插畫 S Pen 不誤滑、橡皮擦滑動、icon／色票工具列、與 Edgeless 共用 S Pen 模組、**Web 側鍵可用**（0.28.0.3–0.28.0.7）
+
+---
+
 # 0.28.0.7
 
 - Web 修復 S Pen 側鍵：新增 `retainStylusButtonBridge`，以 PointerEvent（hover／筆管）合成 `strawnote:spen-button`（不再只靠 Android Capacitor）；插畫同步用 `stylusToolIntent` 處理筆管／橡皮擦尖
