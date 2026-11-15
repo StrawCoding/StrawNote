@@ -1950,7 +1950,7 @@
   "com.affine.share-menu.paywall.member.title": "需要升級工作區",
   "com.affine.share-menu.paywall.member.description": "請詢問您的工作區所有者升級到 Pro 或更高版本以啟用權限管理。",
   "com.affine.share-menu.paywall.member.confirm": "明白了",
-  "com.affine.share-page.footer.built-with": "構建於",
+  "com.affine.share-page.footer.built-with": "StrawNote GitHub",
   "com.affine.share-page.footer.create-with": "建立於",
   "com.affine.share-page.footer.description": "使用 StrawNote Cloud 增強您的共享能力：一鍵文件共享",
   "com.affine.share-page.footer.get-started": "免費開始使用",

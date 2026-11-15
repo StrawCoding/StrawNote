@@ -5,6 +5,7 @@ import { EditorOutlineViewer } from '@affine/core/blocksuite/outline-viewer';
 import { useActiveBlocksuiteEditor } from '@affine/core/components/hooks/use-block-suite-editor';
 import { useNavigateHelper } from '@affine/core/components/hooks/use-navigate-helper';
 import { PageDetailEditor } from '@affine/core/components/page-detail-editor';
+import { STRAWNOTE_GITHUB_URL } from '@affine/core/constants/strawnote-links';
 import { AppContainer } from '@affine/core/desktop/components/app-container';
 import { AuthService, ServerService } from '@affine/core/modules/cloud';
 import { type Doc, DocsService } from '@affine/core/modules/doc';
@@ -430,10 +431,11 @@ const SharePageFooter = () => {
   }
   return (
     <a
-      href="https://github.com/StrawCoding/StrawNote"
+      href={STRAWNOTE_GITHUB_URL}
       target="_blank"
       className={styles.link}
       rel="noreferrer"
+      title={t['com.affine.share-page.footer.built-with']()}
     >
       <span className={styles.linkText}>
         {t['com.affine.share-page.footer.built-with']()}

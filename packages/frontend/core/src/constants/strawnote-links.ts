@@ -1,4 +1,5 @@
 /** Public StrawNote destinations (product UI). */
+export const STRAWNOTE_GITHUB_URL = 'https://github.com/StrawCoding/StrawNote';
 export const STRAWNOTE_HOME_URL = 'https://strawcoding.github.io/StrawNoteWeb/';
 export const STRAWNOTE_COMMUNITY_URL =
   'https://github.com/StrawCoding/StrawNote/discussions';

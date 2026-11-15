@@ -1,3 +1,4 @@
+import { STRAWNOTE_GITHUB_URL } from '@affine/core/constants/strawnote-links';
 import { useI18n } from '@affine/i18n';
 import { ArrowRightBigIcon } from '@blocksuite/icons/rc';
 
@@ -13,7 +14,7 @@ export const ShareFooter = () => {
         </div>
         <a
           className={styles.getStartLink}
-          href="https://github.com/StrawCoding/StrawNote"
+          href={STRAWNOTE_GITHUB_URL}
           target="_blank"
           rel="noreferrer"
         >

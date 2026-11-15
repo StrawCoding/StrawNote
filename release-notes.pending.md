@@ -1,3 +1,9 @@
+# 0.28.0.19
+
+- 公開／分享頁底部品牌：文案改為「StrawNote GitHub」、連結統一 `https://github.com/StrawCoding/StrawNote`（`STRAWNOTE_GITHUB_URL`）
+
+---
+
 # 0.28.0.18
 
 - 產品「官方網站」連結改為 GitHub Pages 官網 `https://strawcoding.github.io/StrawNoteWeb/`（StrawNoteWeb 行銷站上線）
