@@ -1,3 +1,9 @@
+# 0.28.0.10
+
+- 修復 online／雲端同步：self-host CORS 允許私網 `http://192.168.x.x:18080`（yarn:dev LAN）Origin；dev proxy 剝除 Origin，避免 WebSocket 被擋導致雲端失敗
+
+---
+
 # 0.28.0.9
 
 - 修復插畫 mode：**Web 可滑動**（brush 層改 `touch-action: pan-y`，不再整頁鎖死）；**Android S Pen 可畫**（不再把 WebView 誤報的 stylus bit 當擦除、原生端停用 web 側鍵雙橋以免工具卡在橡皮擦）

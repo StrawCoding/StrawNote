@@ -1,0 +1,23 @@
+[    2178ms] [WARNING] Debug logs enabled @ http://192.168.0.66:18080/js/index.js:471532
+[    2202ms] [WARNING] Sentry Logger [warn]: No DSN provided, client will not send events. @ http://192.168.0.66:18080/js/index.js:786014
+[    2232ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://192.168.0.66:18080/js/index.js:109201
+[    3237ms] [WARNING] Sentry Logger [warn]: reactRouterV6Instrumentation was unable to wrap the `createRouter` function because of one or more missing parameters. @ http://192.168.0.66:18080/js/index.js:796612
+[    3279ms] [WARNING] Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information. @ http://192.168.0.66:18080/js/index.js:747123
+[    3280ms] [INFO] %ci18n %c[INFO] i18n initialized%c +0ms color: #99CC00 color: inherit color: #99CC00 @ http://192.168.0.66:18080/js/index.js:20931
+[    3328ms] [WARNING] No `HydrateFallback` element provided to render during initial hydration @ http://192.168.0.66:18080/js/index.js:922950
+[    3856ms] [INFO] %caffine:workspace-repository %c[INFO] open workspace [local] zFwnYXD7tHjCPFnN_LXcP %c +0ms color: #33CCFF color: inherit color: #33CCFF @ http://192.168.0.66:18080/js/index.js:20931
+[    3920ms] [INFO] %ccreateFirstAppData %c[INFO] create first workspace%c +0ms color: #FF6633 color: inherit color: #FF6633 gP1sjnI8xQ @ http://192.168.0.66:18080/js/index.js:20931
+[    4319ms] [ERROR] React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element. extractEmojiAsIcon extractemojiasicon @ http://192.168.0.66:18080/js/index.js:84198
+[    5405ms] [WARNING] Element ai-chat-composer scheduled an update (generally because a property was set) after an update completed, causing a new update to be scheduled. This is inefficient and should be avoided unless the next update can only be scheduled as a side effect of the previous update. See https://lit.dev/msg/change-in-update for more information. @ http://192.168.0.66:18080/js/index.js:747123
+[    5526ms] [ERROR] %caffine:workspace-permission %c[ERROR] Failed to fetch workspace share settings%c +0ms color: #33CCCC color: inherit color: #33CCCC RealtimeUnauthenticated: Realtime is not authenticated
+    at RealtimeManager.connect (http://192.168.0.66:18080/js/nbstore-0.28.0.9.worker.js:68072:31)
+    at Observable._subscribe (http://192.168.0.66:18080/js/nbstore-0.28.0.9.worker.js:68043:18)
+    at Observable._trySubscribe (http://192.168.0.66:18080/js/nbstore-0.28.0.9.worker.js:18300:25)
+    at http://192.168.0.66:18080/js/nbstore-0.28.0.9.worker.js:18294:31
+    at errorContext (http://192.168.0.66:18080/js/nbstore-0.28.0.9.worker.js:21021:9)
+    at Observable.subscribe (http://192.168.0.66:18080/js/nbstore-0.28.0.9.worker.js:18285:61)
+    at http://192.168.0.66:18080/js/nbstore-0.28.0.9.worker.js:20251:38
+    at SafeSubscriber.<anonymous> (http://192.168.0.66:18080/js/nbstore-0.28.0.9.worker.js:21233:28)
+    at http://192.168.0.66:18080/js/nbstore-0.28.0.9.worker.js:18289:30
+    at errorContext (http://192.168.0.66:18080/js/nbstore-0.28.0.9.worker.js:21021:9) @ http://192.168.0.66:18080/js/index.js:20931
+[    5635ms] [ERROR] navigator.clipboard is not supported in current environment. @ http://192.168.0.66:18080/js/index.js:200479

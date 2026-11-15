@@ -62,6 +62,36 @@ function isDevLoopbackOrigin(origin: string) {
   }
 }
 
+/**
+ * Self-hosted LAN / yarn:dev often browse via http://192.168.x.x:18080 while
+ * the API still runs behind externalUrl. Allow RFC1918 (+ loopback) http
+ * origins so WebSocket sync is not rejected as CORS.
+ */
+function isPrivateNetworkHttpOrigin(origin: string) {
+  try {
+    const parsed = new URL(origin);
+    if (parsed.protocol !== 'http:') {
+      return false;
+    }
+    const host = normalizeHostname(parsed.hostname);
+    if (DEV_LOOPBACK_HOSTS.has(host)) {
+      return true;
+    }
+    const parts = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
+    if (!parts) {
+      return false;
+    }
+    const a = Number(parts[1]);
+    const b = Number(parts[2]);
+    if (a === 10) return true;
+    if (a === 192 && b === 168) return true;
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 function normalizeCorsOrigin(origin: string) {
   try {
     const parsed = new URL(origin);
@@ -101,6 +131,10 @@ export function isCorsOriginAllowed(
   }
 
   if ((env.dev || env.testing) && isDevLoopbackOrigin(origin)) {
+    return true;
+  }
+
+  if (env.selfhosted && isPrivateNetworkHttpOrigin(origin)) {
     return true;
   }
 

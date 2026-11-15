@@ -58,18 +58,34 @@ export const DEFAULT_DEV_SERVER_CONFIG: RspackDevServerConfiguration = {
     ],
   },
   proxy: [
+    // yarn:dev serves the UI on :18080 and proxies API/WS to self-host :3010.
+    // Browsers still send Origin: http://<lan-ip>:18080; Nest CORS only allows
+    // externalUrl, so strip Origin — the browser already treats this as
+    // same-origin through the dev server.
     {
       context: '/api',
       target: 'http://localhost:3010',
+      onProxyReq: proxyReq => {
+        proxyReq.removeHeader('origin');
+      },
     },
     {
       context: '/socket.io',
       target: 'http://localhost:3010',
       ws: true,
+      onProxyReq: proxyReq => {
+        proxyReq.removeHeader('origin');
+      },
+      onProxyReqWs: proxyReq => {
+        proxyReq.removeHeader('origin');
+      },
     },
     {
       context: '/graphql',
       target: 'http://localhost:3010',
+      onProxyReq: proxyReq => {
+        proxyReq.removeHeader('origin');
+      },
     },
   ],
 };

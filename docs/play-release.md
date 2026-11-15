@@ -89,3 +89,12 @@ Mitigations:
 1. Server shim on `affine.wastebase.xyz` (`AFFiNE/patches/apply-join-batch-shim.py`)
 2. Client fallback in `@affine/nbstore` (timeout → legacy join)
 3. Native default cloud = `https://affine.wastebase.xyz` (Selfhosted)
+
+## Online mode CORS from yarn:dev LAN (2026-11-15)
+
+Root cause: UI at `http://192.168.x.x:18080` proxies API/WS to self-host `:3010`, but Nest CORS only allows `server.externalUrl`. Browser sends `Origin: http://192.168.x.x:18080` → WebSocket rejected → online/cloud sync fails.
+
+Mitigations:
+
+1. Server shim `AFFiNE/patches/apply-cors-lan-shim.py` (+ source `packages/backend/server/src/base/cors.ts` for selfhosted private LAN http origins)
+2. yarn:dev proxy strips `Origin` when forwarding `/api` `/graphql` `/socket.io` (`tools/cli/src/bundle-shared.ts`)

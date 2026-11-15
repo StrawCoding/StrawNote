@@ -1,0 +1,23 @@
+- generic [ref=e2]:
+    - region "Notifications alt+T"
+    - generic [ref=e4]:
+        - generic [ref=e5]:
+            - img "app icon" [ref=e7]
+            - generic [ref=e8]:
+                - generic [ref=e9]:
+                    - text: Open this doc in StrawNote app
+                    - button [ref=e10] [cursor=pointer]
+                - generic [ref=e14]:
+                    - text: Don't have the app?
+                    - link "Click to download" [ref=e15] [cursor=pointer]:
+                        - /url: https://affine.pro/download
+                    - text: .
+                - generic [ref=e16]:
+                    - generic [ref=e17] [cursor=pointer]:
+                        - checkbox [ref=e18]:
+                            - checkbox "Remember choice" [ref=e21]
+                        - text: Remember choice
+                    - generic [ref=e22]:
+                        - button "Dismiss" [ref=e23] [cursor=pointer]
+                        - button "Open in app" [ref=e25] [cursor=pointer]
+        - navigation [ref=e28]

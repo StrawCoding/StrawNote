@@ -220,3 +220,38 @@ test('should allow desktop file origin', t => {
 
   t.true(isCorsOriginAllowed('file://', allowedOrigins));
 });
+
+test('selfhosted allows private LAN http origins for yarn:dev proxy', t => {
+  const previousType = globalThis.env.DEPLOYMENT_TYPE;
+  globalThis.env.DEPLOYMENT_TYPE = 'selfhosted' as typeof previousType;
+
+  const allowedOrigins = buildCorsAllowedOrigins({
+    allowedOrigins: ['https://affine.wastebase.xyz'],
+  } as any);
+
+  try {
+    t.true(globalThis.env.selfhosted);
+    t.true(
+      isCorsOriginAllowed('http://192.168.0.66:18080', allowedOrigins),
+      'LAN yarn:dev origin'
+    );
+    t.true(
+      isCorsOriginAllowed('http://10.0.0.2:18080', allowedOrigins),
+      '10.x yarn:dev origin'
+    );
+    t.true(
+      isCorsOriginAllowed('http://127.0.0.1:18080', allowedOrigins),
+      'loopback yarn:dev origin'
+    );
+    t.false(
+      isCorsOriginAllowed('https://evil.example', allowedOrigins),
+      'unrelated https origin still blocked'
+    );
+    t.false(
+      isCorsOriginAllowed('http://evil.example', allowedOrigins),
+      'public http origin still blocked'
+    );
+  } finally {
+    globalThis.env.DEPLOYMENT_TYPE = previousType;
+  }
+});
