@@ -44,5 +44,5 @@
     "test": "ava --no-worker-threads --concurrency=2",
     "version": "napi version"
   },
-  "version": "0.28.0.16"
+  "version": "0.28.0.18"
 }

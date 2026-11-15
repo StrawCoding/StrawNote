@@ -1,3 +1,9 @@
+# 0.28.0.18
+
+- 產品「官方網站」連結改為 GitHub Pages 官網 `https://strawcoding.github.io/StrawNoteWeb/`（StrawNoteWeb 行銷站上線）
+
+---
+
 # 0.28.0.17
 
 - 無界墨水工具列即時顯示（含遺漏的 helper 檔，修 v0.28.0.16 建置）
