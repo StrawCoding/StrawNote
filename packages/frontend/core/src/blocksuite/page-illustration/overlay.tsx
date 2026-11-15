@@ -29,6 +29,7 @@ import {
   illustrationLayerTouchAction,
   isStylusPointer,
   PEN_PALM_GRACE_MS,
+  shouldGuardIllustrationPageHitTest,
   shouldRejectPalmTouch,
   SPEN_BUTTON_EVENT,
   type SpenButtonDetail,
@@ -181,6 +182,21 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const refreshBrushes = useCallback(() => {
     setBrushes([...listPageIllustrationBrushes(doc)]);
   }, [doc]);
+
+  useEffect(() => {
+    const viewport = rootRef.current?.closest(
+      '[data-illustration-mode="true"]'
+    );
+    if (!(viewport instanceof HTMLElement)) return;
+    if (shouldGuardIllustrationPageHitTest(tool)) {
+      viewport.dataset.illustrationGuardPage = 'true';
+    } else {
+      delete viewport.dataset.illustrationGuardPage;
+    }
+    return () => {
+      delete viewport.dataset.illustrationGuardPage;
+    };
+  }, [tool]);
 
   const syncSize = useCallback(() => {
     const el = resolveContentEl();

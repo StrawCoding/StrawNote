@@ -114,6 +114,38 @@ export function illustrationLayerTouchAction(
 
 export type StylusToolIntent = 'brush' | 'eraser' | null;
 
+/** Gfx tool names that own an in-progress ink stroke — never re-`setTool` mid-drag. */
+export const GFX_INK_STROKE_TOOLS = new Set(['brush', 'highlighter']);
+
+/** Fired when the user picks a tool from mobile ink chrome (edgeless toolbar portal). */
+export const INK_TOOL_PICK_EVENT = 'strawnote:ink-tool-pick';
+
+/** After temporary eraser, switch back to brush only when still on eraser. */
+export function shouldRestoreBrushAfterEraserTip(
+  currentTool: string,
+  intent: StylusToolIntent,
+  session: { isForced: boolean; isSticky: boolean },
+  buttons: number
+): boolean {
+  if (intent !== 'brush' || !session.isForced || session.isSticky) return false;
+  if (buttons === 0) return false;
+  return currentTool === 'eraser';
+}
+
+/** Avoid calling `setTool(Brush)` again on stylus down — that restarts BlockSuite drag. */
+export function shouldSkipBrushToolSwitchOnStylusDown(
+  currentTool: string,
+  intent: StylusToolIntent
+): boolean {
+  if (intent === 'eraser') return false;
+  return GFX_INK_STROKE_TOOLS.has(currentTool);
+}
+
+/** Whether to block page / title hit-testing under illustration ink. */
+export function shouldGuardIllustrationPageHitTest(_tool: string): boolean {
+  return true;
+}
+
 /**
  * Decide which edgeless tool a stylus pointerdown should activate.
  * Returns null when the event is not a stylus tip (e.g. touch/mouse).

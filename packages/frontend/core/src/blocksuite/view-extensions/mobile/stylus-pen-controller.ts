@@ -11,7 +11,10 @@ import { GfxControllerIdentifier } from '@blocksuite/affine/std/gfx';
 
 import {
   classifySpenButtonGesture,
+  INK_TOOL_PICK_EVENT,
   isStylusPointer,
+  shouldRestoreBrushAfterEraserTip,
+  shouldSkipBrushToolSwitchOnStylusDown,
   SPEN_BUTTON_EVENT,
   type SpenButtonDetail,
   spenButtonEraserAction,
@@ -126,17 +129,28 @@ export class StylusPenController extends LifeCycleWatcher {
     const onPointerMove = (event: PointerEvent) => {
       if (!isStylusPointer(event) || !this._penActive) return;
 
+      const gfx = this.gfx;
+      const current = gfx?.tool.currentToolName$.peek() ?? '';
       const intent = stylusToolIntent(event, { autoBrushOnPen: true });
       const session = this._session;
       if (!session) return;
 
+      if (shouldSkipBrushToolSwitchOnStylusDown(current, intent)) {
+        if (intent === 'eraser' && !session.isForced) {
+          session.enterFromStylusTip();
+        }
+        return;
+      }
+
       if (intent === 'eraser' && !session.isForced) {
         session.enterFromStylusTip();
       } else if (
-        intent === 'brush' &&
-        session.isForced &&
-        !session.isSticky &&
-        event.buttons !== 0
+        shouldRestoreBrushAfterEraserTip(
+          current,
+          intent,
+          session,
+          event.buttons
+        )
       ) {
         session.onStylusTipUp();
         this._ensureTool('brush');
@@ -187,6 +201,11 @@ export class StylusPenController extends LifeCycleWatcher {
     });
     window.addEventListener(SPEN_BUTTON_EVENT, onNativeSpenButton);
 
+    const onInkToolPick = () => {
+      this._session?.clear();
+    };
+    window.addEventListener(INK_TOOL_PICK_EVENT, onInkToolPick);
+
     this._disposables.add(() => {
       releaseBridge();
       this._session?.dispose();
@@ -198,6 +217,7 @@ export class StylusPenController extends LifeCycleWatcher {
       host.removeEventListener('touchstart', rejectPalm, true);
       host.removeEventListener('touchmove', rejectPalm, true);
       window.removeEventListener(SPEN_BUTTON_EVENT, onNativeSpenButton);
+      window.removeEventListener(INK_TOOL_PICK_EVENT, onInkToolPick);
     });
   }
 
@@ -215,6 +235,10 @@ export class StylusPenController extends LifeCycleWatcher {
 
     if (intent === 'eraser') {
       session.enterFromStylusTip();
+      return;
+    }
+
+    if (shouldSkipBrushToolSwitchOnStylusDown(current, intent)) {
       return;
     }
 
@@ -239,9 +263,12 @@ export class StylusPenController extends LifeCycleWatcher {
   private _ensureTool(kind: 'brush' | 'eraser') {
     const gfx = this.gfx;
     if (!gfx) return;
+    const current = gfx.tool.currentToolName$.peek();
     if (kind === 'eraser') {
-      gfx.tool.setTool(EraserTool);
-    } else {
+      if (current !== 'eraser') gfx.tool.setTool(EraserTool);
+      return;
+    }
+    if (current !== 'brush' && current !== 'highlighter') {
       gfx.tool.setTool(BrushTool);
     }
   }

@@ -1,4 +1,4 @@
-import { style } from '@vanilla-extract/css';
+import { globalStyle, style } from '@vanilla-extract/css';
 
 export const root = style({
   position: 'absolute',
@@ -14,3 +14,23 @@ export const layer = style({
   // touchAction set inline via illustrationLayerTouchAction:
   // brush+fingerPanOnly → pan-y (web scroll); pen stroke → none.
 });
+
+/** Finger may scroll but must not place caret in page blocks while inking. */
+globalStyle(
+  '[data-illustration-mode="true"][data-illustration-guard-page="true"] .affine-page-root-block-container',
+  {
+    pointerEvents: 'none',
+  }
+);
+globalStyle(
+  '[data-illustration-mode="true"][data-illustration-guard-page="true"] .doc-title-container',
+  {
+    pointerEvents: 'none',
+  }
+);
+globalStyle(
+  '[data-illustration-mode="true"][data-illustration-guard-page="true"] .doc-editor-gap',
+  {
+    pointerEvents: 'none',
+  }
+);

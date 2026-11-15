@@ -8,7 +8,10 @@ import {
   isStylusEraseGesture,
   isStylusPointer,
   PEN_PALM_GRACE_MS,
+  shouldGuardIllustrationPageHitTest,
   shouldRejectPalmTouch,
+  shouldRestoreBrushAfterEraserTip,
+  shouldSkipBrushToolSwitchOnStylusDown,
   SPEN_BUTTON_CLICK_MS,
   SPEN_BUTTON_EVENT,
   spenButtonEraserAction,
@@ -206,5 +209,34 @@ describe('stylus-pen helpers', () => {
         nowMs: 0,
       })
     ).toBe(false);
+  });
+
+  test('shouldSkipBrushToolSwitchOnStylusDown avoids redundant setTool', () => {
+    expect(shouldSkipBrushToolSwitchOnStylusDown('brush', 'brush')).toBe(true);
+    expect(shouldSkipBrushToolSwitchOnStylusDown('highlighter', 'brush')).toBe(
+      true
+    );
+    expect(shouldSkipBrushToolSwitchOnStylusDown('pan', 'brush')).toBe(false);
+    expect(shouldSkipBrushToolSwitchOnStylusDown('brush', 'eraser')).toBe(
+      false
+    );
+  });
+
+  test('shouldRestoreBrushAfterEraserTip only when leaving eraser mid-stroke', () => {
+    const session = { isForced: true, isSticky: false };
+    expect(
+      shouldRestoreBrushAfterEraserTip('eraser', 'brush', session, 1)
+    ).toBe(true);
+    expect(shouldRestoreBrushAfterEraserTip('brush', 'brush', session, 1)).toBe(
+      false
+    );
+    expect(
+      shouldRestoreBrushAfterEraserTip('eraser', 'brush', session, 0)
+    ).toBe(false);
+  });
+
+  test('shouldGuardIllustrationPageHitTest keeps page inert during illustration', () => {
+    expect(shouldGuardIllustrationPageHitTest('brush')).toBe(true);
+    expect(shouldGuardIllustrationPageHitTest('pan')).toBe(true);
   });
 });

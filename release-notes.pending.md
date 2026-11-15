@@ -1,3 +1,10 @@
+# 0.28.0.14
+
+- 修復 Edgeless／畫布 S Pen **斷觸**：描線中不再重複 `setTool(Brush)` 重開筆開筆畫；僅在橡皮擦提示離開時才還原畫筆
+- 插畫 mode：**手指不再誤觸編輯文字**（標題與區塊 `pointer-events: none`）；關閉 fingerPanOnly 時手指可在 brush 描線，仍不會進文字編
+
+---
+
 # 0.28.0.13
 
 - Android 無界（Edgeless）：掛載與插畫相同的 `StylusInkToolbar`（筆／橡皮／手掌＋色票／線寬），同步 Gfx 工具並隱藏原生底部 BlockSuite 工具列；修正唯讀邏輯（無界不再被鍵盤工具列旗標誤鎖、插畫維持可編輯）

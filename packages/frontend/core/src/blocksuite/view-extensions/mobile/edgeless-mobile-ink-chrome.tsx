@@ -12,7 +12,8 @@ import {
   gfxToolNameToInkTool,
   inkToolToGfxTool,
 } from './edgeless-mobile-ink-tool';
-import { type StylusInkTool,StylusInkToolbar } from './stylus-ink-toolbar';
+import { type StylusInkTool, StylusInkToolbar } from './stylus-ink-toolbar';
+import { INK_TOOL_PICK_EVENT } from './stylus-pen';
 
 const EDGELESS_INK_DEFAULT_COLOR = '#000000';
 
@@ -61,6 +62,7 @@ export function EdgelessMobileInkChrome({ readonly }: { readonly?: boolean }) {
       setTool(next);
       if (!gfx) return;
       gfx.tool.setTool(inkToolToGfxTool(next));
+      window.dispatchEvent(new CustomEvent(INK_TOOL_PICK_EVENT));
     },
     [gfx]
   );
