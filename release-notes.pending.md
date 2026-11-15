@@ -1,3 +1,9 @@
+# 0.28.0.20
+
+- Android／原生預設雲端改回 **AFFiNE Cloud**（`https://app.affine.pro`）；私人自架 `affine.wastebase.xyz` 不再內建，僅在設定手動新增伺服器
+
+---
+
 # 0.28.0.19
 
 - 公開／分享頁底部品牌：文案改為「StrawNote GitHub」、連結統一 `https://github.com/StrawCoding/StrawNote`（`STRAWNOTE_GITHUB_URL`）

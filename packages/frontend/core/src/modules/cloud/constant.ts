@@ -4,16 +4,50 @@ import {
   ServerFeature,
 } from '@affine/graphql';
 
-import { STRAWNOTE_CLOUD_URL } from '../../constants/strawnote-links';
+import { AFFINE_OFFICIAL_CLOUD_URL } from '../../constants/strawnote-links';
 import { DEFAULT_SELF_HOSTED_SERVER_NAME } from './server-name';
 import type { ServerConfig, ServerMetadata } from './types';
 
 /**
- * Default cloud for StrawNote:
+ * Default cloud:
  * - Web selfhost → location.origin
- * - Native → STRAWNOTE_CLOUD_URL (affine.wastebase.xyz), typed Selfhosted
- * Official AFFiNE channel hosts remain only for non-StrawNote upstream builds.
+ * - Native stable → AFFiNE Cloud (app.affine.pro), typed Affine
+ * - Private wastebase self-host is never baked in; add under Settings → Servers.
  */
+function nativeCloudBaseUrl(): string {
+  switch (BUILD_CONFIG.appBuildType) {
+    case 'canary':
+      return 'https://affine.fail';
+    case 'beta':
+    case 'internal':
+      return 'https://insider.affine.pro';
+    default:
+      return AFFINE_OFFICIAL_CLOUD_URL;
+  }
+}
+
+function cloudServerConfig(type: ServerDeploymentType): ServerConfig {
+  return {
+    serverName:
+      type === ServerDeploymentType.Affine ? 'AFFiNE Cloud' : 'StrawNote Cloud',
+    features: [
+      ServerFeature.Indexer,
+      ServerFeature.Copilot,
+      ServerFeature.CopilotEmbedding,
+      ServerFeature.OAuth,
+      ServerFeature.Payment,
+      ServerFeature.LocalWorkspace,
+    ],
+    oauthProviders: [OAuthProviderType.Google, OAuthProviderType.Apple],
+    type,
+    credentialsRequirement: {
+      password: {
+        minLength: 8,
+        maxLength: 32,
+      },
+    },
+  };
+}
 export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
   environment.isSelfHosted
     ? [
@@ -68,73 +102,20 @@ export const BUILD_IN_SERVERS: (ServerMetadata & { config: ServerConfig })[] =
             },
           },
         ]
-      : BUILD_CONFIG.appBuildType === 'stable'
+      : BUILD_CONFIG.appBuildType === 'stable' ||
+          BUILD_CONFIG.appBuildType === 'beta' ||
+          BUILD_CONFIG.appBuildType === 'internal' ||
+          BUILD_CONFIG.appBuildType === 'canary'
         ? [
             {
               id: 'affine-cloud',
               baseUrl: BUILD_CONFIG.isNative
-                ? STRAWNOTE_CLOUD_URL
+                ? nativeCloudBaseUrl()
                 : location.origin,
-              config: {
-                serverName: 'StrawNote Cloud',
-                features: [
-                  ServerFeature.Indexer,
-                  ServerFeature.Copilot,
-                  ServerFeature.CopilotEmbedding,
-                  ServerFeature.OAuth,
-                  ServerFeature.Payment,
-                  ServerFeature.LocalWorkspace,
-                ],
-                oauthProviders: [
-                  OAuthProviderType.Google,
-                  OAuthProviderType.Apple,
-                ],
-                type: ServerDeploymentType.Selfhosted,
-                credentialsRequirement: {
-                  password: {
-                    minLength: 8,
-                    maxLength: 32,
-                  },
-                },
-              },
+              config: cloudServerConfig(ServerDeploymentType.Affine),
             },
           ]
-        : BUILD_CONFIG.appBuildType === 'beta' ||
-            BUILD_CONFIG.appBuildType === 'internal' ||
-            BUILD_CONFIG.appBuildType === 'canary'
-          ? [
-              {
-                id: 'affine-cloud',
-                // StrawNote Play builds use canary/beta flavors but must still
-                // talk to self-hosted wastebase — not affine.fail / insider.
-                baseUrl: BUILD_CONFIG.isNative
-                  ? STRAWNOTE_CLOUD_URL
-                  : location.origin,
-                config: {
-                  serverName: 'StrawNote Cloud',
-                  features: [
-                    ServerFeature.Indexer,
-                    ServerFeature.Copilot,
-                    ServerFeature.CopilotEmbedding,
-                    ServerFeature.OAuth,
-                    ServerFeature.Payment,
-                    ServerFeature.LocalWorkspace,
-                  ],
-                  oauthProviders: [
-                    OAuthProviderType.Google,
-                    OAuthProviderType.Apple,
-                  ],
-                  type: ServerDeploymentType.Selfhosted,
-                  credentialsRequirement: {
-                    password: {
-                      minLength: 8,
-                      maxLength: 32,
-                    },
-                  },
-                },
-              },
-            ]
-          : [];
+        : [];
 
 export type TelemetryChannel =
   | 'stable'
@@ -144,7 +125,7 @@ export type TelemetryChannel =
   | 'local';
 
 const OFFICIAL_TELEMETRY_ENDPOINTS: Record<TelemetryChannel, string> = {
-  stable: STRAWNOTE_CLOUD_URL,
+  stable: AFFINE_OFFICIAL_CLOUD_URL,
   beta: 'https://insider.affine.pro',
   internal: 'https://insider.affine.pro',
   canary: 'https://affine.fail',

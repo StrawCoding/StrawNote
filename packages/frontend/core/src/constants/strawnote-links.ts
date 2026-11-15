@@ -18,9 +18,14 @@ export const STRAWNOTE_SELFHOST_DOCS_URL =
  */
 export const TEMP_OFFICIAL_DESKTOP_DOWNLOAD_URL = 'https://affine.pro/download';
 
+/** Default built-in cloud for native Play / App Store builds (upstream AFFiNE). */
+export const AFFINE_OFFICIAL_CLOUD_URL = 'https://app.affine.pro';
+
 /**
- * Default cloud origin for StrawNote native builds = self-hosted.
- * Official AFFiNE Cloud is a different product; keep wastebase as the default
- * so Android/iOS sync against the same server users already use on web.
+ * Operator-only self-host (not a built-in default). Users add manually under
+ * Settings → Servers when self-hosting StrawNote.
  */
-export const STRAWNOTE_CLOUD_URL = 'https://affine.wastebase.xyz';
+export const STRAWNOTE_SELFHOST_CLOUD_URL = 'https://affine.wastebase.xyz';
+
+/** @deprecated Use AFFINE_OFFICIAL_CLOUD_URL or STRAWNOTE_SELFHOST_CLOUD_URL. */
+export const STRAWNOTE_CLOUD_URL = STRAWNOTE_SELFHOST_CLOUD_URL;
