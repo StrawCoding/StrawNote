@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   collectDefaultErasableTargets,
   isProtectedFromDefaultEraser,
-} from '../../../../../../../blocksuite/affine/gfx/brush/src/eraser-erasable';
+} from '../../../../../../blocksuite/affine/gfx/brush/src/eraser-erasable';
 
 const noteBlock = { flavour: 'affine:note', xywh: '[0,0,1,1]' };
 const shape = { type: 'brush', xywh: '[0,0,1,1]' };
