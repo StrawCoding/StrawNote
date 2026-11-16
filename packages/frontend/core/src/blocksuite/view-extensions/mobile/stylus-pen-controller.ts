@@ -161,6 +161,10 @@ export class StylusPenController extends LifeCycleWatcher {
       const session = this._session;
       if (!session) return;
 
+      // The normalized button stream owns hold/toggle while pressed. Re-reading
+      // the same barrel through pen motion would apply its eraser action twice.
+      if (session.isButtonHeld) return;
+
       if (shouldSkipBrushToolSwitchOnStylusDown(current, intent)) {
         if (intent === 'eraser' && !session.isForced) {
           session.enterFromStylusTip();
@@ -200,6 +204,9 @@ export class StylusPenController extends LifeCycleWatcher {
       const session = this._session;
       if (!session) return;
       const detail = (event as CustomEvent<SpenButtonDetail>).detail ?? {};
+      session.setButtonPressed(
+        detail.pressed === true || detail.action === 'down'
+      );
       const { gesture, nextDownAt } = classifySpenButtonGesture(detail, {
         downAt: this._spenDownAt,
       });
@@ -260,10 +267,15 @@ export class StylusPenController extends LifeCycleWatcher {
 
     const current = gfx.tool.currentToolName$.peek();
 
+    if (session.isButtonHeld) return;
+
     if (intent === 'eraser') {
       session.enterFromStylusTip();
       return;
     }
+
+    // A normal pen tip must not undo a side-button hold or a sticky toggle.
+    if (session.isForced && session.isSticky) return;
 
     if (shouldSkipBrushToolSwitchOnStylusDown(current, intent)) {
       return;

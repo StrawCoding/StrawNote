@@ -168,6 +168,101 @@ test('illustration S Pen barrel on web toggles eraser via pointer bridge', async
   ).toHaveAttribute('data-active', 'true');
 });
 
+test('held S Pen button keeps erasing through pen contact and tip-up', async ({
+  page,
+}) => {
+  await clickIllustrationModeButton(page);
+  await page.getByTestId('page-illustration-tool-brush').click();
+  await page.evaluate(() =>
+    window.dispatchEvent(
+      new CustomEvent('strawnote:spen-button', {
+        detail: { action: 'down', pressed: true },
+      })
+    )
+  );
+  const eraser = page.getByTestId('page-illustration-tool-eraser');
+  await expect(eraser).toHaveAttribute('data-active', 'true');
+  const svg = page.getByTestId('page-illustration-overlay').locator('svg');
+  const box = await svg.boundingBox();
+  expect(box).toBeTruthy();
+  if (!box) return;
+  const pointer = {
+    pointerType: 'pen',
+    pointerId: 19,
+    buttons: 1,
+    button: 0,
+    clientX: box.x + 60,
+    clientY: box.y + 100,
+    pressure: 0.5,
+    bubbles: true,
+  };
+  await svg.dispatchEvent('pointerdown', pointer);
+  await expect(eraser).toHaveAttribute('data-active', 'true');
+  await svg.dispatchEvent('pointermove', {
+    ...pointer,
+    clientY: pointer.clientY + 30,
+  });
+  await svg.dispatchEvent('pointerup', { ...pointer, buttons: 0 });
+  await expect(eraser).toHaveAttribute('data-active', 'true');
+  await page.evaluate(() =>
+    window.dispatchEvent(
+      new CustomEvent('strawnote:spen-button', {
+        detail: { action: 'up', pressed: false },
+      })
+    )
+  );
+  await expect(
+    page.getByTestId('page-illustration-tool-brush')
+  ).toHaveAttribute('data-active', 'true');
+});
+
+test('short side-button click during tip contact toggles only once', async ({
+  page,
+}) => {
+  await clickIllustrationModeButton(page);
+  await page.getByTestId('page-illustration-tool-brush').click();
+  const svg = page.getByTestId('page-illustration-overlay').locator('svg');
+  await svg.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    window.dispatchEvent(
+      new CustomEvent('strawnote:spen-button', {
+        detail: { action: 'down', pressed: true },
+      })
+    );
+    el.dispatchEvent(
+      new PointerEvent('pointerdown', {
+        pointerType: 'pen',
+        pointerId: 20,
+        button: 2,
+        buttons: 3,
+        clientX: r.x + 60,
+        clientY: r.y + 100,
+        pressure: 0.5,
+        bubbles: true,
+        cancelable: true,
+      })
+    );
+    window.dispatchEvent(
+      new CustomEvent('strawnote:spen-button', {
+        detail: { action: 'up', pressed: false },
+      })
+    );
+  });
+  await expect(
+    page.getByTestId('page-illustration-tool-eraser')
+  ).toHaveAttribute('data-active', 'true');
+  await svg.dispatchEvent('pointerup', {
+    pointerType: 'pen',
+    pointerId: 20,
+    button: 0,
+    buttons: 0,
+    bubbles: true,
+  });
+  await expect(
+    page.getByTestId('page-illustration-tool-eraser')
+  ).toHaveAttribute('data-active', 'true');
+});
+
 test('illustration toolbar is fixed to the viewport, not page bottom', async ({
   page,
 }) => {

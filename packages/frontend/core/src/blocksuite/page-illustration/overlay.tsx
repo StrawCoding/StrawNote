@@ -327,6 +327,9 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       const session = sessionRef.current;
       if (!session) return;
       const detail = (event as CustomEvent<SpenButtonDetail>).detail ?? {};
+      session.setButtonPressed(
+        detail.pressed === true || detail.action === 'down'
+      );
       const { gesture, nextDownAt } = classifySpenButtonGesture(detail, {
         downAt: spenDownAtRef.current,
       });
@@ -353,7 +356,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
   const syncStylusToolIntent = useCallback((native: PointerEvent) => {
     const session = sessionRef.current;
-    if (!session || !isStylusPointer(native)) return;
+    if (!session || !isStylusPointer(native) || session.isButtonHeld) return;
     const intent = stylusToolIntent(native, { autoBrushOnPen: true });
     if (intent === 'eraser' && !session.isForced) {
       session.enterFromStylusTip();

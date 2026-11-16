@@ -1,6 +1,6 @@
 {
   "name": "@affine/doc-diff",
-  "version": "0.28.0.24",
+  "version": "0.28.0.25",
   "private": true,
   "type": "module",
   "description": "Diff AFFiNE Yjs snapshot docs (rootdoc/folder/favorite)",

@@ -136,6 +136,16 @@ describe('stylus-pen helpers', () => {
     expect(up.gesture).toBe('click');
   });
 
+  test('ignores duplicate or unmatched side-button release reports', () => {
+    expect(
+      classifySpenButtonGesture(
+        { action: 'up', pressed: false },
+        { downAt: null },
+        1000
+      )
+    ).toEqual({ gesture: null, nextDownAt: null });
+  });
+
   test('classifies long press as press then release', () => {
     const down = classifySpenButtonGesture(
       { action: 'down', pressed: true },
@@ -234,6 +244,17 @@ describe('stylus-pen helpers', () => {
     expect(shouldRestoreBrushAfterEraserTip('brush', 'brush', session, 1)).toBe(
       false
     );
+    expect(
+      shouldRestoreBrushAfterEraserTip(
+        'eraser',
+        'brush',
+        {
+          ...session,
+          isButtonHeld: true,
+        },
+        1
+      )
+    ).toBe(false);
     expect(
       shouldRestoreBrushAfterEraserTip('eraser', 'brush', session, 0)
     ).toBe(false);

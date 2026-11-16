@@ -91,6 +91,18 @@ describe('SpenEraserSession', () => {
     expect(h.getTool()).toBe('eraser');
   });
 
+  test('holding the side button keeps erasing across pen tip events until release', () => {
+    const h = createHarness('brush');
+    h.session.setButtonPressed(true);
+    h.session.handleAction('force-eraser');
+    h.session.onStylusTipUp();
+    expect(h.getTool()).toBe('eraser');
+    expect(h.session.isButtonHeld).toBe(true);
+    h.session.setButtonPressed(false);
+    h.session.handleAction('restore');
+    expect(h.getTool()).toBe('brush');
+  });
+
   test('enterFromStylusTip clears sticky', () => {
     const h = createHarness('brush');
     h.session.handleAction('toggle');

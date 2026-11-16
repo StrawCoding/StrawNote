@@ -125,10 +125,11 @@ export const INK_TOOL_PICK_EVENT = 'strawnote:ink-tool-pick';
 export function shouldRestoreBrushAfterEraserTip(
   currentTool: string,
   intent: StylusToolIntent,
-  session: { isForced: boolean; isSticky: boolean },
+  session: { isForced: boolean; isSticky: boolean; isButtonHeld?: boolean },
   buttons: number
 ): boolean {
   if (intent !== 'brush' || !session.isForced || session.isSticky) return false;
+  if (session.isButtonHeld) return false;
   if (buttons === 0) return false;
   return currentTool === 'eraser';
 }
@@ -188,6 +189,8 @@ export function classifySpenButtonGesture(
   if (released) {
     const downAt = state.downAt;
     const nextDownAt = null;
+    // A duplicate/up-only report must not undo an already completed toggle.
+    if (downAt == null) return { gesture: null, nextDownAt };
     if (downAt != null && now - downAt <= clickMs) {
       return { gesture: 'click', nextDownAt };
     }

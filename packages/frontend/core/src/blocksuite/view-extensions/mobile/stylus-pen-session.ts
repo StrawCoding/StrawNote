@@ -35,6 +35,7 @@ export type SpenEraserSessionHost = {
 export class SpenEraserSession {
   private forced = false;
   private sticky = false;
+  private buttonHeld = false;
   private toolBefore: string | null = null;
   private holdTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly holdMs: number;
@@ -53,6 +54,14 @@ export class SpenEraserSession {
     return this.sticky;
   }
 
+  get isButtonHeld(): boolean {
+    return this.buttonHeld;
+  }
+
+  setButtonPressed(pressed: boolean) {
+    this.buttonHeld = pressed;
+  }
+
   get previousTool(): string | null {
     return this.toolBefore;
   }
@@ -66,6 +75,7 @@ export class SpenEraserSession {
     this.clearHold();
     this.forced = false;
     this.sticky = false;
+    this.buttonHeld = false;
     this.toolBefore = null;
   }
 
@@ -116,10 +126,11 @@ export class SpenEraserSession {
   }
 
   /**
-   * Stylus tip-up: restore when eraser was momentary (not sticky click).
+   * Tip-up restores only a temporary tip eraser. A physical side-button hold
+   * stays active until its own release; a sticky click stays active until toggled.
    */
   onStylusTipUp() {
-    if (this.forced && !this.sticky) {
+    if (this.forced && !this.sticky && !this.buttonHeld) {
       this.restore();
     }
   }
