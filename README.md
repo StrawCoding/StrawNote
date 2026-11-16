@@ -41,7 +41,7 @@ StrawNote 是 StrawCoding 的筆記產品，基於開源專案 [AFFiNE](https://
 | Deep link | `strawnote://`（含 canary / beta / internal / dev） |
 | Electron productName | `StrawNote` |
 | 圖示來源 | `StrawNoteIcon.png` → Electron / 各平台 icon 產物 |
-| 開發分支 | `strawnote` |
+| 開發分支 | `main` |
 | 內部套件路徑 | 多數仍為 `@affine/*`（避免一次大規模改 import） |
 
 ---
@@ -105,7 +105,7 @@ docker compose up -d
 ```bash
 git clone https://github.com/StrawCoding/StrawNote.git
 cd StrawNote
-git checkout strawnote
+git checkout main
 
 yarn install
 yarn dev

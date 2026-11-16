@@ -13,5 +13,5 @@
   "devDependencies": {
     "@types/aws4": "^1.11.6"
   },
-  "version": "0.28.0.20"
+  "version": "0.28.0.21"
 }

@@ -1,5 +1,4 @@
 import { AffineContext } from '@affine/core/components/context';
-import { DocumentTitle } from '@affine/core/components/document-title';
 import { AppFallback } from '@affine/core/mobile/components/app-fallback';
 import { configureMobileModules } from '@affine/core/mobile/modules';
 import { HapticProvider } from '@affine/core/mobile/modules/haptics';
@@ -148,7 +147,6 @@ export function App() {
     <Suspense fallback={<AppFallback />}>
       <FrameworkRoot framework={frameworkProvider}>
         <I18nProvider>
-          <DocumentTitle />
           <AffineContext store={getCurrentStore()}>
             <RouterProvider router={router} />
           </AffineContext>

@@ -831,7 +831,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				MARKETING_VERSION = 2026.11.15;
+				MARKETING_VERSION = 2026.11.16;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.strawcoding.strawnote;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -868,7 +868,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				MARKETING_VERSION = 2026.11.15;
+				MARKETING_VERSION = 2026.11.16;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.strawcoding.strawnote;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -901,7 +901,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2026.11.15;
+				MARKETING_VERSION = 2026.11.16;
 				PRODUCT_BUNDLE_IDENTIFIER = com.strawcoding.strawnote.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -929,7 +929,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2026.11.15;
+				MARKETING_VERSION = 2026.11.16;
 				PRODUCT_BUNDLE_IDENTIFIER = com.strawcoding.strawnote.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

@@ -1,7 +1,7 @@
 {
   "name": "@affine/reader",
   "type": "module",
-  "version": "0.28.0.20",
+  "version": "0.28.0.21",
   "private": true,
   "sideEffects": false,
   "module": "./src/index.ts",

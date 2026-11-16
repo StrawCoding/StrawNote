@@ -1,6 +1,7 @@
 import { uniReactRoot } from '@affine/component';
 import { AffineErrorBoundary } from '@affine/core/components/affine/affine-error-boundary';
 import { AiLoginRequiredModal } from '@affine/core/components/affine/auth/ai-login-required';
+import { DocumentTitle } from '@affine/core/components/document-title';
 import { SWRConfigProvider } from '@affine/core/components/providers/swr-config-provider';
 import { WorkspaceSideEffects } from '@affine/core/components/providers/workspace-side-effects';
 import {
@@ -149,6 +150,7 @@ export const WorkspaceLayout = ({
               <AiLoginRequiredModal />
               <uniReactRoot.Root />
               <WorkspaceSideEffects />
+              <DocumentTitle />
               {children}
             </MobileShellHost>
           </SWRConfigProvider>

@@ -1,6 +1,6 @@
 {
   "name": "@affine/web",
-  "version": "0.28.0.20",
+  "version": "0.28.0.21",
   "description": "StrawNote Desktop Web application",
   "private": true,
   "browser": "src/index.tsx",

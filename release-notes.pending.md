@@ -1,3 +1,9 @@
+# 0.28.0.21
+
+- 修復啟動白屏：Web、手機網頁與 Android 的分頁標題元件改在工作區服務範圍內掛載，避免啟動時發生 `NotificationCountService not found`；保留文件標題與未讀通知數。
+
+---
+
 # 0.28.0.20
 
 - Android／原生預設雲端改回 **AFFiNE Cloud**（`https://app.affine.pro`）；私人自架 `affine.wastebase.xyz` 不再內建，僅在設定手動新增伺服器
