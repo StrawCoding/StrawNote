@@ -136,36 +136,28 @@ test('illustration S Pen barrel on web toggles eraser via pointer bridge', async
     page.getByTestId('page-illustration-tool-brush')
   ).toHaveAttribute('data-active', 'true');
 
-  // Hover barrel press/release (tip up) — web path without Android plugin.
-  // buttons bit 32 = STYLUS_BUTTON_PRIMARY
-  await page.evaluate(() => {
-    window.dispatchEvent(
-      new PointerEvent('pointermove', {
-        pointerType: 'pen',
-        pointerId: 9,
-        button: -1,
-        buttons: 32,
-        bubbles: true,
-        cancelable: true,
-        composed: true,
-      })
-    );
-    window.dispatchEvent(
-      new PointerEvent('pointermove', {
-        pointerType: 'pen',
-        pointerId: 9,
-        button: -1,
-        buttons: 0,
-        bubbles: true,
-        cancelable: true,
-        composed: true,
-      })
-    );
-  });
-
-  await expect(
-    page.getByTestId('page-illustration-tool-eraser')
-  ).toHaveAttribute('data-active', 'true');
+  // Both Android-style stylus bits and Chromium's standard secondary bit.
+  for (const buttons of [32, 2]) {
+    await page.getByTestId('page-illustration-tool-brush').click();
+    await page.evaluate(buttons => {
+      for (const state of [buttons, 0]) {
+        window.dispatchEvent(
+          new PointerEvent('pointermove', {
+            pointerType: 'pen',
+            pointerId: 9,
+            button: -1,
+            buttons: state,
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+          })
+        );
+      }
+    }, buttons);
+    await expect(
+      page.getByTestId('page-illustration-tool-eraser')
+    ).toHaveAttribute('data-active', 'true');
+  }
 });
 
 test('held S Pen button keeps erasing through pen contact and tip-up', async ({

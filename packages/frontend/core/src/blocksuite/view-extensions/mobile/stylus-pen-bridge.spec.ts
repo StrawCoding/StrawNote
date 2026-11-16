@@ -140,4 +140,27 @@ describe('stylus-pen-bridge', () => {
     window.removeEventListener(SPEN_BUTTON_EVENT, onEvent);
     release();
   });
+
+  test('Chromium secondary-button hover reports produce one down/up pair', () => {
+    const release = retainStylusButtonBridge();
+    const onEvent = vi.fn();
+    window.addEventListener(SPEN_BUTTON_EVENT, onEvent);
+    for (const buttons of [2, 2, 0]) {
+      window.dispatchEvent(
+        new PointerEvent('pointermove', {
+          pointerType: 'pen',
+          pointerId: 5,
+          button: -1,
+          buttons,
+          bubbles: true,
+        })
+      );
+    }
+    expect(onEvent).toHaveBeenCalledTimes(2);
+    expect(
+      onEvent.mock.calls.map(([event]) => (event as CustomEvent).detail.pressed)
+    ).toEqual([true, false]);
+    window.removeEventListener(SPEN_BUTTON_EVENT, onEvent);
+    release();
+  });
 });

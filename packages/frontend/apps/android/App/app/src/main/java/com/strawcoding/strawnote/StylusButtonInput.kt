@@ -36,7 +36,8 @@ class StylusButtonInput(private val emit: (Boolean, Int?) -> Unit) {
         if (event.pointerCount == 0) return false
         if (!StylusPalmRejection.isStylusTool(event.getToolType(0)) &&
             !event.isFromSource(InputDevice.SOURCE_STYLUS)) return false
-        val mask = MotionEvent.BUTTON_STYLUS_PRIMARY or MotionEvent.BUTTON_STYLUS_SECONDARY
+        val mask = MotionEvent.BUTTON_STYLUS_PRIMARY or MotionEvent.BUTTON_STYLUS_SECONDARY or
+            MotionEvent.BUTTON_SECONDARY
         when (event.actionMasked) {
             MotionEvent.ACTION_BUTTON_PRESS -> {
                 if ((event.actionButton or event.buttonState) and mask == 0) return false

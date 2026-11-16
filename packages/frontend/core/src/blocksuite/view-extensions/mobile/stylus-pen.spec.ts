@@ -146,6 +146,18 @@ describe('stylus-pen helpers', () => {
     ).toEqual({ gesture: null, nextDownAt: null });
   });
 
+  test('a held Chromium secondary button remains eraser across pen moves', () => {
+    expect(
+      stylusToolIntent({ pointerType: 'pen', button: -1, buttons: 3 })
+    ).toBe('eraser');
+    expect(
+      stylusToolIntent({ pointerType: 'pen', button: -1, buttons: 1 })
+    ).toBe('brush');
+    expect(
+      stylusToolIntent({ pointerType: 'pen', button: -1, buttons: 33 })
+    ).toBe('brush');
+  });
+
   test('classifies long press as press then release', () => {
     const down = classifySpenButtonGesture(
       { action: 'down', pressed: true },

@@ -1,6 +1,6 @@
 {
   "name": "@affine/copilot-result",
-  "version": "0.28.0.25",
+  "version": "0.28.0.26",
   "type": "module",
   "main": "index.js",
   "private": true,

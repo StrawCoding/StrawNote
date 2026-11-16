@@ -14,6 +14,7 @@ export function isStylusBarrelPressed(
   if (e.pointerType !== 'pen') return false;
 
   if (
+    (e.buttons & 2) !== 0 ||
     (e.buttons & STYLUS_BUTTON_PRIMARY) !== 0 ||
     (e.buttons & STYLUS_BUTTON_SECONDARY) !== 0
   ) {

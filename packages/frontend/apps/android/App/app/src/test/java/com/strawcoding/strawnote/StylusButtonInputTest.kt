@@ -47,6 +47,17 @@ class StylusButtonInputTest {
     }
 
     @Test
+    fun stylusDriversUsingSecondaryButtonAlsoEmitOnePair() {
+        val seen = mutableListOf<Boolean>()
+        val input = StylusButtonInput { pressed, _ -> seen.add(pressed) }
+        motion(MotionEvent.ACTION_BUTTON_PRESS, MotionEvent.BUTTON_SECONDARY) {
+            assertTrue(input.handleMotionEvent(it))
+        }
+        motion(MotionEvent.ACTION_BUTTON_RELEASE, 0) { assertTrue(input.handleMotionEvent(it)) }
+        assertEquals(listOf(true, false), seen)
+    }
+
+    @Test
     fun keyboardAndMotionReportsDoNotDoubleToggle() {
         val seen = mutableListOf<Boolean>()
         val input = StylusButtonInput { pressed, _ -> seen.add(pressed) }

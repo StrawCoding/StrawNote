@@ -94,7 +94,7 @@ export function isStylusEraseGesture(e: StylusPointerLike): boolean {
   if (e.pointerType !== 'pen') return false;
 
   // Chromium maps barrel to secondary (2) or pen eraser button (5)
-  return e.button === 2 || e.button === 5;
+  return e.button === 2 || e.button === 5 || (e.buttons & 2) !== 0;
 }
 
 /**
