@@ -2645,5 +2645,11 @@
   "error.COMMENT_NOT_FOUND": "Comment not found.",
   "error.REPLY_NOT_FOUND": "Reply not found.",
   "error.COMMENT_ATTACHMENT_NOT_FOUND": "Comment attachment not found.",
-  "error.COMMENT_ATTACHMENT_QUOTA_EXCEEDED": "You have exceeded the comment attachment size quota."
+  "error.COMMENT_ATTACHMENT_QUOTA_EXCEEDED": "You have exceeded the comment attachment size quota.",
+  "com.affine.mobile.setting.pen.palm-rejection": "Palm rejection",
+  "com.affine.mobile.setting.pen.palm-rejection.desc": "Ignore finger and palm touches while the stylus is writing and briefly after it lifts.",
+  "com.affine.mobile.setting.pen.illustration-text-lock": "Lock text in illustration mode",
+  "com.affine.mobile.setting.pen.illustration-text-lock.desc": "Prevent accidental text editing. When turned off, the text / scroll tool lets you edit text; select the pen to draw.",
+  "com.affine.mobile.setting.pen.text-scroll": "Edit text / scroll",
+  "com.affine.mobile.setting.pen.scroll": "Scroll"
 }

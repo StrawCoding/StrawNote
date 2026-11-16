@@ -111,10 +111,12 @@ describe('stylus-pen helpers', () => {
     ).toBe(null);
   });
 
-  test('illustrationLayerTouchAction allows pan-y for brush+fingerPanOnly', () => {
+  test('illustrationLayerTouchAction allows pan-y for brush/eraser+fingerPanOnly', () => {
     expect(illustrationLayerTouchAction('brush', true, false)).toBe('pan-y');
     expect(illustrationLayerTouchAction('brush', true, true)).toBe('none');
-    expect(illustrationLayerTouchAction('eraser', true, false)).toBe('none');
+    expect(illustrationLayerTouchAction('eraser', true, false)).toBe('pan-y');
+    expect(illustrationLayerTouchAction('eraser', true, true)).toBe('none');
+    expect(illustrationLayerTouchAction('eraser', false, false)).toBe('none');
     expect(illustrationLayerTouchAction('pan', true, false)).toBe('pan-y');
     expect(illustrationLayerTouchAction('brush', false, false)).toBe('none');
   });
@@ -168,12 +170,14 @@ describe('stylus-pen helpers', () => {
     expect(SPEN_BUTTON_EVENT).toBe('strawnote:spen-button');
   });
 
-  test('canInkWithPointer respects fingerPanOnly and eraser swipe', () => {
+  test('canInkWithPointer respects fingerPanOnly for brush and eraser', () => {
     expect(canInkWithPointer('pen', 'brush', true)).toBe(true);
     expect(canInkWithPointer('touch', 'brush', true)).toBe(false);
     expect(canInkWithPointer('touch', 'brush', false)).toBe(true);
-    expect(canInkWithPointer('touch', 'eraser', true)).toBe(true);
+    expect(canInkWithPointer('touch', 'eraser', true)).toBe(false);
+    expect(canInkWithPointer('touch', 'eraser', false)).toBe(true);
     expect(canInkWithPointer('mouse', 'brush', true)).toBe(true);
+    expect(canInkWithPointer('mouse', 'eraser', true)).toBe(true);
   });
 
   test('shouldRejectPalmTouch only for touch during pen/grace', () => {
@@ -235,8 +239,32 @@ describe('stylus-pen helpers', () => {
     ).toBe(false);
   });
 
-  test('shouldGuardIllustrationPageHitTest keeps page inert during illustration', () => {
-    expect(shouldGuardIllustrationPageHitTest('brush')).toBe(true);
-    expect(shouldGuardIllustrationPageHitTest('pan')).toBe(true);
+  test('text lock defaults off and applies independently of the ink tool', () => {
+    for (const tool of ['brush', 'eraser', 'pan']) {
+      expect(shouldGuardIllustrationPageHitTest(tool)).toBe(false);
+      expect(shouldGuardIllustrationPageHitTest(tool, false)).toBe(false);
+      expect(shouldGuardIllustrationPageHitTest(tool, true)).toBe(true);
+    }
+  });
+
+  test('palm rejection can be disabled even during a pen stroke or grace period', () => {
+    expect(
+      shouldRejectPalmTouch({
+        pointerType: 'touch',
+        penActive: true,
+        graceUntilMs: 2000,
+        nowMs: 1000,
+        enabled: false,
+      })
+    ).toBe(false);
+    expect(
+      shouldRejectPalmTouch({
+        pointerType: 'touch',
+        penActive: false,
+        graceUntilMs: 2000,
+        nowMs: 1000,
+        enabled: false,
+      })
+    ).toBe(false);
   });
 });

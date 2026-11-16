@@ -2648,5 +2648,11 @@
   "com.affine.strawnote.app-update.version-line": "最新 {{latest}} · 目前 {{current}}",
   "com.affine.strawnote.app-update.later": "下次提醒",
   "com.affine.strawnote.app-update.ignore": "忽略",
-  "com.affine.strawnote.app-update.go": "前往更新"
+  "com.affine.strawnote.app-update.go": "前往更新",
+  "com.affine.mobile.setting.pen.palm-rejection": "防誤觸",
+  "com.affine.mobile.setting.pen.palm-rejection.desc": "觸控筆書寫時及抬筆後短暫忽略手指與手掌觸控。",
+  "com.affine.mobile.setting.pen.illustration-text-lock": "插畫模式鎖定文字",
+  "com.affine.mobile.setting.pen.illustration-text-lock.desc": "避免誤觸文字。關閉後可用文字／捲動工具編輯文字，選取畫筆即可手寫。",
+  "com.affine.mobile.setting.pen.text-scroll": "文字／捲動",
+  "com.affine.mobile.setting.pen.scroll": "捲動"
 }

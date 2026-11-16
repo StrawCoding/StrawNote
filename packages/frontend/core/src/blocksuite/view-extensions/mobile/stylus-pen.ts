@@ -45,13 +45,14 @@ export function isStylusPointer(e: StylusPointerLike): boolean {
  */
 export function canInkWithPointer(
   pointerType: string,
-  activeTool: string,
+  _activeTool: string,
   fingerPanOnly: boolean
 ): boolean {
   if (pointerType === 'pen' || pointerType === 'eraser') return true;
   if (pointerType === 'mouse') return true;
   if (pointerType === 'touch') {
-    if (activeTool === 'eraser') return true;
+    // Brush and eraser both defer to page scroll when fingerPanOnly is on;
+    // only pen/mouse ink. Finger erase requires fingerPanOnly=false.
     return !fingerPanOnly;
   }
   return true;
@@ -59,15 +60,16 @@ export function canInkWithPointer(
 
 /**
  * Palm rejection while stylus is active (or within grace after tip-up).
- * Never used to block an intentional finger eraser swipe — callers should
- * skip this when `activeTool === 'eraser'`.
+ * Applies to touch input only; callers can disable it independently of tools.
  */
 export function shouldRejectPalmTouch(opts: {
   pointerType: string;
   penActive: boolean;
   graceUntilMs: number;
   nowMs?: number;
+  enabled?: boolean;
 }): boolean {
+  if (opts.enabled === false) return false;
   if (opts.pointerType !== 'touch') return false;
   const now = opts.nowMs ?? Date.now();
   return opts.penActive || now < opts.graceUntilMs;
@@ -97,8 +99,8 @@ export function isStylusEraseGesture(e: StylusPointerLike): boolean {
 
 /**
  * touch-action for the illustration ink layer.
- * Brush + fingerPanOnly → pan-y so web/mobile can scroll; pen strokes call
- * preventDefault. Eraser needs none so finger swipe can erase.
+ * Brush/eraser + fingerPanOnly → pan-y so the page can scroll; pen strokes
+ * call preventDefault. Finger erase only when fingerPanOnly is off.
  */
 export function illustrationLayerTouchAction(
   tool: string,
@@ -107,8 +109,7 @@ export function illustrationLayerTouchAction(
 ): 'none' | 'pan-y' {
   if (strokeActive) return 'none';
   if (tool === 'pan') return 'pan-y';
-  if (tool === 'eraser') return 'none';
-  if (tool === 'brush' && fingerPanOnly) return 'pan-y';
+  if ((tool === 'brush' || tool === 'eraser') && fingerPanOnly) return 'pan-y';
   return 'none';
 }
 
@@ -142,8 +143,11 @@ export function shouldSkipBrushToolSwitchOnStylusDown(
 }
 
 /** Whether to block page / title hit-testing under illustration ink. */
-export function shouldGuardIllustrationPageHitTest(_tool: string): boolean {
-  return true;
+export function shouldGuardIllustrationPageHitTest(
+  _tool: string,
+  textLock = false
+): boolean {
+  return textLock;
 }
 
 /**

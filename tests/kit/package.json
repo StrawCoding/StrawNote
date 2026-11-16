@@ -2,7 +2,7 @@
   "name": "@affine-test/kit",
   "private": true,
   "type": "module",
-  "version": "0.28.0.21",
+  "version": "0.28.0.22",
   "exports": {
     "./electron": "./src/electron.ts",
     "./mobile": "./src/mobile.ts",

@@ -203,17 +203,17 @@ test('illustration toolbar is fixed to the viewport, not page bottom', async ({
   expect(after.top).toBeGreaterThan(vh * 0.5);
 });
 
-test('illustration brush allows pan-y scroll; eraser and active stroke lock', async ({
+test('illustration brush and eraser allow pan-y scroll; active stroke locks', async ({
   page,
 }) => {
   await clickIllustrationModeButton(page);
   await page.getByTestId('page-illustration-tool-brush').click();
   const svg = page.getByTestId('page-illustration-overlay').locator('svg');
-  // fingerPanOnly default: browser may scroll; pen strokes preventDefault.
+  // fingerPanOnly default: finger may scroll; pen strokes preventDefault.
   await expect(svg).toHaveCSS('touch-action', 'pan-y');
 
   await page.getByTestId('page-illustration-tool-eraser').click();
-  await expect(svg).toHaveCSS('touch-action', 'none');
+  await expect(svg).toHaveCSS('touch-action', 'pan-y');
 
   await page.getByTestId('page-illustration-tool-brush').click();
   const box = await svg.boundingBox();
@@ -243,11 +243,10 @@ test('illustration brush allows pan-y scroll; eraser and active stroke lock', as
   await expect(svg).toHaveCSS('touch-action', 'pan-y');
 });
 
-test('illustration mode page can scroll under brush overlay', async ({
+test('illustration mode page can scroll under brush and eraser overlay', async ({
   page,
 }) => {
   await clickIllustrationModeButton(page);
-  await page.getByTestId('page-illustration-tool-brush').click();
 
   await page.locator('affine-page-root').evaluate(root => {
     for (let i = 0; i < 50; i++) {
@@ -259,16 +258,24 @@ test('illustration mode page can scroll under brush overlay', async ({
   });
 
   const viewport = page.locator('.affine-page-viewport').first();
-  const before = await viewport.evaluate(el => el.scrollTop);
-  await viewport.evaluate(el => {
-    el.scrollTop = 400;
-  });
-  const after = await viewport.evaluate(el => el.scrollTop);
-  expect(after).toBeGreaterThan(before);
-  expect(after).toBeGreaterThanOrEqual(300);
+  for (const tool of ['brush', 'eraser'] as const) {
+    await page.getByTestId(`page-illustration-tool-${tool}`).click();
+    const before = await viewport.evaluate(el => el.scrollTop);
+    await viewport.evaluate(el => {
+      el.scrollTop = 400;
+    });
+    const after = await viewport.evaluate(el => el.scrollTop);
+    expect(after).toBeGreaterThan(before);
+    expect(after).toBeGreaterThanOrEqual(300);
+    await viewport.evaluate(el => {
+      el.scrollTop = 0;
+    });
+  }
 });
 
-test('illustration eraser accepts finger touch swipe', async ({ page }) => {
+test('illustration eraser uses pen stroke; finger stays scroll-only by default', async ({
+  page,
+}) => {
   await clickIllustrationModeButton(page);
   const overlay = page.getByTestId('page-illustration-overlay');
   const svg = overlay.locator('svg');
@@ -321,11 +328,12 @@ test('illustration eraser accepts finger touch swipe', async ({ page }) => {
   const beforeCount = await svg.locator('path').count();
   expect(beforeCount).toBeGreaterThan(0);
 
-  // Finger swipe with eraser should erase (even when fingerPanOnly default)
+  // fingerPanOnly default: finger swipe must not erase (page scroll).
   await page.getByTestId('page-illustration-tool-eraser').click();
   await expect(
     page.getByTestId('page-illustration-tool-eraser')
   ).toHaveAttribute('data-active', 'true');
+  await expect(svg).toHaveCSS('touch-action', 'pan-y');
   await firePointer('pointerdown', 'touch', 2, startX + 10, startY, 1);
   for (let i = 1; i <= 10; i++) {
     await firePointer(
@@ -338,6 +346,14 @@ test('illustration eraser accepts finger touch swipe', async ({ page }) => {
     );
   }
   await firePointer('pointerup', 'touch', 2, startX + 90, startY, 0);
+  expect(await svg.locator('path').count()).toBe(beforeCount);
+
+  // Pen eraser still removes ink.
+  await firePointer('pointerdown', 'pen', 3, startX + 10, startY, 1);
+  for (let i = 1; i <= 10; i++) {
+    await firePointer('pointermove', 'pen', 3, startX + 10 + i * 8, startY, 1);
+  }
+  await firePointer('pointerup', 'pen', 3, startX + 90, startY, 0);
 
   await expect
     .poll(async () => svg.locator('path').count(), { timeout: 5000 })

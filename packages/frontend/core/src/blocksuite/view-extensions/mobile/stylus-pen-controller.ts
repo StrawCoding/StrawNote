@@ -13,6 +13,8 @@ import {
   classifySpenButtonGesture,
   INK_TOOL_PICK_EVENT,
   isStylusPointer,
+  PEN_PALM_GRACE_MS,
+  shouldRejectPalmTouch,
   shouldRestoreBrushAfterEraserTip,
   shouldSkipBrushToolSwitchOnStylusDown,
   SPEN_BUTTON_EVENT,
@@ -62,20 +64,26 @@ export class StylusPenController extends LifeCycleWatcher {
   private getStylusPrefs(): {
     buttonMode: SpenButtonMode;
     fingerPanOnly: boolean;
+    palmRejection: boolean;
   } {
     try {
       const setting = this.std.get(EditorSettingProvider);
       const stylus = (
         setting.setting$.value as {
-          stylus?: { buttonMode?: SpenButtonMode; fingerPanOnly?: boolean };
+          stylus?: {
+            buttonMode?: SpenButtonMode;
+            fingerPanOnly?: boolean;
+            palmRejection?: boolean;
+          };
         }
       ).stylus;
       return {
         buttonMode: stylus?.buttonMode ?? 'both',
         fingerPanOnly: stylus?.fingerPanOnly ?? true,
+        palmRejection: stylus?.palmRejection ?? false,
       };
     } catch {
-      return { buttonMode: 'both', fingerPanOnly: true };
+      return { buttonMode: 'both', fingerPanOnly: true, palmRejection: false };
     }
   }
 
@@ -107,9 +115,22 @@ export class StylusPenController extends LifeCycleWatcher {
 
     this._session = this._createSession();
     const releaseBridge = retainStylusButtonBridge();
+    let penGraceUntil = 0;
+    const shouldRejectTouch = (pointerType: string) =>
+      shouldRejectPalmTouch({
+        pointerType,
+        penActive: this._penActive,
+        graceUntilMs: penGraceUntil,
+        enabled: this.getStylusPrefs().palmRejection,
+      });
 
     const onPointerDown = (event: PointerEvent) => {
       if (!isStylusPointer(event)) {
+        if (shouldRejectTouch(event.pointerType)) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
         if (
           this.getStylusPrefs().fingerPanOnly &&
           event.pointerType === 'touch' &&
@@ -127,6 +148,11 @@ export class StylusPenController extends LifeCycleWatcher {
     };
 
     const onPointerMove = (event: PointerEvent) => {
+      if (shouldRejectTouch(event.pointerType)) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
       if (!isStylusPointer(event) || !this._penActive) return;
 
       const gfx = this.gfx;
@@ -160,11 +186,12 @@ export class StylusPenController extends LifeCycleWatcher {
     const onPointerEnd = (event: PointerEvent) => {
       if (!isStylusPointer(event)) return;
       this._penActive = false;
+      penGraceUntil = Date.now() + PEN_PALM_GRACE_MS;
       this._session?.onStylusTipUp();
     };
 
     const rejectPalm = (event: TouchEvent) => {
-      if (!this._penActive) return;
+      if (!shouldRejectTouch('touch')) return;
       event.preventDefault();
       event.stopPropagation();
     };

@@ -229,6 +229,34 @@ export const PenSettings = () => {
         />
       </SettingRow>
       <SettingRow
+        name={t['com.affine.mobile.setting.pen.palm-rejection']()}
+        desc={t['com.affine.mobile.setting.pen.palm-rejection.desc']()}
+      >
+        <Switch
+          data-testid="desktop-pen-palm-rejection"
+          aria-label={t['com.affine.mobile.setting.pen.palm-rejection']()}
+          checked={settings.stylus?.palmRejection ?? false}
+          onChange={checked =>
+            editorSetting.set('stylus', { palmRejection: checked })
+          }
+        />
+      </SettingRow>
+      <SettingRow
+        name={t['com.affine.mobile.setting.pen.illustration-text-lock']()}
+        desc={t['com.affine.mobile.setting.pen.illustration-text-lock.desc']()}
+      >
+        <Switch
+          data-testid="desktop-pen-illustration-text-lock"
+          aria-label={t[
+            'com.affine.mobile.setting.pen.illustration-text-lock'
+          ]()}
+          checked={settings.stylus?.illustrationTextLock ?? false}
+          onChange={checked =>
+            editorSetting.set('stylus', { illustrationTextLock: checked })
+          }
+        />
+      </SettingRow>
+      <SettingRow
         name={t['com.affine.mobile.setting.pen.button-mode']()}
         desc={t['com.affine.mobile.setting.pen.button-mode.desc']()}
       >

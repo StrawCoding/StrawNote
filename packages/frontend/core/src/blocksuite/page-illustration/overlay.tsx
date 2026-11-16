@@ -1,4 +1,5 @@
 import { EditorSettingService } from '@affine/core/modules/editor-setting';
+import { useI18n } from '@affine/i18n';
 import {
   Bound,
   getSolidStrokePoints,
@@ -101,11 +102,16 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const svgRef = useRef<SVGSVGElement>(null);
   const editorSetting = useService(EditorSettingService).editorSetting;
   const settings = useLiveData(editorSetting.settings$);
+  const t = useI18n();
+  const textLock = settings.stylus?.illustrationTextLock ?? false;
+  const palmRejection = settings.stylus?.palmRejection ?? false;
   const { resolvedTheme } = useTheme();
   const colorScheme =
     resolvedTheme === 'dark' ? ColorScheme.Dark : ColorScheme.Light;
 
-  const [tool, setTool] = useState<StylusInkTool>('brush');
+  const [tool, setTool] = useState<StylusInkTool>(() =>
+    textLock ? 'brush' : 'pan'
+  );
   const toolRef = useRef<StylusInkTool>(tool);
   toolRef.current = tool;
 
@@ -115,6 +121,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const [live, setLive] = useState<LiveStroke | null>(null);
   const liveRef = useRef<LiveStroke | null>(null);
   const drawingRef = useRef(false);
+  const strokePointerRef = useRef<number | null>(null);
   const [strokeActive, setStrokeActive] = useState(false);
   const penActiveRef = useRef(false);
   const penGraceUntilRef = useRef(0);
@@ -188,7 +195,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       '[data-illustration-mode="true"]'
     );
     if (!(viewport instanceof HTMLElement)) return;
-    if (shouldGuardIllustrationPageHitTest(tool)) {
+    if (shouldGuardIllustrationPageHitTest(tool, textLock)) {
       viewport.dataset.illustrationGuardPage = 'true';
     } else {
       delete viewport.dataset.illustrationGuardPage;
@@ -196,7 +203,64 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
     return () => {
       delete viewport.dataset.illustrationGuardPage;
     };
-  }, [tool]);
+  }, [tool, textLock]);
+
+  // Text editing must also bypass the ink SVG, not only the page's CSS guard.
+  useEffect(() => {
+    sessionRef.current?.clear();
+    const next = textLock ? 'brush' : 'pan';
+    toolRef.current = next;
+    setTool(next);
+  }, [textLock]);
+
+  useEffect(() => {
+    const viewport = rootRef.current?.closest(
+      '[data-illustration-mode="true"]'
+    );
+    if (!(viewport instanceof HTMLElement)) return;
+    const rejectTouch = (event: PointerEvent | TouchEvent) => {
+      if (
+        shouldRejectPalmTouch({
+          pointerType: 'pointerType' in event ? event.pointerType : 'touch',
+          penActive: penActiveRef.current,
+          graceUntilMs: penGraceUntilRef.current,
+          enabled: palmRejection,
+        })
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+    const onDown = (event: PointerEvent) => {
+      if (isStylusPointer(event)) penActiveRef.current = true;
+      else rejectTouch(event);
+    };
+    const onEnd = (event: PointerEvent) => {
+      if (!isStylusPointer(event)) return;
+      penActiveRef.current = false;
+      penGraceUntilRef.current = Date.now() + PEN_PALM_GRACE_MS;
+    };
+    viewport.addEventListener('pointerdown', onDown, true);
+    viewport.addEventListener('pointermove', rejectTouch, true);
+    viewport.addEventListener('touchstart', rejectTouch, {
+      capture: true,
+      passive: false,
+    });
+    viewport.addEventListener('touchmove', rejectTouch, {
+      capture: true,
+      passive: false,
+    });
+    window.addEventListener('pointerup', onEnd, true);
+    window.addEventListener('pointercancel', onEnd, true);
+    return () => {
+      viewport.removeEventListener('pointerdown', onDown, true);
+      viewport.removeEventListener('pointermove', rejectTouch, true);
+      viewport.removeEventListener('touchstart', rejectTouch, true);
+      viewport.removeEventListener('touchmove', rejectTouch, true);
+      window.removeEventListener('pointerup', onEnd, true);
+      window.removeEventListener('pointercancel', onEnd, true);
+    };
+  }, [palmRejection]);
 
   const syncSize = useCallback(() => {
     const el = resolveContentEl();
@@ -309,11 +373,11 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         // Barrel / eraser tip → same session path as edgeless (works on web).
         syncStylusToolIntent(e.nativeEvent);
       } else if (
-        toolRef.current !== 'eraser' &&
         shouldRejectPalmTouch({
           pointerType: e.pointerType,
           penActive: penActiveRef.current,
           graceUntilMs: penGraceUntilRef.current,
+          enabled: palmRejection,
         })
       ) {
         e.preventDefault();
@@ -323,10 +387,11 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
       const activeTool = toolRef.current;
 
-      // Brush + fingerPanOnly: layer uses touch-action pan-y — leave touch to
-      // the browser so web/desktop can scroll. Do not capture / preventDefault.
+      // Brush/eraser + fingerPanOnly: layer uses touch-action pan-y — leave
+      // touch to the browser so the page can scroll. Do not capture /
+      // preventDefault.
       if (
-        activeTool === 'brush' &&
+        (activeTool === 'brush' || activeTool === 'eraser') &&
         fingerPanOnly &&
         e.pointerType === 'touch' &&
         !stylus
@@ -335,6 +400,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       }
 
       if (!canInkWithPointer(e.pointerType, activeTool, fingerPanOnly)) return;
+      if (drawingRef.current) return;
 
       const content = resolveContentEl();
       if (!content) return;
@@ -346,6 +412,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         // Synthetic / already-captured pointers may throw; drawing can continue.
       }
       drawingRef.current = true;
+      strokePointerRef.current = e.pointerId;
       setStrokeActive(true);
       const [x, y] = clientToPageContentPoint(e.clientX, e.clientY, content);
 
@@ -369,6 +436,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       brushStreamline,
       doc,
       fingerPanOnly,
+      palmRejection,
       refreshBrushes,
       resolveContentEl,
       syncStylusToolIntent,
@@ -377,7 +445,8 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
   const onPointerMove = useCallback(
     (e: ReactPointerEvent<SVGSVGElement>) => {
-      if (!drawingRef.current) return;
+      if (!drawingRef.current || strokePointerRef.current !== e.pointerId)
+        return;
       e.preventDefault();
 
       if (isStylusPointer(e.nativeEvent) || e.pointerType === 'pen') {
@@ -420,8 +489,10 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         sessionRef.current?.onStylusTipUp();
       }
 
-      if (!drawingRef.current) return;
+      if (!drawingRef.current || strokePointerRef.current !== e.pointerId)
+        return;
       drawingRef.current = false;
+      strokePointerRef.current = null;
       setStrokeActive(false);
       try {
         e.currentTarget.releasePointerCapture(e.pointerId);
@@ -501,6 +572,18 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       onBrushLineWidthChange={setLineWidth}
       ariaLabel="Illustration tools"
       testIdPrefix="page-illustration"
+      panLabel={
+        textLock
+          ? t['com.affine.mobile.setting.pen.scroll']()
+          : t['com.affine.mobile.setting.pen.text-scroll']()
+      }
+      textLock={textLock}
+      textLockLabel={t[
+        'com.affine.mobile.setting.pen.illustration-text-lock'
+      ]()}
+      onTextLockChange={locked =>
+        editorSetting.set('stylus', { illustrationTextLock: locked })
+      }
     />
   );
 

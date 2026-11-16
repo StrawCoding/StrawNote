@@ -12,7 +12,7 @@ export const layer = style({
   position: 'absolute',
   pointerEvents: 'auto',
   // touchAction set inline via illustrationLayerTouchAction:
-  // brush+fingerPanOnly → pan-y (web scroll); pen stroke → none.
+  // brush/eraser+fingerPanOnly → pan-y (web scroll); pen stroke → none.
 });
 
 /** Finger may scroll but must not place caret in page blocks while inking. */

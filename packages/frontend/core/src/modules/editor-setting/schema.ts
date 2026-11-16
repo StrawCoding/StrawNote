@@ -56,6 +56,10 @@ const AffineEditorSettingSchema = z.object({
     .object({
       /** Finger pans only; only pen/stylus (and mouse on desktop) can draw */
       fingerPanOnly: z.boolean().default(true),
+      /** Reject palm touches while a stylus is active and briefly after lifting. */
+      palmRejection: z.boolean().default(false),
+      /** Prevent text editing beneath the illustration ink layer. */
+      illustrationTextLock: z.boolean().default(false),
       /**
        * Side button: hold = momentary erase, toggle = sticky click,
        * both = short click toggles + long press holds.
@@ -64,6 +68,8 @@ const AffineEditorSettingSchema = z.object({
     })
     .default({
       fingerPanOnly: true,
+      palmRejection: false,
+      illustrationTextLock: false,
       buttonMode: 'both',
     }),
 });

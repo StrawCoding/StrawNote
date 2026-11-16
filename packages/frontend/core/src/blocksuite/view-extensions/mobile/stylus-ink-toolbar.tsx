@@ -2,6 +2,7 @@ import {
   ColorPickerIcon,
   EraserIcon,
   HandIcon,
+  LockIcon,
   PenIcon,
   PlusIcon,
 } from '@blocksuite/icons/rc';
@@ -29,6 +30,10 @@ export type StylusInkToolbarProps = {
   testIdPrefix?: string;
   ariaLabel?: string;
   showPan?: boolean;
+  panLabel?: string;
+  textLock?: boolean;
+  onTextLockChange?: (locked: boolean) => void;
+  textLockLabel?: string;
 };
 
 /**
@@ -46,6 +51,10 @@ export function StylusInkToolbar({
   testIdPrefix = 'page-illustration',
   ariaLabel = 'Ink tools',
   showPan = true,
+  panLabel = 'Scroll',
+  textLock,
+  onTextLockChange,
+  textLockLabel,
 }: StylusInkToolbarProps) {
   const colorInputRef = useRef<HTMLInputElement>(null);
   const hexAddInputRef = useRef<HTMLInputElement>(null);
@@ -130,11 +139,25 @@ export function StylusInkToolbar({
           className={styles.toolButton}
           data-active={tool === 'pan'}
           data-testid={tid('tool-pan')}
-          title="Scroll"
-          aria-label="Scroll"
+          title={panLabel}
+          aria-label={panLabel}
           onClick={() => onToolChange('pan')}
         >
           <HandIcon width={18} height={18} />
+        </button>
+      ) : null}
+      {onTextLockChange ? (
+        <button
+          type="button"
+          className={styles.toolButton}
+          data-active={textLock}
+          data-testid={tid('text-lock')}
+          title={textLockLabel}
+          aria-label={textLockLabel}
+          aria-pressed={textLock}
+          onClick={() => onTextLockChange(!textLock)}
+        >
+          <LockIcon width={18} height={18} />
         </button>
       ) : null}
       <div className={styles.divider} />
