@@ -126,6 +126,12 @@ test('illustration S Pen barrel on web toggles eraser via pointer bridge', async
   page,
 }) => {
   await clickIllustrationModeButton(page);
+  // Text editing is the default; choose the pen before testing its side button.
+  await expect(page.getByTestId('page-illustration-tool-pan')).toHaveAttribute(
+    'data-active',
+    'true'
+  );
+  await page.getByTestId('page-illustration-tool-brush').click();
   await expect(
     page.getByTestId('page-illustration-tool-brush')
   ).toHaveAttribute('data-active', 'true');
