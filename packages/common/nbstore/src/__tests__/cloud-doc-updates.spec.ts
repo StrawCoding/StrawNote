@@ -35,6 +35,8 @@ class FakeSocket {
   }
 
   supportJoinBatch = true;
+  /** When false, simulate 0.27.4 self-host with no space:doc-lifecycle. */
+  supportDocLifecycle = true;
 
   async emitWithAck(
     event: string,
@@ -44,6 +46,7 @@ class FakeSocket {
       spaceType?: string;
       spaceId?: string;
       clientVersion?: string;
+      lifecycle?: string;
     }
   ) {
     this.emitted.push({ event, payload });
@@ -73,6 +76,9 @@ class FakeSocket {
       return { data: { missing: 'AAA=', state: 'AA==', timestamp: 1_000 } };
     }
     if (event === 'space:doc-lifecycle') {
+      if (!this.supportDocLifecycle) {
+        return new Promise(() => {}) as Promise<never>;
+      }
       return { data: { rootUpdate: base64UpdateA, timestamp: 1_000 } };
     }
     return { data: { clientId: 'client-1', success: true } };
@@ -196,6 +202,56 @@ describe('CloudDocStorage broadcast updates', () => {
 
     expect(disconnect).toHaveBeenCalledOnce();
     vi.unstubAllGlobals();
+  });
+
+  test('doc lifecycle times out on 0.27.4 and skips later attempts', async () => {
+    vi.useFakeTimers();
+    const fakeSocket = new FakeSocket();
+    fakeSocket.supportDocLifecycle = false;
+    const storage = new CloudDocStorage({
+      id: 'space-1',
+      serverBaseUrl: 'http://localhost',
+      isSelfHosted: true,
+      type: 'workspace',
+      readonlyMode: true,
+    });
+    const connection = storage.connection as any;
+    Object.defineProperty(connection, 'manager', {
+      configurable: true,
+      value: {
+        connect: () => ({ socket: fakeSocket, disconnect: vi.fn() }),
+      },
+    });
+    const inner = await connection.doConnect();
+    connection._inner = inner;
+    connection.idConverter = {
+      oldIdToNewId: (id: string) => id,
+      newIdToOldId: (id: string) => id,
+    };
+
+    const pending = storage.applyDocLifecycle('doc-1', 'trash');
+    const assertion = expect(pending).rejects.toMatchObject({
+      name: 'DOC_LIFECYCLE_UNAVAILABLE',
+    });
+    await vi.advanceTimersByTimeAsync(2_000);
+    await assertion;
+
+    // Cached: second call fails immediately without another emit.
+    const before = fakeSocket.emitted.filter(
+      e => e.event === 'space:doc-lifecycle'
+    ).length;
+    await expect(
+      storage.applyDocLifecycle('doc-2', 'trash')
+    ).rejects.toMatchObject({
+      name: 'DOC_LIFECYCLE_UNAVAILABLE',
+    });
+    const after = fakeSocket.emitted.filter(
+      e => e.event === 'space:doc-lifecycle'
+    ).length;
+    expect(after).toBe(before);
+
+    connection.doDisconnect(inner);
+    vi.useRealTimers();
   });
 
   test('awareness joins active documents through the batch route', async () => {

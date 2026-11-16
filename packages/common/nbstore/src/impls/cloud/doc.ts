@@ -31,8 +31,33 @@ function createWebsocketError(error: { name: string; message: string }) {
   return err;
 }
 
+/** Raised when the server never ACKs `space:doc-lifecycle` (e.g. 0.27.4). */
+export function createDocLifecycleUnavailableError(cause?: unknown) {
+  const err = new Error('Document lifecycle is unavailable');
+  err.name = 'DOC_LIFECYCLE_UNAVAILABLE';
+  if (cause !== undefined) {
+    (err as Error & { cause?: unknown }).cause = cause;
+  }
+  return err;
+}
+
+export function isDocLifecycleUnavailableError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  return (
+    error.name === 'DOC_LIFECYCLE_UNAVAILABLE' ||
+    error.message.includes('Document lifecycle is unavailable') ||
+    error.message.includes('socket ack timed out')
+  );
+}
+
 export class CloudDocStorage extends SnapshotDocStorageBase<CloudDocStorageOptions> {
   static readonly identifier = 'CloudDocStorage';
+
+  /**
+   * 0.27.x self-host has no `space:doc-lifecycle` handler; emitWithAck never
+   * settles. After the first timeout we skip further attempts for this storage.
+   */
+  private docLifecycleSupported: boolean | null = null;
 
   get socket() {
     return this.connection.inner.socket;
@@ -262,19 +287,37 @@ export class CloudDocStorage extends SnapshotDocStorageBase<CloudDocStorageOptio
     docId: string,
     lifecycle: 'trash' | 'restore' | 'delete'
   ) {
-    const response = await this.socket.emitWithAck('space:doc-lifecycle', {
-      spaceType: this.spaceType,
-      spaceId: this.spaceId,
-      docId: this.idConverter.newIdToOldId(docId),
-      lifecycle,
-    });
-    if ('error' in response) {
-      throw createWebsocketError(response.error);
+    if (this.docLifecycleSupported === false) {
+      throw createDocLifecycleUnavailableError();
     }
-    return {
-      rootUpdate: base64ToUint8Array(response.data.rootUpdate),
-      timestamp: new Date(response.data.timestamp),
-    };
+
+    try {
+      // Missing handler never ACKs — same class of bug as legacy join-batch.
+      const response = await withAckTimeout(
+        this.socket.emitWithAck('space:doc-lifecycle', {
+          spaceType: this.spaceType,
+          spaceId: this.spaceId,
+          docId: this.idConverter.newIdToOldId(docId),
+          lifecycle,
+        }),
+        2_000
+      );
+      if ('error' in response) {
+        throw createWebsocketError(response.error);
+      }
+      this.docLifecycleSupported = true;
+      return {
+        rootUpdate: base64ToUint8Array(response.data.rootUpdate),
+        timestamp: new Date(response.data.timestamp),
+      };
+    } catch (error) {
+      // Timeout (no handler) or prior cached unavailability.
+      if (isDocLifecycleUnavailableError(error)) {
+        this.docLifecycleSupported = false;
+        throw createDocLifecycleUnavailableError(error);
+      }
+      throw error;
+    }
   }
 
   protected async setDocSnapshot() {

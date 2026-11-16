@@ -1,3 +1,4 @@
+import { isDocLifecycleUnavailableError } from '@affine/nbstore/cloud';
 import type { DocMode } from '@blocksuite/affine/model';
 import type { DocMeta } from '@blocksuite/affine/store';
 import {
@@ -248,28 +249,60 @@ export class DocsStore extends Store {
     this.workspaceService.workspace.docCollection.meta.setDocMeta(id, meta);
   }
 
+  /**
+   * Legacy / local path: mutate workspace root meta (or remove the doc).
+   * Also used when the cloud server has no `space:doc-lifecycle` (0.27.4).
+   */
+  private applyDocLifecycleLocally(
+    id: string,
+    lifecycle: 'trash' | 'restore' | 'delete'
+  ) {
+    const workspace = this.workspaceService.workspace;
+    if (lifecycle === 'delete') {
+      workspace.docCollection.removeDoc(id);
+      return;
+    }
+    this.setDocMeta(
+      id,
+      lifecycle === 'trash'
+        ? { trash: true, trashDate: Date.now() }
+        : { trash: false, trashDate: undefined }
+    );
+  }
+
   async applyDocLifecycle(
     id: string,
     lifecycle: 'trash' | 'restore' | 'delete'
   ) {
     const workspace = this.workspaceService.workspace;
     if (workspace.flavour === 'local') {
-      if (lifecycle === 'delete') {
-        workspace.docCollection.removeDoc(id);
-      } else {
-        this.setDocMeta(
-          id,
-          lifecycle === 'trash'
-            ? { trash: true, trashDate: Date.now() }
-            : { trash: false, trashDate: undefined }
-        );
-      }
+      this.applyDocLifecycleLocally(id, lifecycle);
       return;
     }
-    const result = await workspace.engine.doc.applyDocLifecycle(id, lifecycle);
-    applyUpdate(workspace.rootYDoc, result.rootUpdate, 'server-lifecycle');
-    if (lifecycle === 'delete') {
-      await workspace.engine.doc.storage.deleteDoc(id);
+
+    try {
+      const result = await workspace.engine.doc.applyDocLifecycle(
+        id,
+        lifecycle
+      );
+      applyUpdate(workspace.rootYDoc, result.rootUpdate, 'server-lifecycle');
+      if (lifecycle === 'delete') {
+        await workspace.engine.doc.storage.deleteDoc(id);
+      }
+    } catch (error) {
+      // Self-host 0.27.4 never ACKs space:doc-lifecycle — fall back so the
+      // confirm modal does not spin forever (join-batch used the same pattern).
+      if (!isDocLifecycleUnavailableError(error)) {
+        throw error;
+      }
+      this.applyDocLifecycleLocally(id, lifecycle);
+      if (lifecycle === 'delete') {
+        try {
+          await workspace.engine.doc.storage.deleteDoc(id);
+        } catch {
+          // Local remove already succeeded; remote delete is best-effort.
+        }
+      }
     }
   }
 
