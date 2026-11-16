@@ -9,6 +9,7 @@ type SPenButtonEvent = {
 
 type SPenPlugin = {
   ping(): Promise<{ ok: boolean }>;
+  setPalmRejection(options: { enabled: boolean }): Promise<void>;
   addListener(
     event: 'spenButton',
     listener: (event: SPenButtonEvent) => void

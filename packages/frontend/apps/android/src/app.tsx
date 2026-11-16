@@ -20,6 +20,7 @@ import {
 } from '@affine/core/modules/cloud';
 import { registerNativePreviewHandlers } from '@affine/core/modules/code-block-preview-renderer';
 import { DocsService } from '@affine/core/modules/doc';
+import { EditorSettingService } from '@affine/core/modules/editor-setting';
 import { GlobalContextService } from '@affine/core/modules/global-context';
 import { I18nProvider } from '@affine/core/modules/i18n';
 import { LifecycleService } from '@affine/core/modules/lifecycle';
@@ -470,6 +471,15 @@ const AndroidBackAdapter = () => {
 };
 
 const AndroidSPenAdapter = () => {
+  const settings = useLiveData(
+    useService(EditorSettingService).editorSetting.settings$
+  );
+  const palmRejection = settings.stylus?.palmRejection ?? false;
+  useEffect(() => {
+    SPen.setPalmRejection({ enabled: palmRejection }).catch(() => {
+      // Native plugin is unavailable in browser previews.
+    });
+  }, [palmRejection]);
   useEffect(() => {
     let remove = () => {};
     let disposed = false;

@@ -111,10 +111,10 @@ describe('stylus-pen helpers', () => {
     ).toBe(null);
   });
 
-  test('illustrationLayerTouchAction allows pan-y for brush/eraser+fingerPanOnly', () => {
-    expect(illustrationLayerTouchAction('brush', true, false)).toBe('pan-y');
+  test('ink tools block native panning before the first pen contact', () => {
+    expect(illustrationLayerTouchAction('brush', true, false)).toBe('none');
     expect(illustrationLayerTouchAction('brush', true, true)).toBe('none');
-    expect(illustrationLayerTouchAction('eraser', true, false)).toBe('pan-y');
+    expect(illustrationLayerTouchAction('eraser', true, false)).toBe('none');
     expect(illustrationLayerTouchAction('eraser', true, true)).toBe('none');
     expect(illustrationLayerTouchAction('eraser', false, false)).toBe('none');
     expect(illustrationLayerTouchAction('pan', true, false)).toBe('pan-y');

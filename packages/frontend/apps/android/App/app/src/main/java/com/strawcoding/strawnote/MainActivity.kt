@@ -5,6 +5,7 @@ import android.content.ComponentCallbacks2
 import android.os.Bundle
 import android.view.Gravity
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -164,6 +165,11 @@ class MainActivity : BridgeActivity(), AIButtonPlugin.Callback, AFFiNEThemePlugi
             return true
         }
         return super.dispatchKeyEvent(event)
+    }
+
+    override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
+        if (spenPlugin()?.handleMotionEvent(event) == true) return true
+        return super.dispatchGenericMotionEvent(event)
     }
 
     override fun present() {

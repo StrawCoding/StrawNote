@@ -122,6 +122,11 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const liveRef = useRef<LiveStroke | null>(null);
   const drawingRef = useRef(false);
   const strokePointerRef = useRef<number | null>(null);
+  const fingerScrollRef = useRef<{
+    pointerId: number;
+    y: number;
+    viewport: HTMLElement;
+  } | null>(null);
   const [strokeActive, setStrokeActive] = useState(false);
   const penActiveRef = useRef(false);
   const penGraceUntilRef = useRef(0);
@@ -387,15 +392,37 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
       const activeTool = toolRef.current;
 
-      // Brush/eraser + fingerPanOnly: layer uses touch-action pan-y — leave
-      // touch to the browser so the page can scroll. Do not capture /
-      // preventDefault.
+      // Ink surfaces suppress native panning before contact; route an
+      // intentional finger drag to the page scroller instead.
       if (
         (activeTool === 'brush' || activeTool === 'eraser') &&
         fingerPanOnly &&
         e.pointerType === 'touch' &&
         !stylus
       ) {
+        if (drawingRef.current || fingerScrollRef.current) return;
+        let viewport: HTMLElement | null = e.currentTarget.parentElement;
+        while (viewport) {
+          if (
+            /(auto|scroll)/.test(getComputedStyle(viewport).overflowY) &&
+            viewport.scrollHeight > viewport.clientHeight
+          )
+            break;
+          viewport = viewport.parentElement;
+        }
+        viewport ??= document.scrollingElement as HTMLElement | null;
+        if (!viewport) return;
+        e.preventDefault();
+        fingerScrollRef.current = {
+          pointerId: e.pointerId,
+          y: e.clientY,
+          viewport,
+        };
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          /* synthetic pointer */
+        }
         return;
       }
 
@@ -445,6 +472,14 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
   const onPointerMove = useCallback(
     (e: ReactPointerEvent<SVGSVGElement>) => {
+      const fingerScroll = fingerScrollRef.current;
+      if (fingerScroll?.pointerId === e.pointerId) {
+        e.preventDefault();
+        if (!drawingRef.current)
+          fingerScroll.viewport.scrollTop += fingerScroll.y - e.clientY;
+        fingerScroll.y = e.clientY;
+        return;
+      }
       if (!drawingRef.current || strokePointerRef.current !== e.pointerId)
         return;
       e.preventDefault();
@@ -482,6 +517,15 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
   const endStroke = useCallback(
     (e: ReactPointerEvent<SVGSVGElement>) => {
+      if (fingerScrollRef.current?.pointerId === e.pointerId) {
+        fingerScrollRef.current = null;
+        try {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        } catch {
+          /* synthetic pointer */
+        }
+        return;
+      }
       if (isStylusPointer(e.nativeEvent) || e.pointerType === 'pen') {
         penActiveRef.current = false;
         penGraceUntilRef.current = Date.now() + PEN_PALM_GRACE_MS;

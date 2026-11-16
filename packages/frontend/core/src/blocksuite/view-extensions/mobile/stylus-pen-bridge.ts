@@ -73,11 +73,8 @@ function shouldInstallWebBridge(): boolean {
   if (typeof window === 'undefined') return false;
   // Android Capacitor already has SPenPlugin — dual bridges sticky-toggle eraser
   // and can leave the tool stuck so S Pen never draws.
-  try {
-    if (BUILD_CONFIG.isNative || BUILD_CONFIG.isAndroid) return false;
-  } catch {
-    // BUILD_CONFIG missing in some unit tests
-  }
+  // Inspect the actual host so Android bundle previews still receive web
+  // stylus buttons when the native plugin is unavailable.
   const cap = (
     window as unknown as {
       Capacitor?: { isNativePlatform?: () => boolean };

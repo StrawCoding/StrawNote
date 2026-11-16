@@ -99,17 +99,17 @@ export function isStylusEraseGesture(e: StylusPointerLike): boolean {
 
 /**
  * touch-action for the illustration ink layer.
- * Brush/eraser + fingerPanOnly → pan-y so the page can scroll; pen strokes
- * call preventDefault. Finger erase only when fingerPanOnly is off.
+ * Ink tools must suppress native panning before contact: changing touch-action
+ * during pointerdown cannot change the browser's decision for that gesture.
+ * Finger scrolling in ink tools is routed explicitly by the overlay.
  */
 export function illustrationLayerTouchAction(
   tool: string,
-  fingerPanOnly: boolean,
+  _fingerPanOnly: boolean,
   strokeActive: boolean
 ): 'none' | 'pan-y' {
   if (strokeActive) return 'none';
   if (tool === 'pan') return 'pan-y';
-  if ((tool === 'brush' || tool === 'eraser') && fingerPanOnly) return 'pan-y';
   return 'none';
 }
 

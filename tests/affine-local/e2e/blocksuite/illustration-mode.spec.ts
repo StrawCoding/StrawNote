@@ -209,17 +209,17 @@ test('illustration toolbar is fixed to the viewport, not page bottom', async ({
   expect(after.top).toBeGreaterThan(vh * 0.5);
 });
 
-test('illustration brush and eraser allow pan-y scroll; active stroke locks', async ({
+test('illustration ink tools block native pan before contact and during strokes', async ({
   page,
 }) => {
   await clickIllustrationModeButton(page);
   await page.getByTestId('page-illustration-tool-brush').click();
   const svg = page.getByTestId('page-illustration-overlay').locator('svg');
-  // fingerPanOnly default: finger may scroll; pen strokes preventDefault.
-  await expect(svg).toHaveCSS('touch-action', 'pan-y');
+  // Native panning must be off before contact; fingers use the overlay scroll handler.
+  await expect(svg).toHaveCSS('touch-action', 'none');
 
   await page.getByTestId('page-illustration-tool-eraser').click();
-  await expect(svg).toHaveCSS('touch-action', 'pan-y');
+  await expect(svg).toHaveCSS('touch-action', 'none');
 
   await page.getByTestId('page-illustration-tool-brush').click();
   const box = await svg.boundingBox();
@@ -246,7 +246,7 @@ test('illustration brush and eraser allow pan-y scroll; active stroke locks', as
     button: 0,
     bubbles: true,
   });
-  await expect(svg).toHaveCSS('touch-action', 'pan-y');
+  await expect(svg).toHaveCSS('touch-action', 'none');
 });
 
 test('illustration mode page can scroll under brush and eraser overlay', async ({
@@ -277,6 +277,87 @@ test('illustration mode page can scroll under brush and eraser overlay', async (
       el.scrollTop = 0;
     });
   }
+});
+
+test('vertical pen strokes stay ink while real finger drags scroll', async ({
+  page,
+}) => {
+  await clickIllustrationModeButton(page);
+  await page.locator('affine-page-root').evaluate(root => {
+    for (let i = 0; i < 50; i++) {
+      const p = document.createElement('p');
+      p.textContent = `gesture scroll spacer ${i}`;
+      p.style.minHeight = '64px';
+      root.append(p);
+    }
+  });
+  await page.getByTestId('page-illustration-tool-brush').click();
+  const viewport = page.locator('.affine-page-viewport').first();
+  const svg = page.getByTestId('page-illustration-overlay').locator('svg');
+  await expect(svg).toHaveCSS('touch-action', 'none');
+  const box = await viewport.boundingBox();
+  expect(box).toBeTruthy();
+  if (!box) return;
+  const x = box.x + box.width / 2;
+  const y = box.y + 300;
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchMouseEvent', {
+    type: 'mouseMoved',
+    x,
+    y,
+    pointerType: 'pen',
+  });
+  await cdp.send('Input.dispatchMouseEvent', {
+    type: 'mousePressed',
+    x,
+    y,
+    button: 'left',
+    buttons: 1,
+    clickCount: 1,
+    pointerType: 'pen',
+    force: 0.5,
+  });
+  for (let i = 1; i <= 8; i++) {
+    await cdp.send('Input.dispatchMouseEvent', {
+      type: 'mouseMoved',
+      x,
+      y: y - i * 15,
+      button: 'left',
+      buttons: 1,
+      pointerType: 'pen',
+      force: 0.5,
+    });
+  }
+  await cdp.send('Input.dispatchMouseEvent', {
+    type: 'mouseReleased',
+    x,
+    y: y - 120,
+    button: 'left',
+    buttons: 0,
+    clickCount: 1,
+    pointerType: 'pen',
+  });
+  await expect(svg.locator('path')).not.toHaveCount(0);
+  expect(await viewport.evaluate(el => el.scrollTop)).toBe(0);
+  const count = await svg.locator('path').count();
+  // Use Chromium's actual touch input path, not a synthetic pointer event.
+  await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true });
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x, y }],
+  });
+  for (let i = 1; i <= 8; i++) {
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ x, y: y - i * 15 }],
+    });
+  }
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchEnd',
+    touchPoints: [],
+  });
+  expect(await viewport.evaluate(el => el.scrollTop)).toBeGreaterThan(50);
+  await expect(svg.locator('path')).toHaveCount(count);
 });
 
 test('illustration eraser uses pen stroke; finger stays scroll-only by default', async ({
@@ -339,7 +420,7 @@ test('illustration eraser uses pen stroke; finger stays scroll-only by default',
   await expect(
     page.getByTestId('page-illustration-tool-eraser')
   ).toHaveAttribute('data-active', 'true');
-  await expect(svg).toHaveCSS('touch-action', 'pan-y');
+  await expect(svg).toHaveCSS('touch-action', 'none');
   await firePointer('pointerdown', 'touch', 2, startX + 10, startY, 1);
   for (let i = 1; i <= 10; i++) {
     await firePointer(

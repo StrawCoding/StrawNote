@@ -214,6 +214,8 @@ yarn typecheck
 
 ## Troubleshooting
 
+- **Vertical S Pen strokes scroll the illustration page** — ink tools must have `touch-action: none` before contact; changing it after `pointerdown` cannot revoke an already allowed pan gesture. Finger drags are routed to the page scroller by the illustration overlay; keep native panning for the text/scroll tool. See the [Pointer Events specification](https://www.w3.org/TR/pointerevents/).
+- **Android S Pen side button does not switch tools** — forward `dispatchGenericMotionEvent` button/hover events as well as stylus keycodes. `SPenPlugin` sends one Capacitor listener stream to `AndroidSPenAdapter`; do not also dispatch the same event through `evaluateJavascript`, which duplicates toggles. Native event regressions run in `StylusButtonInputTest`.
 - **Blank screen with `NotificationCountService not found`** — fixed in StrawNote `0.28.0.21`. `DocumentTitle` needs both server and workspace services; mount it inside the desktop/mobile workspace layout, never directly under the application's `FrameworkRoot`. Check a fresh browser profile, document reload, all-docs navigation, and the sign-in route when changing this wiring.
 - **`yarn install` fails or complains about the Node/Yarn version** — check that `node -v` matches [`.nvmrc`](../.nvmrc) (`fnm use` / `nvm use`) and that Corepack is enabled (`yarn -v` should print `4.x`, not `1.x`).
 - **Native module fails to build on macOS** — make sure `strip` is the system one, not the one from `binutils` ([details](https://github.com/toeverything/AFFiNE/discussions/2840)).

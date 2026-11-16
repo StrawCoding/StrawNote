@@ -21,6 +21,8 @@ class AffineEditorWebView(
 
     /** Reject finger/palm until this uptime ms (hover + contact + grace). */
     private var stylusActiveUntil = 0L
+    @Volatile
+    var palmRejectionEnabled = false
 
     private val imeBridge = AffineImeBridge(
         isTrustedPage = { this.isTrustedPage },
@@ -79,7 +81,7 @@ class AffineEditorWebView(
             markStylusActive()
         }
 
-        if (!isStylusActive(now)) {
+        if (!palmRejectionEnabled || !isStylusActive(now)) {
             return super.dispatchTouchEvent(event)
         }
 

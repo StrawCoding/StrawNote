@@ -14,6 +14,8 @@ import {
 describe('stylus-pen-bridge', () => {
   afterEach(() => {
     __resetStylusButtonBridgeForTests();
+    vi.unstubAllGlobals();
+    delete (window as Window & { Capacitor?: unknown }).Capacitor;
   });
 
   test('detects tip and barrel bits', () => {
@@ -95,6 +97,45 @@ describe('stylus-pen-bridge', () => {
       })
     );
 
+    expect(onEvent).not.toHaveBeenCalled();
+    window.removeEventListener(SPEN_BUTTON_EVENT, onEvent);
+    release();
+  });
+
+  test('Android bundle previews still use browser button events', () => {
+    vi.stubGlobal('BUILD_CONFIG', {
+      ...BUILD_CONFIG,
+      isNative: true,
+      isAndroid: true,
+    });
+    const release = retainStylusButtonBridge();
+    const onEvent = vi.fn();
+    window.addEventListener(SPEN_BUTTON_EVENT, onEvent);
+    window.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'StylusPrimaryButton' })
+    );
+    window.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'StylusPrimaryButton' })
+    );
+    expect(onEvent).toHaveBeenCalledTimes(2);
+    window.removeEventListener(SPEN_BUTTON_EVENT, onEvent);
+    release();
+  });
+
+  test('a native Capacitor host owns the button stream without a second web bridge', () => {
+    Object.defineProperty(window, 'Capacitor', {
+      configurable: true,
+      value: { isNativePlatform: () => true },
+    });
+    const release = retainStylusButtonBridge();
+    const onEvent = vi.fn();
+    window.addEventListener(SPEN_BUTTON_EVENT, onEvent);
+    window.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'StylusPrimaryButton' })
+    );
+    window.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'StylusPrimaryButton' })
+    );
     expect(onEvent).not.toHaveBeenCalled();
     window.removeEventListener(SPEN_BUTTON_EVENT, onEvent);
     release();

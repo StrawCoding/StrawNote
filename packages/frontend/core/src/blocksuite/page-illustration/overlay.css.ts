@@ -11,8 +11,8 @@ export const root = style({
 export const layer = style({
   position: 'absolute',
   pointerEvents: 'auto',
-  // touchAction set inline via illustrationLayerTouchAction:
-  // brush/eraser+fingerPanOnly → pan-y (web scroll); pen stroke → none.
+  // Ink tools suppress native panning before contact; finger drags are routed
+  // to the page scroller. The text/scroll tool passes native input through.
 });
 
 /** Finger may scroll but must not place caret in page blocks while inking. */
