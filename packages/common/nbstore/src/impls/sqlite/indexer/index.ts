@@ -24,7 +24,11 @@ import {
 import { createNode } from './node-builder';
 
 const SQLITE_INDEXER_VERSION_OFFSET = 1;
-const NATIVE_INDEXER_MAX_LIMIT = 0xffffffff;
+/**
+ * memory-indexer rejects `offset + limit > 10_000` ("search window exceeds").
+ * Mapping Infinity → u32::MAX used to ANR Android on every all-docs refresh.
+ */
+export const NATIVE_INDEXER_MAX_LIMIT = 10_000;
 
 export class SqliteIndexerStorage extends IndexerStorageBase {
   static readonly identifier = 'SqliteIndexerStorage';
@@ -240,9 +244,13 @@ function toNativeOptions(
   offset: number
 ): NativeIndexSearchOptions {
   const highlights = options?.highlights?.map(item => String(item.field)) ?? [];
+  const { limit: safeLimit, offset: safeOffset } = clampNativeSearchWindow(
+    limit,
+    offset
+  );
   return {
-    limit: toNativeLimit(limit),
-    offset,
+    limit: safeLimit,
+    offset: safeOffset,
     fields: [
       ...new Set([...(options?.fields?.map(String) ?? []), ...highlights]),
     ],
@@ -250,6 +258,25 @@ function toNativeOptions(
   };
 }
 
+/** Clamp JS search pagination into memory-indexer's hard window. */
+export function clampNativeSearchWindow(
+  limit: number,
+  offset = 0
+): { limit: number; offset: number } {
+  const safeOffset = Number.isFinite(offset)
+    ? Math.min(NATIVE_INDEXER_MAX_LIMIT, Math.max(0, Math.floor(offset)))
+    : 0;
+  const remaining = NATIVE_INDEXER_MAX_LIMIT - safeOffset;
+  const requested =
+    !Number.isFinite(limit) || limit === Infinity
+      ? remaining
+      : Math.floor(limit);
+  return {
+    offset: safeOffset,
+    limit: Math.min(remaining, Math.max(0, requested)),
+  };
+}
+
 function toNativeLimit(limit: number) {
-  return limit === Infinity ? NATIVE_INDEXER_MAX_LIMIT : limit;
+  return clampNativeSearchWindow(limit, 0).limit;
 }

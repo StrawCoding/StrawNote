@@ -5,3 +5,4 @@ import './iterator-helpers';
 import './promise-with-resolvers';
 import './request-idle-callback';
 import './resize-observer';
+import './url-can-parse';

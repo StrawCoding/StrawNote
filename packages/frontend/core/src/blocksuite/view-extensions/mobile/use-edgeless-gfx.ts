@@ -10,7 +10,10 @@ function readGfx(
 ): GfxController | null {
   if (!editorContainer?.host?.std) return null;
   try {
-    return editorContainer.host.std.get(GfxControllerIdentifier);
+    const gfx = editorContainer.host.std.get(GfxControllerIdentifier);
+    // A page host also has a GfxController, but only an edgeless host
+    // installs the tool extension. Wait for that host during mode changes.
+    return gfx.tool ? gfx : null;
   } catch {
     return null;
   }

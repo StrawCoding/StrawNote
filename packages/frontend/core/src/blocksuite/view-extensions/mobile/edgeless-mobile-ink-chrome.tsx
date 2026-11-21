@@ -105,6 +105,8 @@ export function EdgelessMobileInkChrome({ readonly }: { readonly?: boolean }) {
       onBrushColorChange={onBrushColorChange}
       brushLineWidth={brushLineWidth}
       onBrushLineWidthChange={onBrushLineWidthChange}
+      eraserSize={settings.eraser.size}
+      onEraserSizeChange={size => editorSetting.set('eraser', { size })}
       showPan
       ariaLabel="Edgeless tools"
       testIdPrefix="edgeless-ink"

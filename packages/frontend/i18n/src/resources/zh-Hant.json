@@ -2654,5 +2654,7 @@
   "com.affine.mobile.setting.pen.illustration-text-lock": "插畫模式鎖定文字",
   "com.affine.mobile.setting.pen.illustration-text-lock.desc": "避免誤觸文字。關閉後可用文字／捲動工具編輯文字，選取畫筆即可手寫。",
   "com.affine.mobile.setting.pen.text-scroll": "文字／捲動",
-  "com.affine.mobile.setting.pen.scroll": "捲動"
+  "com.affine.mobile.setting.pen.scroll": "捲動",
+  "com.affine.mobile.setting.pen.eraser-range": "橡皮擦範圍",
+  "com.affine.mobile.setting.pen.brush-width": "筆畫粗細"
 }

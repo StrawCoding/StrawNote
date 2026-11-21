@@ -24,6 +24,8 @@ export const STYLUS_QUICK_COLORS = [
 ] as const;
 
 export const STYLUS_LINE_WIDTHS = [2, 4, 6, 8, 10, 12] as const;
+/** Eraser diameter in screen CSS pixels, saved independently of brush width. */
+export const STYLUS_ERASER_SIZES = [8, 16, 32, 48, 64, 96] as const;
 
 const CUSTOM_COLORS_KEY = 'strawnote.stylus.customColors';
 /** Legacy illustration-only key — migrated on first read. */

@@ -2651,5 +2651,7 @@
   "com.affine.mobile.setting.pen.illustration-text-lock": "Lock text in illustration mode",
   "com.affine.mobile.setting.pen.illustration-text-lock.desc": "Prevent accidental text editing. When turned off, the text / scroll tool lets you edit text; select the pen to draw.",
   "com.affine.mobile.setting.pen.text-scroll": "Edit text / scroll",
-  "com.affine.mobile.setting.pen.scroll": "Scroll"
+  "com.affine.mobile.setting.pen.scroll": "Scroll",
+  "com.affine.mobile.setting.pen.eraser-range": "Eraser range",
+  "com.affine.mobile.setting.pen.brush-width": "Pen width"
 }

@@ -3,6 +3,7 @@ import {
   Overlay,
   type SurfaceBlockComponent,
 } from '@blocksuite/affine-block-surface';
+import { EditorSettingProvider } from '@blocksuite/affine-shared/services';
 import { isTopLevelBlock } from '@blocksuite/affine-shared/utils';
 import {
   Bound,
@@ -14,7 +15,10 @@ import {
 import type { PointerEventState } from '@blocksuite/std';
 import { BaseTool, type GfxModel } from '@blocksuite/std/gfx';
 
-import { collectDefaultErasableTargets } from './eraser-erasable.js';
+import {
+  collectDefaultErasableTargets,
+  eraserSweptHit,
+} from './eraser-erasable.js';
 
 class EraserOverlay extends Overlay {
   d = '';
@@ -35,6 +39,13 @@ export class EraserTool extends BaseTool {
   private _eraserPoints: IVec[] = [];
 
   private readonly _eraseTargets = new Set<GfxModel>();
+
+  private get _size() {
+    return (
+      this.std.getOptional(EditorSettingProvider)?.setting$.value.eraser
+        ?.size ?? 32
+    );
+  }
 
   private get _surfaceComponent() {
     return this.gfx.surfaceComponent as SurfaceBlockComponent | null;
@@ -60,7 +71,7 @@ export class EraserTool extends BaseTool {
       const zoom = this.gfx.viewport.zoom;
       const d = getSvgPathFromStroke(
         getStroke(this._eraserPoints, {
-          size: 16 / zoom,
+          size: this._size / zoom,
           start: { taper: true },
         })
       );
@@ -120,7 +131,13 @@ export class EraserTool extends BaseTool {
       if (isTopLevelBlock(erasable)) {
         const bound = Bound.deserialize(erasable.xywh);
         if (
-          linePolygonIntersects(this._prevPoint, currentPoint, bound.points)
+          linePolygonIntersects(this._prevPoint, currentPoint, bound.points) ||
+          eraserSweptHit(
+            erasable,
+            this._prevPoint,
+            currentPoint,
+            this._size / 2 / this.gfx.viewport.zoom
+          )
         ) {
           this._eraseTargets.add(erasable);
           const ele = this.std.view.getBlock(erasable.id);
@@ -128,9 +145,11 @@ export class EraserTool extends BaseTool {
         }
       } else {
         if (
-          erasable.getLineIntersections(
-            this._prevPoint as IVec,
-            currentPoint as IVec
+          eraserSweptHit(
+            erasable,
+            this._prevPoint,
+            currentPoint,
+            this._size / 2 / this.gfx.viewport.zoom
           )
         ) {
           this._eraseTargets.add(erasable);

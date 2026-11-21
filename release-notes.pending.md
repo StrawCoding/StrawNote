@@ -1,3 +1,12 @@
+# 0.28.0.27
+
+- 切換 Pen／Eraser 時，右側選項自動切換為筆畫粗細／橡皮擦範圍，兩者分別保存。
+- 插畫與手機無界模式共用橡皮擦尺寸；選取的範圍同時影響提示與實際擦除判定，S Pen 側鍵切換也會同步。
+- 修復 Android 啟動崩潰：`URL.canParse` 於舊版 System WebView 補 polyfill。
+- 修復本機索引 `indexSearch` 把 `limit: Infinity` 送成超大值導致「search window exceeds 10000」反覆重試、畫面卡住／ANR。
+
+---
+
 # 0.28.0.26
 
 - 完整包含 S Pen 垂直畫線誤判捲動、側鍵事件去重與短按／長按擦除修正。

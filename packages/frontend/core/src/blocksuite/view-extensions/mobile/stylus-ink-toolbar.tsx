@@ -1,3 +1,4 @@
+import { useI18n } from '@affine/i18n';
 import {
   ColorPickerIcon,
   EraserIcon,
@@ -13,6 +14,7 @@ import {
   mergeStylusPalette,
   parseStylusHexColor,
   saveStylusCustomColors,
+  STYLUS_ERASER_SIZES,
   STYLUS_LINE_WIDTHS,
 } from './stylus-ink-palette';
 import * as styles from './stylus-ink-toolbar.css';
@@ -26,6 +28,8 @@ export type StylusInkToolbarProps = {
   onBrushColorChange: (color: string) => void;
   brushLineWidth: number;
   onBrushLineWidthChange: (width: number) => void;
+  eraserSize: number;
+  onEraserSizeChange: (size: number) => void;
   /** data-testid prefix, default page-illustration */
   testIdPrefix?: string;
   ariaLabel?: string;
@@ -48,6 +52,8 @@ export function StylusInkToolbar({
   onBrushColorChange,
   brushLineWidth,
   onBrushLineWidthChange,
+  eraserSize,
+  onEraserSizeChange,
   testIdPrefix = 'page-illustration',
   ariaLabel = 'Ink tools',
   showPan = true,
@@ -56,6 +62,9 @@ export function StylusInkToolbar({
   onTextLockChange,
   textLockLabel,
 }: StylusInkToolbarProps) {
+  const t = useI18n();
+  const erasing = tool === 'eraser';
+  const sizes = erasing ? STYLUS_ERASER_SIZES : STYLUS_LINE_WIDTHS;
   const colorInputRef = useRef<HTMLInputElement>(null);
   const hexAddInputRef = useRef<HTMLInputElement>(null);
   const [customColors, setCustomColors] = useState<string[]>(() =>
@@ -266,23 +275,42 @@ export function StylusInkToolbar({
         </div>
       ) : null}
       <div className={styles.divider} />
-      {STYLUS_LINE_WIDTHS.map(w => (
-        <button
-          key={w}
-          type="button"
-          className={styles.widthChip}
-          data-active={brushLineWidth === w}
-          data-testid={tid(`width-${w}`)}
-          title={`Width ${w}`}
-          aria-label={`Width ${w}`}
-          onClick={() => onBrushLineWidthChange(w)}
-        >
-          <span
-            className={styles.widthMark}
-            style={{ height: Math.max(2, Math.min(12, w)) }}
-          />
-        </button>
-      ))}
+      <div
+        className={styles.sizeOptions}
+        role="group"
+        data-testid={tid('size-options')}
+        data-tool={erasing ? 'eraser' : 'brush'}
+        aria-label={t[
+          erasing
+            ? 'com.affine.mobile.setting.pen.eraser-range'
+            : 'com.affine.mobile.setting.pen.brush-width'
+        ]()}
+      >
+        {sizes.map(w => (
+          <button
+            key={w}
+            type="button"
+            className={styles.widthChip}
+            data-active={(erasing ? eraserSize : brushLineWidth) === w}
+            aria-pressed={(erasing ? eraserSize : brushLineWidth) === w}
+            data-testid={tid(erasing ? `eraser-size-${w}` : `width-${w}`)}
+            title={`${t[erasing ? 'com.affine.mobile.setting.pen.eraser-range' : 'com.affine.mobile.setting.pen.brush-width']()} ${w}px`}
+            aria-label={`${t[erasing ? 'com.affine.mobile.setting.pen.eraser-range' : 'com.affine.mobile.setting.pen.brush-width']()} ${w}px`}
+            onClick={() =>
+              erasing ? onEraserSizeChange(w) : onBrushLineWidthChange(w)
+            }
+          >
+            <span
+              className={erasing ? styles.eraserMark : styles.widthMark}
+              style={
+                erasing
+                  ? { width: 4 + w / 6, height: 4 + w / 6 }
+                  : { height: Math.max(2, Math.min(12, w)) }
+              }
+            />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

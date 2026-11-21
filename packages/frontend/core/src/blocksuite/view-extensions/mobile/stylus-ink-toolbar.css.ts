@@ -114,6 +114,17 @@ export const widthMark = style({
   background: 'currentColor',
 });
 
+export const sizeOptions = style({
+  display: 'inline-flex',
+  gap: 4,
+  alignItems: 'center',
+});
+export const eraserMark = style({
+  border: '1px solid currentColor',
+  borderRadius: '50%',
+  flexShrink: 0,
+});
+
 export const divider = style({
   width: 1,
   alignSelf: 'stretch',

@@ -336,6 +336,43 @@ test('illustration ink tools block native pan before contact and during strokes'
   await expect(svg).toHaveCSS('touch-action', 'none');
 });
 
+test('illustration toolbar swaps pen width and eraser range options', async ({
+  page,
+}) => {
+  await clickIllustrationModeButton(page);
+  await page.getByTestId('page-illustration-tool-brush').click();
+
+  const sizeOptions = page.getByTestId('page-illustration-size-options');
+  await expect(sizeOptions).toHaveAttribute('data-tool', 'brush');
+  await expect(page.getByTestId('page-illustration-width-4')).toBeVisible();
+  await page.getByTestId('page-illustration-width-8').click();
+  await expect(page.getByTestId('page-illustration-width-8')).toHaveAttribute(
+    'aria-pressed',
+    'true'
+  );
+
+  await page.getByTestId('page-illustration-tool-eraser').click();
+  await expect(sizeOptions).toHaveAttribute('data-tool', 'eraser');
+  await expect(
+    page.getByTestId('page-illustration-eraser-size-32')
+  ).toBeVisible();
+  await page.getByTestId('page-illustration-eraser-size-64').click();
+  await expect(
+    page.getByTestId('page-illustration-eraser-size-64')
+  ).toHaveAttribute('aria-pressed', 'true');
+
+  // Switching back keeps brush width independent of eraser range.
+  await page.getByTestId('page-illustration-tool-brush').click();
+  await expect(sizeOptions).toHaveAttribute('data-tool', 'brush');
+  await expect(page.getByTestId('page-illustration-width-8')).toHaveAttribute(
+    'aria-pressed',
+    'true'
+  );
+  await expect(
+    page.getByTestId('page-illustration-eraser-size-64')
+  ).toHaveCount(0);
+});
+
 test('illustration mode page can scroll under brush and eraser overlay', async ({
   page,
 }) => {

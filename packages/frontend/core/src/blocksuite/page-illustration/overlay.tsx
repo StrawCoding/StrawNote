@@ -82,19 +82,16 @@ function strokePath(
   return getSvgPathFromStroke(stroke);
 }
 
-function eraseAtPoint(doc: Store, x: number, y: number) {
-  const hit = listPageIllustrationBrushes(doc).find(brush =>
+function eraseAtPoint(doc: Store, x: number, y: number, diameter: number) {
+  const hits = listPageIllustrationBrushes(doc).filter(brush =>
     isNearPolyline(
       [x, y],
       brushAbsolutePoints(brush),
-      Math.max(28, brush.lineWidth * 4)
+      diameter / 2 + brush.lineWidth / 2
     )
   );
-  if (hit) {
-    deletePageIllustrationBrush(doc, hit.id);
-    return true;
-  }
-  return false;
+  hits.forEach(hit => deletePageIllustrationBrush(doc, hit.id));
+  return hits.length > 0;
 }
 
 export function PageIllustrationOverlay({ doc }: { doc: Store }) {
@@ -119,6 +116,9 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
   const [layerOffset, setLayerOffset] = useState({ left: 0, top: 0 });
   const [brushes, setBrushes] = useState<BrushElementModel[]>([]);
   const [live, setLive] = useState<LiveStroke | null>(null);
+  const [eraserCursor, setEraserCursor] = useState<[number, number] | null>(
+    null
+  );
   const liveRef = useRef<LiveStroke | null>(null);
   const drawingRef = useRef(false);
   const strokePointerRef = useRef<number | null>(null);
@@ -147,6 +147,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
   const brushLineWidth =
     settings.brush.lineWidth ?? PAGE_ILLUSTRATION_DEFAULT_LINE_WIDTH;
+  const eraserSize = settings.eraser.size;
   const brushStreamline = settings.brush.streamline ?? 0.5;
   const fingerPanOnly = settings.stylus?.fingerPanOnly ?? true;
   const buttonMode = (settings.stylus?.buttonMode ?? 'both') as SpenButtonMode;
@@ -447,7 +448,8 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       const [x, y] = clientToPageContentPoint(e.clientX, e.clientY, content);
 
       if (toolRef.current === 'eraser') {
-        if (eraseAtPoint(doc, x, y)) refreshBrushes();
+        setEraserCursor([x, y]);
+        if (eraseAtPoint(doc, x, y, eraserSize)) refreshBrushes();
         return;
       }
 
@@ -463,6 +465,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
     [
       brushColor,
       brushLineWidth,
+      eraserSize,
       brushStreamline,
       doc,
       fingerPanOnly,
@@ -475,6 +478,16 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
 
   const onPointerMove = useCallback(
     (e: ReactPointerEvent<SVGSVGElement>) => {
+      if (
+        toolRef.current === 'eraser' &&
+        (e.pointerType !== 'touch' || !fingerPanOnly)
+      ) {
+        const content = resolveContentEl();
+        if (content)
+          setEraserCursor(
+            clientToPageContentPoint(e.clientX, e.clientY, content)
+          );
+      }
       const fingerScroll = fingerScrollRef.current;
       if (fingerScroll?.pointerId === e.pointerId) {
         e.preventDefault();
@@ -501,7 +514,7 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
           liveRef.current = null;
           setLive(null);
         }
-        if (eraseAtPoint(doc, x, y)) refreshBrushes();
+        if (eraseAtPoint(doc, x, y, eraserSize)) refreshBrushes();
         return;
       }
       if (toolRef.current !== 'brush') return;
@@ -515,7 +528,14 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         return next;
       });
     },
-    [doc, refreshBrushes, resolveContentEl, syncStylusToolIntent]
+    [
+      doc,
+      eraserSize,
+      fingerPanOnly,
+      refreshBrushes,
+      resolveContentEl,
+      syncStylusToolIntent,
+    ]
   );
 
   const endStroke = useCallback(
@@ -617,6 +637,8 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
       onBrushColorChange={setBrushColor}
       brushLineWidth={brushLineWidth}
       onBrushLineWidthChange={setLineWidth}
+      eraserSize={eraserSize}
+      onEraserSizeChange={size => editorSetting.set('eraser', { size })}
       ariaLabel="Illustration tools"
       testIdPrefix="page-illustration"
       panLabel={
@@ -668,8 +690,21 @@ export function PageIllustrationOverlay({ doc }: { doc: Store }) {
         onPointerMove={onPointerMove}
         onPointerUp={endStroke}
         onPointerCancel={endStroke}
+        onPointerLeave={() => setEraserCursor(null)}
       >
         {rendered}
+        {tool === 'eraser' && eraserCursor ? (
+          <circle
+            data-testid="page-illustration-eraser-range"
+            cx={eraserCursor[0]}
+            cy={eraserCursor[1]}
+            r={eraserSize / 2}
+            fill="none"
+            stroke="var(--affine-text-secondary-color, #777)"
+            strokeWidth={1}
+            pointerEvents="none"
+          />
+        ) : null}
         {livePath ? (
           <path
             d={livePath}
